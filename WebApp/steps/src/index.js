@@ -22,7 +22,7 @@ root.render(
         <Route path="/" element={<Home />}/>
         <Route path="/createNewProject" element={<CreateNewProject />}/>
         <Route path="/project/:projectName" element={<ProjectPage />}/>
-        <Route path="/project/:projectName/:proposedChange" element={<ProjectPage />}/>
+        <Route path="/project/:projectName/:changeProposal" element={<ProjectPage />}/>
         <Route path="/project/:projectName/development" element={<ProjectDevelopment />}/>
       </Routes>
     </BrowserRouter>

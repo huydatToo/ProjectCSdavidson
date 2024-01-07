@@ -140,7 +140,7 @@ const ProjectDevelopment = () => {
             <div className='line projectListFiles'> 
             {ChangeProposals.map((item, index) => (
                 <div className='FileLine'>
-                <span className='FileText'>{item}</span>
+                <span onClick={() => {navigate(`/project/${projectName}/${item}`)}} className='FileText'>{item}</span>
                 <span className='FileText'>|</span>
                 <span className='FileText'>Change Proposal</span>
             </div>))}

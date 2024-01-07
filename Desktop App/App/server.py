@@ -253,7 +253,6 @@ def get_single_file():
     data = request.get_json()
     changes_cids = data["changes"]
     file_name = data["file_name"]
-    
     version = get_single_file_internal(changes_cids, file_name)
     return jsonify({'file': version}), 200
 

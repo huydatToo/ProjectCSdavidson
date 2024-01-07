@@ -88,6 +88,7 @@ def get_project_files_cid(old_list, patch_cid):
                 old_list.pop(old_list.index(new_file_path))
     
     client.close()
+    return old_list
 
 def get_file_content(file_name, change_cid, client):
     files_list = client.ls(change_cid)
@@ -167,14 +168,16 @@ def get_single_file_internal(changes_cids, file_name):
     hash_idx = 0
     
     if len(changes_cids) > 1:
-        for cid in range(len(changes_cids[1:]) - 1, 0, -1):
+        for cid in range(0, len(changes_cids)):
             if is_create_in_change(file_name, changes_cids[cid]):
                 hash_idx = cid
 
     version = get_file_content(file_name, changes_cids[hash_idx], client)
     if len(changes_cids) > 1 and type(version) != list:
         for cid in range(hash_idx + 1, len(changes_cids)):
-            version = apply_patch(version, client.cat(changes_cids[cid]).decode('utf-8'))
+            patch = get_file_content(file_name, changes_cids[cid], client)
+            if patch != version:
+                version = apply_patch(version, patch)
     client.close() 
     return version
 
@@ -192,9 +195,9 @@ def is_create_in_change(file_name, change_cid):
 
     created = False
     for changed_dir in data["Changes"]:
-        for change in list(changed_dir.items())[0][1]:         
+        for change in list(changed_dir.items())[0][1]:
             if change["Sign"] == "+":
-                new_file_path = "\\".join(os.path.join(list(changed_dir.items())[0][0].split("-")[1], change["name"]).split("\\")[1:])
+                new_file_path = os.path.join(list(changed_dir.items())[0][0].split("-")[1], change["name"])
                 if new_file_path == file_name:
                     created = True
     client.close()
