@@ -485,4 +485,17 @@
   cursor: pointer;
 }
 
+.ListOfPatchesNo {
+  display: flex;
+  margin-top: auto;
+  margin-bottom: auto;
+  justify-content: center;  
+  text-align: center;
+}
+
+.ListOfPatchesNoText {
+  color: #ffffff9c;
+  pointer-events: none;
+  user-select: none;
+}
 /* projectPage */

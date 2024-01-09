@@ -68,6 +68,13 @@ def get_project_files_cid(old_list, patch_cid):
     json_data = client.cat(patch_json_cid)
     data = json.loads(json_data.decode('utf-8'))
 
+    for changed_dir in data["Directories_Changes"]:
+        if (changed_dir["sign"] == "+"):
+            old_list.append(changed_dir["path"])
+        elif (changed_dir["sign"] == "-"):
+            old_list.pop(old_list.index(changed_dir["path"]))
+
+
     for changed_dir in data["Changes"]:
         for change in list(changed_dir.items())[0][1]:
             if change["Sign"] == "+":
@@ -176,7 +183,7 @@ def get_single_file_internal(changes_cids, file_name):
     if len(changes_cids) > 1 and type(version) != list:
         for cid in range(hash_idx + 1, len(changes_cids)):
             patch = get_file_content(file_name, changes_cids[cid], client)
-            if patch != version:
+            if patch != version and patch != False:
                 version = apply_patch(version, patch)
     client.close() 
     return version

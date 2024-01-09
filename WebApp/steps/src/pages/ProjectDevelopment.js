@@ -137,13 +137,13 @@ const ProjectDevelopment = () => {
                 </motion.div>
             </div>
 
-            <div className='line projectListFiles'> 
-            {ChangeProposals.map((item, index) => (
+            <div className={ChangeProposals.length > 0 ? "line projectListFiles" : "line projectListFiles ListOfPatchesNo"}> 
+            {ChangeProposals.length > 0 ? ChangeProposals.map((item, index) => (
                 <div className='FileLine'>
                 <span onClick={() => {navigate(`/project/${projectName}/${item}`)}} className='FileText'>{item}</span>
                 <span className='FileText'>|</span>
                 <span className='FileText'>Change Proposal</span>
-            </div>))}
+            </div>)) : <h1 className='ListOfPatchesNoText'>[ Change Proposals ]</h1>}
             </div>
 
         </div>

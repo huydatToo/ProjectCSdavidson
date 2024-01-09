@@ -35,9 +35,9 @@ const ProjectPage = () => {
       }
     };
 
-    function comparePaths(path1, path2) {
+    function comparePaths(path1) {
       const dir1 = path1.substring(0, path1.lastIndexOf('\\') + 1);
-      const dir2 = path2.substring(0, path2.lastIndexOf('\\') + 1);
+      const dir2 = project.path.substring(0, project.path.lastIndexOf('\\') + 1);
     
       return dir1 === dir2;
     }
@@ -57,8 +57,9 @@ const ProjectPage = () => {
     }
 
     const getFilesHtml = () => {
-      return project.files.map((fileName, index) => (
-        comparePaths(project.path, fileName) ? (
+      let folder_files = project.files.filter(comparePaths)
+      if (folder_files.length > 0) {
+      return folder_files.map((fileName, index) => (
         fileName.includes(".") ? (
             <div onClick={() => {getFileContent(fileName)}} className='FileLine' key={index}>
                 <span className='FileText'>{getFileNameFromPath(fileName)}</span>
@@ -69,8 +70,11 @@ const ProjectPage = () => {
                 <span className='FileText'>{getFileNameFromPath(fileName)}</span>
                 <span className='FileText'>Date</span>
             </div>
-        )) : null
+        )
     ))}
+    else {
+      return <div className='ListOfPatchesNo'><h1 className='ListOfPatchesNoText'>[ Empty ]</h1></div>
+    }}
     const getProjectDetails = async () => {
       let changes = await contract.getProjectChanges(projectName);
       let currentProjectState = {state: -1, projectName: projectName, changes: changes, files: [], path: ''}
@@ -234,7 +238,7 @@ const ProjectPage = () => {
           </motion.div>
         </div>
 
-        <div className='line projectListFiles'> 
+        <div className={project.files.length > 0 ? "line projectListFiles" : 'line projectListFiles ListOfPatchesNo'}> 
         {fileContent === false ? <>
         {project.path.length > 1 ? 
         <div onClick={() => {setProject({...project, path: goBackOneLevel(project.path)})}} className='FileLine'>
