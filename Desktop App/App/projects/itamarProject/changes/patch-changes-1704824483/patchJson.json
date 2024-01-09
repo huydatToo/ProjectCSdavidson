@@ -1,0 +1,31 @@
+{
+  "Directories_Changes": [
+    {
+      "sign": "?",
+      "old_path": "foldertwo",
+      "new_path": "foldertwo"
+    }
+  ],
+  "Changes": [
+    {
+      "foldertwo-foldertwo": [
+        {
+          "Sign": "?",
+          "New_name": "photo.jpg",
+          "Old_name": "photo.jpg",
+          "Hash": "d89b3b29157f379b793bbf20866fa26cf2f931949e2b8a56a1667091951a9719"
+        }
+      ]
+    },
+    {
+      "-": [
+        {
+          "Sign": "?",
+          "New_name": "text.txt",
+          "Old_name": "text.txt",
+          "Hash": "56cc2b7ffa870f863696d104d86e9223e75ba59a93574b6e4f83b5b83f4df399"
+        }
+      ]
+    }
+  ]
+}

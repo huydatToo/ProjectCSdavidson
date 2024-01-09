@@ -3,6 +3,9 @@ import downArrow from '../assets/down-arrow-svgrepo-com.svg';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWallet } from '../utils/WalletContext';
+import { Link } from 'react-scroll';
+import { Scrollbars } from 'react-custom-scrollbars-2';
+
 
 
 function Home() {
@@ -51,16 +54,17 @@ function Home() {
   }, [checkWalletConnection, isConnected]);
 
   return (
-    <div className="background center">
+    <div className="background">
+      <div name="pageOne" className='pageTwo center'>
       <div className='moveUp'>
-        <div className='line'>
+        <div className='line lineGapHome'>
           <div className='box-search '>
             <h1 className='Title'>Search</h1>
             <input className='search' type="text"/>
           </div>
         </div>
 
-        <div className='line'>
+        <div className='line lineGapHome'>
           <div className='box-projects'>
             <h1 className='Title'>Popular Projects</h1>
             <motion.div whileHover={{scale: 1.05}} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", duration: 0.7 }} className='project-box'>
@@ -84,9 +88,11 @@ function Home() {
             </AnimatePresence>
             </div>
 
+            <Link to="pageTwo" smooth={true} duration={500}>
             <motion.div whileHover={{scale: 1.03}} animate={{ scale: 1 }} transition={{ type: "spring", duration: 0.7 }} className='box-arrow-down'>
               <img className='arrowDown' src={downArrow} alt="" />
             </motion.div>
+            </Link>
           </div>
 
           <div className='box-projects'>
@@ -101,6 +107,11 @@ function Home() {
 
           </div>
         </div>
+      </div>
+      </div>
+
+      <div name="pageTwo" className='pageTwo background2'>
+        <h1>itamar</h1>
       </div>
     </div>
   );

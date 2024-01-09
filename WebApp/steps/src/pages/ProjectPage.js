@@ -185,7 +185,7 @@ const ProjectPage = () => {
   }, []);
 
     return (
-    <div className='background middle center gapLines'>
+    <div className='background middle center gapLines lineGap pageOne'>
         <ModalDetails isOpen={isModalOpen} closeModal={closeModal} closeInput={ClosePathInput}>
         <div className='modalFlex'>
           <div className=''>
@@ -214,7 +214,7 @@ const ProjectPage = () => {
           </div>
         </div>
         </ModalDetails>
-
+        
         <div className='line projectHeaderLine'>
         <motion.div whileTap={{scale: 0.9}} whileHover={{scale: 1.03}} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} onClick={() => {navigate('/')}} className='projectHeader HomeButtonDiv'>
             <img className="HomeButton" src={HomeSvg} alt="" />
@@ -238,7 +238,7 @@ const ProjectPage = () => {
           </motion.div>
         </div>
 
-        <div className={project.files.length > 0 ? "line projectListFiles" : 'line projectListFiles ListOfPatchesNo'}> 
+        <div className={project.files.length > 0 ? "line projectListFiles" : 'projectListFiles ListOfPatchesNo line'}> 
         {fileContent === false ? <>
         {project.path.length > 1 ? 
         <div onClick={() => {setProject({...project, path: goBackOneLevel(project.path)})}} className='FileLine'>

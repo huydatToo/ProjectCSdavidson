@@ -15,6 +15,7 @@ const ProjectDevelopment = () => {
     const [ChangeProposals, setChangeProposals] = useState([]);
     const [myChanges, setMyChanges] = useState([]);
     const [isModalOpen, setModalOpen] = useState(false);
+    const [clickedChangeProposal, setClickedChangeProposal] = useState(false);
     
 
     const getChangeProposals = async () => {
@@ -47,6 +48,11 @@ const ProjectDevelopment = () => {
         }
     }
 
+    const voteForChange = async() => {
+      await contract.accept(clickedChangeProposal, projectName)
+      navigate(`/project/${projectName}`)
+    }
+
     const uploadChanges = async () => {
       try {
         const response = await fetch('http://127.0.0.1:8000/api/upload_changes', {
@@ -58,6 +64,7 @@ const ProjectDevelopment = () => {
         });
         const data = await response.json(); 
         await contract.changeProposal(data["ipfsCID"], projectName)
+        closeModal()
         
       } catch (error) {
           console.error('Error:', error);
@@ -88,7 +95,7 @@ const ProjectDevelopment = () => {
     }, [contract]);
 
     return (
-        <div className='background middle center gapLines'>
+        <div className='background middle center lineGap pageOne'>
         <ModalChanges isOpen={isModalOpen} closeModal={closeModal}>
         <div className='modalFlex'>
           <div className=''>
@@ -139,11 +146,17 @@ const ProjectDevelopment = () => {
 
             <div className={ChangeProposals.length > 0 ? "line projectListFiles" : "line projectListFiles ListOfPatchesNo"}> 
             {ChangeProposals.length > 0 ? ChangeProposals.map((item, index) => (
-                <div className='FileLine'>
-                <span onClick={() => {navigate(`/project/${projectName}/${item}`)}} className='FileText'>{item}</span>
+                (item != clickedChangeProposal ?
+                <div onClick={() => {setClickedChangeProposal(item)}} className='FileLine'>
+                <span className='FileText'>{item}</span>
                 <span className='FileText'>|</span>
                 <span className='FileText'>Change Proposal</span>
-            </div>)) : <h1 className='ListOfPatchesNoText'>[ Change Proposals ]</h1>}
+                </div> : 
+                <div onClick={() => {setClickedChangeProposal(false)}} className='clickChangeProposal'>
+                  <span onClick={(e) => {e.stopPropagation(); voteForChange()}} className='FileText buttonFileLine'>Vote</span>
+                  <span onClick={(e) => {e.stopPropagation(); navigate(`/project/${projectName}/${item}`)}} className='FileText buttonFileLine'>Watch the change proposal</span>
+                </div>
+              ))) : <h1 className='ListOfPatchesNoText'>[ Change Proposals ]</h1>}
             </div>
 
         </div>
