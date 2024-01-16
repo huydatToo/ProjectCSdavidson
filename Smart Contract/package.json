@@ -13,6 +13,8 @@
   "license": "ISC",
   "dependencies": {
     "@openzeppelin/contracts": "^4.9.3",
-    "truffle": "^5.11.5"
+    "@openzeppelin/test-helpers": "^0.5.16",
+    "truffle": "^5.5.19",
+    "uuid": "^9.0.1"
   }
 }

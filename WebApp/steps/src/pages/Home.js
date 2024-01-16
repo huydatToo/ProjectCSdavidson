@@ -111,7 +111,7 @@ function Home() {
       </div>
 
       <div name="pageTwo" className='pageTwo background2'>
-        <h1>itamar</h1>
+        <h1>How it works</h1>
       </div>
     </div>
   );

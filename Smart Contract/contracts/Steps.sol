@@ -10,7 +10,7 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
     using Counters for Counters.Counter;
 
     // -------------------------------------------------------- Mappings
-    mapping(string => uint) public NameToID;
+    mapping(string => uint) public NameToID;    
 
     // -------------------------------------------------------- Structs
     struct Change {
@@ -19,10 +19,21 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
         uint votes;
     }
 
+    struct goBack {
+        uint votes;
+        string changeCID;
+        address goBackMaker;
+    }
+
     struct Project {
         string name;
         Change[] changes;
         Change[] changeProposals;
+        goBack[] goBackProposals;
+
+        // - ChangeCID => Voter address => Voted?
+        mapping(string => mapping(address => bool)) Voted;
+
     }
 
 
@@ -32,25 +43,21 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
     // -------------------------------------------------------- Events
     event NewProjectCreated(string message, string name, uint value);
     event NewChangeProposalCreated(string message, string Name, string CID, uint indexValue);
-    event NewVoteForChangeProposal(string message, uint projectCID, string proposedChangeCID, address voter, uint votes);
-    event NewChangeIsMadeToProject(string message, uint projectCID, string changeCID); // Message, Project CID, Message, ChangeCID
-    event ProjectGoBack(string message, uint step, string changeCID);
+    event NewVoteForChangeProposal(string message, string projectName, string changeProposalCID, address voter, uint votes);
+    event NewChangeIsMadeToProject(string message, string projectName, string changeCID); // Message, Project CID, Message, ChangeCID
+    event ProjectWentBack(string message, string changeCID, string ProjectName);
 
     // -------------------------------------------------------- Modifiers
     modifier ProjectExist(string memory _Name) {
         uint id = NameToID[_Name];
-        if (id == 0) {
-            require(keccak256(abi.encodePacked(publicProjects[id].name)) == keccak256(abi.encodePacked(_Name)), "Project do not exist");
-        } else {
-            require(id < publicProjects.length, "Project do not exist");
-        }
+        require(id < publicProjects.length, "Project do not exist");
         _;
     }
 
     // -------------------------------------------------------- Constructor
     constructor() ERC1155("URI") {
-
-    } // change URI to the website
+        publicProjects.push();
+    } // change URI to the website's one
 
     // -------------------------------------------------------- Functions
     function _beforeTokenTransfer(address operator, address from, address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data) internal override(ERC1155, ERC1155Supply) {
@@ -72,21 +79,11 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
     }
 
 
-    function changeProposal(string memory _changeCID, string memory _ProjectName) ProjectExist(_ProjectName) public {
-        uint projectIDX = NameToID[_ProjectName];
-        publicProjects[projectIDX].changeProposals.push(Change(_changeCID, msg.sender, balanceOf(msg.sender, NameToID[_ProjectName])));
-        emit NewChangeProposalCreated("New change proposal to the Project with the name and following ID and CID:", _ProjectName, _changeCID, projectIDX);
-    }
-
-
-    function goBack(string memory _ProjectName, uint _step) ProjectExist(_ProjectName) public {
-        uint projectIDX = NameToID[_ProjectName];
-        for (uint index = publicProjects[projectIDX].changes.length; index > _step; index--) {
-            publicProjects[projectIDX].changeProposals.push(publicProjects[projectIDX].changes[index - 1]);
-            publicProjects[projectIDX].changes.pop();
-        }
-
-        emit ProjectGoBack("Project changed to step: ", _step, publicProjects[projectIDX].changes[publicProjects[projectIDX].changes.length - 1].changeCID);
+    function MakeChangeProposal(string memory _changeCID, string memory _projectName) ProjectExist(_projectName) public {
+        uint projectIDX = NameToID[_projectName];
+        publicProjects[projectIDX].changeProposals.push(Change(_changeCID, msg.sender, balanceOf(msg.sender, NameToID[_projectName])));
+        publicProjects[projectIDX].Voted[_changeCID][msg.sender] = true;
+        emit NewChangeProposalCreated("New change proposal to the Project with the name and following ID and CID:", _projectName, _changeCID, projectIDX);
     }
 
     function getChangeProposalIndex(string memory _ChangeCID, string memory _projectName) internal view returns (uint)  {
@@ -107,7 +104,23 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
         return _proposedChangeIdx;
     }
 
-    function accept(string memory _proposedChangeCID, string memory _projectName) ProjectExist(_projectName) public {
+    function MakeGoBackProposal(string memory _changeCID, string memory _projectName) public {
+        uint projectID = NameToID[_projectName];
+        publicProjects[projectID].goBackProposals.push(goBack(0, _changeCID, msg.sender));
+    }
+
+    function acceptGoBack(string memory _projectName, string memory _changeCID) ProjectExist(_projectName) public {
+        uint projectIDX = NameToID[_projectName];
+        uint _proposedChangeIdx = getChangeProposalIndex(_changeCID, _projectName);
+        for (uint index = publicProjects[projectIDX].changes.length; index > _proposedChangeIdx; index--) {
+            publicProjects[projectIDX].changeProposals.push(publicProjects[projectIDX].changes[index - 1]);
+            publicProjects[projectIDX].changes.pop();
+        }
+
+        emit ProjectWentBack("Project changed to change: ", _changeCID, _projectName);
+    }
+
+    function acceptChangeProposal(string memory _proposedChangeCID, string memory _projectName) ProjectExist(_projectName) public {
         uint _proposedChangeIdx = getChangeProposalIndex(_proposedChangeCID, _projectName);
         uint projectID = NameToID[_projectName];
 
@@ -116,28 +129,31 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
         publicProjects[projectID].changeProposals[publicProjects[projectID].changeProposals.length - 1] = proposedChange;
         publicProjects[projectID].changeProposals[_proposedChangeIdx] = LastProposedChange;
         publicProjects[projectID].changeProposals.pop();
-        
+
         publicProjects[projectID].changes.push(Change(proposedChange.changeCID, proposedChange.changeMaker, proposedChange.votes));
 
-        emit NewChangeIsMadeToProject("A new change has been made to project with ID: ", projectID, _proposedChangeCID);
+        emit NewChangeIsMadeToProject("A new change has been made to the project: ", _projectName, _proposedChangeCID);
     }
 
     function getBalance(address _address, string memory _projectName) ProjectExist(_projectName) external view returns (uint) {
         return balanceOf(_address, NameToID[_projectName]);
     }
 
-    function voteToProposedChange(string memory _projectName, string memory _proposedChangeCID) ProjectExist(_projectName) public {
+    function voteForChangeProposal(string memory _changeProposalCID, string memory _projectName) ProjectExist(_projectName) public {
         uint projectID = NameToID[_projectName];
+        require(publicProjects[projectID].Voted[_changeProposalCID][msg.sender] == false, "Already voted");
         uint votingPower = balanceOf(msg.sender, projectID);
-        require(votingPower > 0, "You don't have enough unused tokens");
-        uint _proposedChangeIdx = getChangeProposalIndex(_proposedChangeCID, _projectName);
+        require(votingPower > 0, "Voting power is insufficient");
+        uint _proposedChangeIdx = getChangeProposalIndex(_changeProposalCID, _projectName);
 
         publicProjects[projectID].changeProposals[_proposedChangeIdx].votes += votingPower;
+        publicProjects[projectID].Voted[_changeProposalCID][msg.sender] = true;
         
+        // New vote for change proposal: project name, changeCID, sender, votes
         emit NewVoteForChangeProposal(
-            "New vote for proposal change:",
-            projectID,
-            _proposedChangeCID,
+            "New vote for change proposal:",
+            _projectName,
+            _changeProposalCID,
             msg.sender,
             publicProjects[projectID].changeProposals[_proposedChangeIdx].votes
         );
@@ -155,13 +171,13 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
         return allChanges;
     }
 
-    function getProjectChangeProposals(string memory _projectName) ProjectExist(_projectName) external view returns (string[] memory) {
-        uint projectIDX = NameToID[_projectName];
-        uint arr_length = publicProjects[projectIDX].changeProposals.length;
+    function getChangeProposals(string memory _projectName) ProjectExist(_projectName) external view returns (string[] memory) {
+        uint projectID = NameToID[_projectName];
+        uint arr_length = publicProjects[projectID].changeProposals.length;
         string[] memory allChanges = new string[](arr_length);
 
         for (uint256 i = 0; i < arr_length; i++) {
-            allChanges[i] = publicProjects[projectIDX].changeProposals[i].changeCID;
+            allChanges[i] = publicProjects[projectID].changeProposals[i].changeCID;
         }
 
         return allChanges;

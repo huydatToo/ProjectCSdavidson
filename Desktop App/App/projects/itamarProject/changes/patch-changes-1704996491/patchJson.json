@@ -1,0 +1,25 @@
+{
+  "Directories_Changes": [
+    {
+      "sign": "*",
+      "old_path": "foldertwo",
+      "new_path": "FolderNew"
+    },
+    {
+      "sign": "+",
+      "path": "FolderNew"
+    }
+  ],
+  "Changes": [
+    {
+      "-": [
+        {
+          "Sign": "?",
+          "New_name": "text.txt",
+          "Old_name": "text.txt",
+          "Hash": "b2cda368983801a72a55c60ea4c7e3bdcff77de321279b083395a689bc5ce5b7"
+        }
+      ]
+    }
+  ]
+}

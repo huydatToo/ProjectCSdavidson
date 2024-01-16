@@ -31,6 +31,7 @@ def compare_files_from_ipfs(client, cid_changes, file_name, local_file_path):
 
 def compare_directories_cid(client, changes_cids, file_names, local_dir_path):
     if (len(file_names) != len(os.listdir(local_dir_path))):
+        print(len(file_names), len(os.listdir(local_dir_path)))
         return False
     
     for file_name in file_names:
@@ -40,6 +41,7 @@ def compare_directories_cid(client, changes_cids, file_names, local_dir_path):
                 return False
         else: 
             return False
+    
     return True
 
 def get_project_files(old_list, patch):

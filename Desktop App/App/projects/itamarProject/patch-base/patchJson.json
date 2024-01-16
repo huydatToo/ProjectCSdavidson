@@ -12,11 +12,6 @@
           "Sign": "+",
           "name": "itamar.txt",
           "Hash": "040805b2df49cf649105e7cf922366d825d6c8da823bb616c1c038ef7fe41d9d"
-        },
-        {
-          "Sign": "+",
-          "name": "photo.jpg",
-          "Hash": "d89b3b29157f379b793bbf20866fa26cf2f931949e2b8a56a1667091951a9719"
         }
       ]
     },
@@ -25,7 +20,7 @@
         {
           "Sign": "+",
           "name": "text.txt",
-          "Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          "Hash": "48b21e984cddbeb60c039f3985c4fc189e1e5945399adf7e568c38416448943e"
         }
       ]
     }

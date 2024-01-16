@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 
 const CreateNewProject = () => {
     const { contract } = useWallet();
-    const [step, setStep] = useState(0);
+    const [step, setStep] = useState(1);
     const [name, setName] = useState("");
     const [path, setPath] = useState("")
     const navigate = useNavigate()
@@ -53,12 +53,7 @@ const CreateNewProject = () => {
     }
     
     const getStep = () => {
-        if (step === 0) {
-        return (
-            <motion.div whileHover={{scale: 1.05}} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", duration: 0.7 }} onClick={() => nextStep()} className='box-new-project'>
-                <h1>Create New Project</h1>
-            </motion.div>
-        )} else if (step === 1) {
+        if (step === 1) {
         return (
             <div className='center-new-project'>
             <motion.div whileHover={{scale: 1.05}} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", duration: 0.7 }} style={{cursor: "default"}} className='box-new-project'>
@@ -67,7 +62,7 @@ const CreateNewProject = () => {
             </motion.div>
             <AnimatePresence initial={false} mode='wait'>
             {name.length > 3 ? (
-            <motion.div key={"divSVG"} exit={{y: -170}} whileHover={{scale: 1.05}} initial={{y: -170 }} animate={{y: 0}} transition={{ type: "spring", duration: 0.7 }} onClick={() => nextStep()} className='button-new-project'>
+            <motion.div key={"divSVG"} exit={{y: 10}} whileHover={{scale: 1.05}} initial={{y: 0 }} animate={{y: 210}} transition={{ type: "spring", duration: 0.7 }} onClick={() => nextStep()} className='button-new-project'>
                 <motion.img  transition={{ type: "spring", duration: 1.5 }} initial={{opacity: -1 }} animate={{opacity: 1}} key={"svgSVG"} className='arrowDown' src={CompleteSvg} alt="" />
             </motion.div>
             ) : <></>}
@@ -88,7 +83,7 @@ const CreateNewProject = () => {
 
             <AnimatePresence initial={false} mode='wait'>
             {path.length > 3 ? (
-                <motion.div key={"divSVG"} exit={{y: -170}} whileHover={{scale: 1.05}} initial={{y: -170 }} animate={{y: 0}} transition={{ type: "spring", duration: 0.7 }} onClick={() => nextStep()} className='button-new-project'>
+                <motion.div key={"divSVG"} exit={{y: 10}} whileHover={{scale: 1.05}} initial={{y: 0 }} animate={{y: 210}} transition={{ type: "spring", duration: 0.7 }} onClick={() => nextStep()} className='button-new-project'>
                     <motion.img transition={{ type: "spring", duration: 1.5 }} initial={{opacity: -1 }} animate={{opacity: 1}} key={"svgSVG"} className='arrowDown' src={CompleteSvg} alt="" />
                 </motion.div>
             ) : <></>}
