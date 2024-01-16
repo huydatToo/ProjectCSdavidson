@@ -6,10 +6,7 @@ from .textFilePatch import apply_patch
 import hashlib
 from .others import get_local_file_hash
 import base64
-
-def is_photo(file_name):
-    return file_name.lower().endswith(('.jpg', '.jpeg', '.png', '.bmp'))
-
+from .others import is_text_file
 
 def get_ipfs_file_hash(client, changes_cids, file_name):
     file_content = get_single_file_internal(changes_cids, file_name)
@@ -17,7 +14,7 @@ def get_ipfs_file_hash(client, changes_cids, file_name):
     if type(file_content) == list:
         file_content = client.cat(file_content[0])
 
-    if is_photo(file_name):
+    if not is_text_file(file_name):
         file_content = base64.b64encode(file_content).decode('utf-8')
 
     hasher = hashlib.sha256()

@@ -8,7 +8,7 @@ contract("Steps", accounts => {
 
   it("should create a new project without errors", async () => {
     const StepsInstance = await Steps.deployed();
-    await StepsInstance.createProject("CID", ProjectName, { from: accounts[0] });
+    await StepsInstance.createProject("BaseChange", ProjectName, { from: accounts[0] });
   });
 
   it("should make a change proposal without errors", async () => {
@@ -37,7 +37,8 @@ contract("Steps", accounts => {
 
   it("should get project changes with no errors", async () => {
     const StepsInstance = await Steps.deployed();
-    await StepsInstance.getProjectChanges(ProjectName, { from: accounts[0] });
+    const result = await StepsInstance.getProjectChanges(ProjectName, { from: accounts[0] });
+    assert.lengthOf(result, 2, "Project changes length should be two (base change) and the one we just accepted");
   });
 
 });

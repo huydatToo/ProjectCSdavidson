@@ -63,7 +63,7 @@ const ProjectDevelopment = () => {
           body: JSON.stringify({ "name": projectName }),
         });
         const data = await response.json(); 
-        await contract.changeProposal(data["ipfsCID"], projectName)
+        await contract.MakeChangeProposal(data["ipfsCID"], projectName)
         closeModal()
         
       } catch (error) {

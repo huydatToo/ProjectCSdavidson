@@ -1,4 +1,4 @@
-export const CONTRACT_ADDRESS = "0xAC07d8df5A839Be90E51416a6f2F215F333CFad4"
+export const CONTRACT_ADDRESS = "0x7fcd11938360213Dc0d9528f5c441bD1C75f2954"
 export const CONTRACT_ABI = [
   {
     "inputs": [],
@@ -41,9 +41,9 @@ export const CONTRACT_ABI = [
       },
       {
         "indexed": false,
-        "internalType": "uint256",
-        "name": "projectCID",
-        "type": "uint256"
+        "internalType": "string",
+        "name": "projectName",
+        "type": "string"
       },
       {
         "indexed": false,
@@ -122,14 +122,14 @@ export const CONTRACT_ABI = [
       },
       {
         "indexed": false,
-        "internalType": "uint256",
-        "name": "projectCID",
-        "type": "uint256"
+        "internalType": "string",
+        "name": "projectName",
+        "type": "string"
       },
       {
         "indexed": false,
         "internalType": "string",
-        "name": "proposedChangeCID",
+        "name": "changeProposalCID",
         "type": "string"
       },
       {
@@ -178,18 +178,18 @@ export const CONTRACT_ABI = [
       },
       {
         "indexed": false,
-        "internalType": "uint256",
-        "name": "step",
-        "type": "uint256"
+        "internalType": "string",
+        "name": "changeCID",
+        "type": "string"
       },
       {
         "indexed": false,
         "internalType": "string",
-        "name": "changeCID",
+        "name": "ProjectName",
         "type": "string"
       }
     ],
-    "name": "ProjectGoBack",
+    "name": "ProjectWentBack",
     "type": "event"
   },
   {
@@ -302,7 +302,8 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [
@@ -326,7 +327,8 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [
@@ -350,7 +352,8 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [
@@ -369,7 +372,8 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [
@@ -393,7 +397,8 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -406,7 +411,8 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -516,7 +522,8 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [
@@ -535,7 +542,8 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [
@@ -567,7 +575,8 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [
@@ -596,11 +605,11 @@ export const CONTRACT_ABI = [
       },
       {
         "internalType": "string",
-        "name": "_ProjectName",
+        "name": "_projectName",
         "type": "string"
       }
     ],
-    "name": "changeProposal",
+    "name": "MakeChangeProposal",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -609,16 +618,34 @@ export const CONTRACT_ABI = [
     "inputs": [
       {
         "internalType": "string",
-        "name": "_ProjectName",
+        "name": "_changeCID",
         "type": "string"
       },
       {
-        "internalType": "uint256",
-        "name": "_step",
-        "type": "uint256"
+        "internalType": "string",
+        "name": "_projectName",
+        "type": "string"
       }
     ],
-    "name": "goBack",
+    "name": "MakeGoBackProposal",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_projectName",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_changeCID",
+        "type": "string"
+      }
+    ],
+    "name": "acceptGoBack",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -636,18 +663,13 @@ export const CONTRACT_ABI = [
         "type": "string"
       }
     ],
-    "name": "accept",
+    "name": "acceptChangeProposal",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "inputs": [
-      {
-        "internalType": "address",
-        "name": "_address",
-        "type": "address"
-      },
       {
         "internalType": "string",
         "name": "_projectName",
@@ -663,22 +685,23 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [
       {
         "internalType": "string",
-        "name": "_projectName",
+        "name": "_changeProposalCID",
         "type": "string"
       },
       {
         "internalType": "string",
-        "name": "_proposedChangeCID",
+        "name": "_projectName",
         "type": "string"
       }
     ],
-    "name": "voteToProposedChange",
+    "name": "voteForChangeProposal",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -700,7 +723,8 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [
@@ -719,7 +743,8 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -732,6 +757,7 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   }
 ]

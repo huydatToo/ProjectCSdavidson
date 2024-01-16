@@ -135,8 +135,8 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
         emit NewChangeIsMadeToProject("A new change has been made to the project: ", _projectName, _proposedChangeCID);
     }
 
-    function getBalance(address _address, string memory _projectName) ProjectExist(_projectName) external view returns (uint) {
-        return balanceOf(_address, NameToID[_projectName]);
+    function getBalance(string memory _projectName) ProjectExist(_projectName) external view returns (uint) {
+        return balanceOf(msg.sender, NameToID[_projectName]);
     }
 
     function voteForChangeProposal(string memory _changeProposalCID, string memory _projectName) ProjectExist(_projectName) public {
@@ -171,7 +171,7 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
         return allChanges;
     }
 
-    function getChangeProposals(string memory _projectName) ProjectExist(_projectName) external view returns (string[] memory) {
+    function getProjectChangeProposals(string memory _projectName) ProjectExist(_projectName) external view returns (string[] memory) {
         uint projectID = NameToID[_projectName];
         uint arr_length = publicProjects[projectID].changeProposals.length;
         string[] memory allChanges = new string[](arr_length);
