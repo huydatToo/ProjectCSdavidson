@@ -6,7 +6,9 @@ import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
 import "../node_modules/@openzeppelin/contracts/utils/Counters.sol";
 import "../node_modules/@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
 
+
 contract Steps is ERC1155, Ownable, ERC1155Supply {
+    uint public immutable TimeLockInterval = 60 * 60 * 24 * 7; // One Week
     using Counters for Counters.Counter;
 
     // -------------------------------------------------------- Mappings
@@ -20,9 +22,9 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
     }
 
     struct goBack {
-        uint votes;
         string changeCID;
         address goBackMaker;
+        uint votes;
     }
 
     struct Project {
@@ -30,6 +32,9 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
         Change[] changes;
         Change[] changeProposals;
         goBack[] goBackProposals;
+
+        // time lock
+        uint lastDistributionTime;
 
         // - ChangeCID => Voter address => Voted?
         mapping(string => mapping(address => bool)) Voted;
@@ -75,11 +80,13 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
         newProject.name = projectName;
         Change memory newChange = Change(_CID, msg.sender, 1);
         newProject.changes.push(newChange);
+        newProject.lastDistributionTime = block.timestamp;
+
         emit NewProjectCreated("New project created with ID:", projectName, newProjectID);
     }
 
 
-    function MakeChangeProposal(string memory _changeCID, string memory _projectName) ProjectExist(_projectName) public {
+    function MakeChangeProposal(string memory _changeCID, string memory _projectName) ProjectExist(_projectName) external {
         uint projectIDX = NameToID[_projectName];
         publicProjects[projectIDX].changeProposals.push(Change(_changeCID, msg.sender, balanceOf(msg.sender, NameToID[_projectName])));
         publicProjects[projectIDX].Voted[_changeCID][msg.sender] = true;
@@ -104,12 +111,12 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
         return _proposedChangeIdx;
     }
 
-    function MakeGoBackProposal(string memory _changeCID, string memory _projectName) public {
+    function MakeGoBackProposal(string memory _changeCID, string memory _projectName) external {
         uint projectID = NameToID[_projectName];
-        publicProjects[projectID].goBackProposals.push(goBack(0, _changeCID, msg.sender));
+        publicProjects[projectID].goBackProposals.push(goBack(_changeCID, msg.sender, 0));
     }
 
-    function acceptGoBack(string memory _projectName, string memory _changeCID) ProjectExist(_projectName) public {
+    function acceptGoBack(string memory _projectName, string memory _changeCID) ProjectExist(_projectName) external {
         uint projectIDX = NameToID[_projectName];
         uint _proposedChangeIdx = getChangeProposalIndex(_changeCID, _projectName);
         for (uint index = publicProjects[projectIDX].changes.length; index > _proposedChangeIdx; index--) {
@@ -120,7 +127,7 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
         emit ProjectWentBack("Project changed to change: ", _changeCID, _projectName);
     }
 
-    function acceptChangeProposal(string memory _proposedChangeCID, string memory _projectName) ProjectExist(_projectName) public {
+    function acceptChangeProposal(string memory _proposedChangeCID, string memory _projectName) ProjectExist(_projectName) external {
         uint _proposedChangeIdx = getChangeProposalIndex(_proposedChangeCID, _projectName);
         uint projectID = NameToID[_projectName];
 
@@ -139,7 +146,7 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
         return balanceOf(msg.sender, NameToID[_projectName]);
     }
 
-    function voteForChangeProposal(string memory _changeProposalCID, string memory _projectName) ProjectExist(_projectName) public {
+    function voteForChangeProposal(string memory _changeProposalCID, string memory _projectName) ProjectExist(_projectName) external {
         uint projectID = NameToID[_projectName];
         require(publicProjects[projectID].Voted[_changeProposalCID][msg.sender] == false, "Already voted");
         uint votingPower = balanceOf(msg.sender, projectID);
@@ -160,12 +167,12 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
     }
 
     function getProjectChanges(string memory _projectName) ProjectExist(_projectName) external view returns (string[] memory) {
-        uint projectIDX = NameToID[_projectName];
-        uint arr_length = publicProjects[projectIDX].changes.length;
+        uint projectID = NameToID[_projectName];
+        uint arr_length = publicProjects[projectID].changes.length;
         string[] memory allChanges = new string[](arr_length);
 
         for (uint256 i = 0; i < arr_length; i++) {
-            allChanges[i] = publicProjects[projectIDX].changes[i].changeCID;
+            allChanges[i] = publicProjects[projectID].changes[i].changeCID;
         }
 
         return allChanges;
@@ -197,4 +204,17 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
         }}
         return lastProjects;
     }
+
+    function distributeTokens(string memory _projectName) ProjectExist(_projectName) external {
+        uint projectID = NameToID[_projectName];
+
+        require(block.timestamp >= publicProjects[projectID].lastDistributionTime + TimeLockInterval, "There is still time until the next distribution");
+
+        // <token distribution>
+        // ...
+        // <token distribution/>
+
+        publicProjects[projectID].lastDistributionTime = block.timestamp;
+    }
+
 }
