@@ -36,9 +36,12 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
         // time lock
         uint lastDistributionTime;
 
+        // last distribution time index in changes and changeProposals
+        uint lastDistributionTimeIndexChanges;
+        uint lastDistributionTimeIndexChangeProposals;
+
         // - ChangeCID => Voter address => Voted?
         mapping(string => mapping(address => bool)) Voted;
-
     }
 
 
@@ -51,6 +54,7 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
     event NewVoteForChangeProposal(string message, string projectName, string changeProposalCID, address voter, uint votes);
     event NewChangeIsMadeToProject(string message, string projectName, string changeCID); // Message, Project CID, Message, ChangeCID
     event ProjectWentBack(string message, string changeCID, string ProjectName);
+    event TokensDisributed(string message, uint lastDistributionTime , uint newLastDistributionTimeIndexChanges, uint newLastDistributionTimeIndexChangeProposals);
 
     // -------------------------------------------------------- Modifiers
     modifier ProjectExist(string memory _Name) {
@@ -73,7 +77,7 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
         // Create Project's Token and Mint
         uint newProjectID = publicProjects.length;
         NameToID[projectName] = newProjectID;
-        _mint(msg.sender, newProjectID, 1000000, "");
+        _mint(msg.sender, newProjectID, 10, "");
         
         // Create New Project
         Project storage newProject = publicProjects.push();
@@ -207,7 +211,10 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
 
     function distributeTokens(string memory _projectName) ProjectExist(_projectName) external {
         uint projectID = NameToID[_projectName];
-
+        
+        publicProjects[projectID].lastDistributionTimeIndexChanges = publicProjects[projectID].changes.length - 1;
+        publicProjects[projectID].lastDistributionTimeIndexChangeProposals = publicProjects[projectID].changeProposals.length - 1;
+        
         require(block.timestamp >= publicProjects[projectID].lastDistributionTime + TimeLockInterval, "There is still time until the next distribution");
 
         // <token distribution>
@@ -215,6 +222,13 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
         // <token distribution/>
 
         publicProjects[projectID].lastDistributionTime = block.timestamp;
+
+        emit TokensDisributed(
+            "Tokens distributed",
+            publicProjects[projectID].lastDistributionTime,
+            publicProjects[projectID].lastDistributionTimeIndexChanges,
+            publicProjects[projectID].lastDistributionTimeIndexChangeProposals
+        );
     }
 
 }

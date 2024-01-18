@@ -1,5 +1,5 @@
 const Steps = artifacts.require("./Steps.sol");
-const { expectRevert } = require("@openzeppelin/test-helpers");
+const { expectRevert, time } = require("@openzeppelin/test-helpers");
 
 contract("Steps", accounts => {
 
@@ -39,6 +39,15 @@ contract("Steps", accounts => {
     const StepsInstance = await Steps.deployed();
     const result = await StepsInstance.getProjectChanges(ProjectName, { from: accounts[0] });
     assert.lengthOf(result, 2, "Project changes length should be two (base change) and the one we just accepted");
+  });
+
+  it("should run a token distribution a week later two times", async () => {
+    const StepsInstance = await Steps.deployed();
+    await time.increase(time.duration.days(8));
+    await StepsInstance.distributeTokens(ProjectName);
+    await time.increase(time.duration.days(8));
+    await StepsInstance.distributeTokens(ProjectName);
+
   });
 
 });
