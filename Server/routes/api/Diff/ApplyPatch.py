@@ -3,7 +3,6 @@ import json
 import os
 import shutil
 from .CreatePatch import is_text_file
-import ipfshttpclient2
 
 def apply_project_patch(old, patch):
     with open(os.path.join(patch, "patchJson.json"), 'r') as conf:
@@ -50,8 +49,7 @@ def apply_project_patch(old, patch):
                 os.remove(new_file_path)
                 
 
-def apply_project_patch_cid(old, patch_cid):
-    client = ipfshttpclient2.connect('/ip4/127.0.0.1/tcp/5001')
+def apply_project_patch_cid(old, patch_cid, client):
     files_list = client.ls(patch_cid)
     
     for i in files_list["Objects"]:
@@ -115,4 +113,3 @@ def apply_project_patch_cid(old, patch_cid):
                 new_file_path = os.path.join(old, list(changed_dir.items())[0][0], change["name"])
                 os.remove(new_file_path)
     
-    client.close()

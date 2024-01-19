@@ -49,7 +49,7 @@ const ProjectDevelopment = () => {
     }
 
     const voteForChange = async() => {
-      await contract.accept(clickedChangeProposal, projectName)
+      await contract.acceptChangeProposal(clickedChangeProposal, projectName)
       navigate(`/project/${projectName}`)
     }
 

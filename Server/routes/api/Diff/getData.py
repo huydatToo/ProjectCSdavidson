@@ -9,7 +9,7 @@ import base64
 from .others import is_text_file
 
 def get_ipfs_file_hash(client, changes_cids, file_name):
-    file_content = get_single_file_internal(changes_cids, file_name)
+    file_content = get_single_file_internal(changes_cids, file_name, client)
 
     if type(file_content) == list:
         file_content = client.cat(file_content[0])
@@ -65,8 +65,7 @@ def get_project_files(old_list, patch):
                 old_list.pop(old_list.index(new_file_path))
 
 
-def get_project_files_cid(old_list, patch_cid):
-    client = ipfshttpclient2.connect('/ip4/127.0.0.1/tcp/5001')
+def get_project_files_cid(old_list, patch_cid, client):
     files_list = client.ls(patch_cid)
     
     for i in files_list["Objects"]:
@@ -103,7 +102,6 @@ def get_project_files_cid(old_list, patch_cid):
                 new_file_path = "\\".join(os.path.join(list(changed_dir.items())[0][0].split("-")[1], change["name"]).split("\\")[1:])
                 old_list.pop(old_list.index(new_file_path))
     
-    client.close()
     return old_list
 
 def get_file_content(file_name, change_cid, client):
@@ -179,13 +177,12 @@ def get_file_paths_in_cid(client, cid):
                     list_files.append(change["name"])
     return list_files
 
-def get_single_file_internal(changes_cids, file_name):
-    client = ipfshttpclient2.connect('/ip4/127.0.0.1/tcp/5001')
+def get_single_file_internal(changes_cids, file_name, client):
     hash_idx = 0
     
     if len(changes_cids) > 1:
         for cid in range(0, len(changes_cids)):
-            if is_create_in_change(file_name, changes_cids[cid]):
+            if is_create_in_change(file_name, changes_cids[cid], client):
                 hash_idx = cid
 
     version = get_file_content(file_name, changes_cids[hash_idx], client)
@@ -194,11 +191,9 @@ def get_single_file_internal(changes_cids, file_name):
             patch = get_file_content(file_name, changes_cids[cid], client)
             if patch != version and patch != False:
                 version = apply_patch(version, patch)
-    client.close() 
     return version
 
-def is_create_in_change(file_name, change_cid):
-    client = ipfshttpclient2.connect('/ip4/127.0.0.1/tcp/5001')
+def is_create_in_change(file_name, change_cid, client):
     files_list = client.ls(change_cid)
     
     for i in files_list["Objects"]:
@@ -216,7 +211,6 @@ def is_create_in_change(file_name, change_cid):
                 new_file_path = os.path.join(list(changed_dir.items())[0][0].split("-")[1], change["name"])
                 if new_file_path == file_name:
                     created = True
-    client.close()
     return created
 
 # check if there are un 

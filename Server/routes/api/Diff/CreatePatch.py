@@ -2,19 +2,18 @@ import os
 from .ProjectFilesPatch import compare_projects, compare_projects_cid
 from .textFilePatch import create_patch
 import json
-import hashlib
 import shutil
 from .others import is_text_file, get_local_file_hash
 from .getData import get_single_file_internal
 
-def create_project_patch_json(old_project_CID, new_project_CID):
-    dirs_changes, files_changes = compare_projects(old_project_CID, new_project_CID)
-    patch_name = "patch-{}".format(old_project_CID)
+def create_project_patch_json(old_project_path, new_project_path):
+    dirs_changes, files_changes = compare_projects(old_project_path, new_project_path)
+    patch_name = "patch-{}".format(old_project_path)
     os.mkdir(patch_name)
     os.mkdir(os.path.join(patch_name, "changes"))
     json_patch = {"Directories_Changes": [], "Changes": []}
-    abs_len_new = (len(new_project_CID) + 1)
-    abs_len_old = (len(old_project_CID) + 1)
+    abs_len_new = (len(new_project_path) + 1)
+    abs_len_old = (len(old_project_path) + 1)
 
     for change in dirs_changes:
         data = change.split('|')
@@ -96,8 +95,8 @@ def create_project_patch_json(old_project_CID, new_project_CID):
 
 # -------------------------------------------------------------------------------------
         
-def create_project_patch_json_cid(change_cids, new_project_CID, name):
-    dirs_changes, files_changes = compare_projects_cid(change_cids, new_project_CID)
+def create_project_patch_json_cid(change_cids, new_project_CID, name, client):
+    dirs_changes, files_changes = compare_projects_cid(change_cids, new_project_CID, client)
 
     patch_name = "patch-{}".format(name)
     os.mkdir(patch_name)
@@ -142,7 +141,7 @@ def create_project_patch_json_cid(change_cids, new_project_CID, name):
                     new_file = os.path.join(changed_directory[1], data[2])
                     old_file = os.path.join(changed_directory[0], data[2])
                     if is_text_file(new_file):
-                        original = get_single_file_internal(change_cids, old_file)
+                        original = get_single_file_internal(change_cids, old_file, client)
                         with open(new_file, 'r') as modi: 
                             modified = modi.read()
                         hash_file_name = hash_file + "." + new_file.split(".")[1]

@@ -1,7 +1,6 @@
 import filecmp
 import os
 from .getData import get_file_paths_in_cid, get_project_files_cid
-import ipfshttpclient2
 from .getData import compare_files_from_ipfs, compare_directories_cid
 
 def compare_files(old, new):
@@ -162,17 +161,14 @@ def compare_projects(old_project_name, new_project_name):
     
 # -----------------------------------------------------------------------
 
-def compare_projects_cid(changes_cids, new_project_name):
-    client = ipfshttpclient2.connect('/ip4/127.0.0.1/tcp/5001')
-
+def compare_projects_cid(changes_cids, new_project_name, client):
     folder_changes = []
 
     abs_len_new = (len(new_project_name) + 1)
-
     old_dirs_and_files = get_file_paths_in_cid(client, changes_cids[0])
     if len(changes_cids) > 1:
         for change in changes_cids[1:]:
-            old_dirs_and_files = get_project_files_cid(old_dirs_and_files, change)   
+            old_dirs_and_files = get_project_files_cid(old_dirs_and_files, change, client)   
     old_files = [i for i in old_dirs_and_files if "." in i]
     
     old_dirs = [i for i in old_dirs_and_files if "." not in i]

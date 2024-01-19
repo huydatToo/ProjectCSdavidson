@@ -41,7 +41,8 @@ function Home() {
   }
 
   const getLastProjects = async () => {
-    const lastProjectsNow = await contract.getLastProjects();
+    let lastProjectsNow = await contract.getLastProjects();
+    lastProjectsNow = lastProjectsNow.filter(str => str !== "");
     setLastProjects(lastProjectsNow)
   }
 

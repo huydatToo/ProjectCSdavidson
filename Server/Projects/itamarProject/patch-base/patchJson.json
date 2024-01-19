@@ -1,0 +1,33 @@
+{
+  "Directories_Changes": [
+    {
+      "sign": "+",
+      "path": "foldertwo"
+    }
+  ],
+  "Changes": [
+    {
+      "-foldertwo": [
+        {
+          "Sign": "+",
+          "name": "itamar.txt",
+          "Hash": "040805b2df49cf649105e7cf922366d825d6c8da823bb616c1c038ef7fe41d9d"
+        },
+        {
+          "Sign": "+",
+          "name": "ramatie.txt",
+          "Hash": "f2a6aa97adb2bf15c27aef69bf132106fbc7928a80f55475d0683daee82b4039"
+        }
+      ]
+    },
+    {
+      "-": [
+        {
+          "Sign": "+",
+          "name": "text.txt",
+          "Hash": "1d9283d848ea941ace1fe0d2378ef8b70056a0d4d1648b95a322d90163e78285"
+        }
+      ]
+    }
+  ]
+}

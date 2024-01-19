@@ -36,7 +36,6 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
         // time lock
         uint lastDistributionTime;
 
-        // last distribution time index in changes and changeProposals
         uint lastDistributionTimeIndexChanges;
         uint lastDistributionTimeIndexChangeProposals;
 
@@ -44,7 +43,7 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
         mapping(string => mapping(address => bool)) Voted;
 
         // - delegate address => delegation power
-        mapping(address => address[]) delegate;
+        // mapping(address => address[]) delegate;
     }
 
 
@@ -153,18 +152,19 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
         return balanceOf(msg.sender, NameToID[_projectName]);
     }
 
-    function getDelegationVotingPower(string memory _changeProposalCID, string memory _projectName) ProjectExist(_projectName) public view returns (uint) {
-        uint projectID = NameToID[_projectName];
-        uint votingPower;
-        for (uint i = 0; i < publicProjects[projectID].delegate[msg.sender].length; i++) {
-            address delegated = publicProjects[projectID].delegate[msg.sender][i];
-            if (!publicProjects[projectID].Voted[_changeProposalCID][delegated]) {
-                votingPower += balanceOf(delegated, projectID);
-            }
-        }
+    // function getDelegationVotingPower(string memory _changeProposalCID, string memory _projectName) ProjectExist(_projectName) public returns (uint) {
+    //     uint projectID = NameToID[_projectName];
+    //     uint votingPower;
+    //     for (uint i = 0; i < publicProjects[projectID].delegate[msg.sender].length; i++) {
+    //         address delegated = publicProjects[projectID].delegate[msg.sender][i];
+    //         if (!publicProjects[projectID].Voted[_changeProposalCID][delegated]) {
+    //             votingPower += balanceOf(delegated, projectID);
+    //             publicProjects[projectID].Voted[_changeProposalCID][delegated] = true;
+    //         }
+    //     }
 
-        return votingPower;
-    }
+    //     return votingPower;
+    // }
 
     function voteForChangeProposal(string memory _changeProposalCID, string memory _projectName) ProjectExist(_projectName) external {
         uint projectID = NameToID[_projectName];
@@ -172,7 +172,7 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
         require(publicProjects[projectID].Voted[_changeProposalCID][msg.sender] == false, "Already voted");
 
         uint _proposedChangeIdx = getChangeProposalIndex(_changeProposalCID, _projectName);
-        uint votingPower = balanceOf(msg.sender, projectID) + getDelegationVotingPower(_changeProposalCID, _projectName);
+        uint votingPower = balanceOf(msg.sender, projectID); // + getDelegationVotingPower(_changeProposalCID, _projectName);
         
         if (votingPower <= 0) {
             revert("Voting power is insufficient");
