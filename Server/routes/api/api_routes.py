@@ -121,7 +121,7 @@ def save_changes():
             os.chdir("changes")
             if (unsaved_changes_internal(change_cids=project_details["project-changes"], project_path=project_details["project-path"], client=client)):
                 create_project_patch_json_cid(project_details["project-changes"], project_details["project-path"], "changes-" + str(round(time.time())), client)
-                return jsonify({'message': 355}), 200
+                message = jsonify({'message': 355}), 200
             else:
                 message = jsonify({"message": 356}, 200)
             

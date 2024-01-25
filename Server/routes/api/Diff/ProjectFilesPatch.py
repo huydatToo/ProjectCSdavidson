@@ -7,6 +7,7 @@ def compare_files(old, new):
     return filecmp.cmp(new, old)
 
 def compare_directories(dir1, dir2):
+    print(dir1, dir2)
     dcmp = filecmp.dircmp(dir1, dir2)
 
     if dcmp.left_only or dcmp.right_only or dcmp.funny_files:
@@ -108,8 +109,8 @@ def all_dirs_in_dir(project):
 def compare_projects(old_project_name, new_project_name):
     folder_changes = []
 
-    abs_len_new = (len(old_project_name) + 1)
-    abs_len_old = (len(new_project_name) + 1)
+    abs_len_new = (len(new_project_name) + 1)
+    abs_len_old = (len(old_project_name) + 1)
 
     old_dirs = all_dirs_in_dir(old_project_name)
     new_dirs = all_dirs_in_dir(new_project_name)
@@ -126,6 +127,7 @@ def compare_projects(old_project_name, new_project_name):
                 else:
                     folder_changes.append("*|{0}|{1}".format(old_dir, new_dir))
                 break
+
             elif old_dir[abs_len_old:] == new_dir[abs_len_new:]:
                 cmp_old_scc = True
                 folder_changes.append("?|{0}|{1}".format(old_dir, new_dir))

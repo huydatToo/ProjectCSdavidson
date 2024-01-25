@@ -1,6 +1,5 @@
 import json
 import os
-import ipfshttpclient2
 from .others import is_text_file
 from .textFilePatch import apply_patch
 import hashlib

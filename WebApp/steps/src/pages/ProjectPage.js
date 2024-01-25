@@ -76,7 +76,7 @@ const ProjectPage = () => {
       return <div className='ListOfPatchesNo'><h1 className='ListOfPatchesNoText'>[ Empty ]</h1></div>
     }}
     const getProjectDetails = async () => {
-      let changes = await contract.getProjectChanges(projectName);
+      let changes = await contract.getProjectChangesOrchangeProposals(projectName, true);
       let currentProjectState = {state: -1, projectName: projectName, changes: changes, files: [], path: ''}
       
       try {

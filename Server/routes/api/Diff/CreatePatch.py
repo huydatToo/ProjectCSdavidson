@@ -8,7 +8,8 @@ from .getData import get_single_file_internal
 
 def create_project_patch_json(old_project_path, new_project_path):
     dirs_changes, files_changes = compare_projects(old_project_path, new_project_path)
-    patch_name = "patch-{}".format(old_project_path)
+    print((dirs_changes, files_changes))
+    patch_name = "patch-{}".format(old_project_path.split("\\")[-1])
     os.mkdir(patch_name)
     os.mkdir(os.path.join(patch_name, "changes"))
     json_patch = {"Directories_Changes": [], "Changes": []}
@@ -97,6 +98,7 @@ def create_project_patch_json(old_project_path, new_project_path):
         
 def create_project_patch_json_cid(change_cids, new_project_CID, name, client):
     dirs_changes, files_changes = compare_projects_cid(change_cids, new_project_CID, client)
+    print(dirs_changes, files_changes)
 
     patch_name = "patch-{}".format(name)
     os.mkdir(patch_name)

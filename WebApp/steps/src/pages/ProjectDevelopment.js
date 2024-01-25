@@ -19,7 +19,7 @@ const ProjectDevelopment = () => {
     
 
     const getChangeProposals = async () => {
-        const changeProposalsTemp = await contract.getProjectChangeProposals(projectName);
+        const changeProposalsTemp = await contract.getProjectChangesOrchangeProposals(projectName, false);
         setChangeProposals(changeProposalsTemp);
     }
 

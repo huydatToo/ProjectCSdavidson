@@ -37,15 +37,18 @@ contract("Steps", accounts => {
 
   it("should get project changes with no errors", async () => {
     const StepsInstance = await Steps.deployed();
-    const result = await StepsInstance.getProjectChanges(ProjectName, { from: accounts[0] });
-    assert.lengthOf(result, 2, "Project changes length should be two (base change) and the one we just accepted");
+    const resultChanges = await StepsInstance.getProjectChangesOrchangeProposals(ProjectName, true , { from: accounts[0] });
+    const resultChangeProposals = await StepsInstance.getProjectChangesOrchangeProposals(ProjectName, false  , { from: accounts[0] });
+    console.log(resultChangeProposals, resultChanges)
+    assert.lengthOf(resultChanges, 2, "Project changes length should be two (base change) and the one we just accepted");
+    assert.lengthOf(resultChangeProposals, 1, "Project change proposals length should be zero");
   });
 
   it("should run a token distribution a week later two times", async () => {
     const StepsInstance = await Steps.deployed();
-    await time.increase(time.duration.days(8));
+    await time.increase(time.duration.days(31));
     await StepsInstance.distributeTokens(ProjectName);
-    await time.increase(time.duration.days(8));
+    await time.increase(time.duration.days(31));
     await StepsInstance.distributeTokens(ProjectName);
 
   });

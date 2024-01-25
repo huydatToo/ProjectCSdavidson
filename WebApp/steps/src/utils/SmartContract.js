@@ -1,4 +1,4 @@
-export const CONTRACT_ADDRESS = "0xdbd08cf4603e50be16c684322cca205aabe555a6"
+export const CONTRACT_ADDRESS = "0x76aB225B85e54935410822D9a41803E0C2A6db1A"
 export const CONTRACT_ABI = [
   {
     "inputs": [],
@@ -205,18 +205,6 @@ export const CONTRACT_ABI = [
         "indexed": false,
         "internalType": "uint256",
         "name": "lastDistributionTime",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "newLastDistributionTimeIndexChanges",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "newLastDistributionTimeIndexChangeProposals",
         "type": "uint256"
       }
     ],
@@ -757,29 +745,14 @@ export const CONTRACT_ABI = [
         "internalType": "string",
         "name": "_projectName",
         "type": "string"
-      }
-    ],
-    "name": "getProjectChanges",
-    "outputs": [
+      },
       {
-        "internalType": "string[]",
-        "name": "",
-        "type": "string[]"
+        "internalType": "bool",
+        "name": "changesOrChangeProposals",
+        "type": "bool"
       }
     ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "_projectName",
-        "type": "string"
-      }
-    ],
-    "name": "getProjectChangeProposals",
+    "name": "getProjectChangesOrchangeProposals",
     "outputs": [
       {
         "internalType": "string[]",
