@@ -1,6 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
+
+// the function returns the modal the shows your local changes
 const ModalChanges = ({ isOpen, closeModal, children }) => {
   if (!isOpen) return null;
 

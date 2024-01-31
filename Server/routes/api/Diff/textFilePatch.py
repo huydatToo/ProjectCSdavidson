@@ -1,6 +1,7 @@
 import difflib
 import re
 
+# the functions creates a text changes patch
 def create_patch(original, modified):
     diffs = difflib.unified_diff(original.splitlines(True), modified.splitlines(True), n=0)
     try:
@@ -10,6 +11,7 @@ def create_patch(original, modified):
 
     return ''.join([d if d[-1] == '\n' else d + '\n' + "\\" + '\n' for d in diffs])
 
+# the function apply text changes patch
 def apply_patch(original, patch):
     original = original.splitlines(True)
     patch = patch.splitlines(True)

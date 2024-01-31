@@ -3,9 +3,12 @@ import os
 from .getData import get_file_paths_in_cid, get_project_files_cid
 from .getData import compare_files_from_ipfs, compare_directories_cid
 
+
+# the function compare two local files
 def compare_files(old, new):
     return filecmp.cmp(new, old)
 
+# the function compare two local folders by content
 def compare_directories(dir1, dir2):
     print(dir1, dir2)
     dcmp = filecmp.dircmp(dir1, dir2)
@@ -17,6 +20,7 @@ def compare_directories(dir1, dir2):
     else:
         return True
     
+# the function compare two local folders and return their differences
 def compare_dirs(_old_dir, _new_dir):
     changes = []
     new_dir = [item for item in os.listdir(_new_dir) if "." in item]
@@ -55,6 +59,8 @@ def compare_dirs(_old_dir, _new_dir):
 
     return changes
 
+
+# the function compare local folder and a remoote folder and return their differences
 def compare_dirs_cid(_old_dir, old_dir_files, _new_dir, changes_cid, client):
     changes = []
     new_dir = [item for item in os.listdir(_new_dir) if "." in item]
@@ -94,6 +100,7 @@ def compare_dirs_cid(_old_dir, old_dir_files, _new_dir, changes_cid, client):
     
     return changes
 
+# the functions return all the sub-directories paths in a folder
 def all_dirs_in_dir(project):
     folder_list = []
     if os.path.isdir(project):
@@ -106,6 +113,7 @@ def all_dirs_in_dir(project):
                 folder_list.extend(subfolder_list)
     return folder_list
 
+# the functions compare two local projects and returns their differences
 def compare_projects(old_project_name, new_project_name):
     folder_changes = []
 
@@ -163,6 +171,7 @@ def compare_projects(old_project_name, new_project_name):
     
 # -----------------------------------------------------------------------
 
+# the functions compare local and remo projects and returns their differences
 def compare_projects_cid(changes_cids, new_project_name, client):
     folder_changes = []
 
@@ -229,3 +238,5 @@ def compare_projects_cid(changes_cids, new_project_name, client):
     old_dir_files = [i for i in old_files if "\\" not in i]
     changes.append(["", new_project_name, compare_dirs_cid(changes_cids, old_dir_files, new_project_name, changes_cids, client)])
     return folder_changes, changes
+
+

@@ -7,6 +7,7 @@ webapp_blueprint = Blueprint('webapp', __name__)
 
 build_dir = "C:/Users/User/Desktop/תכנות/davidson/project/DavidsonProject/WebApp/steps/build"
 
+# the function returns the webapp to the user
 @webapp_blueprint.route('/', defaults={'path': ''})
 @webapp_blueprint.route('/<path:path>')
 def serve(path):

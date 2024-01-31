@@ -4,7 +4,8 @@ import os
 import shutil
 from .CreatePatch import is_text_file
 
-def apply_project_patch(old, patch):
+# the function apply changes patch to a local project
+def apply_project_patch(old: str, patch: str):
     with open(os.path.join(patch, "patchJson.json"), 'r') as conf:
         data = json.load(conf)
 
@@ -49,6 +50,7 @@ def apply_project_patch(old, patch):
                 os.remove(new_file_path)
                 
 
+# the function apply remote changes patch to a local project
 def apply_project_patch_cid(old, patch_cid, client):
     files_list = client.ls(patch_cid)
     

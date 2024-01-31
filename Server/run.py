@@ -3,7 +3,8 @@ from flask_cors import CORS
 from routes.api.api_routes import api_routes
 from routes.webapp.web_routes import webapp_blueprint
 
-class MyFlaskApp:
+# the server allow the user to interact with the system
+class Server:
     def __init__(self, build_dir, port=8000):
         self.app = Flask(__name__, static_url_path='', static_folder=build_dir)
         CORS(self.app)
@@ -18,5 +19,5 @@ class MyFlaskApp:
 
 if __name__ == '__main__':
     build_dir = "C:/Users/User/Desktop/תכנות/davidson/project/DavidsonProject/WebApp/steps/build"
-    my_app = MyFlaskApp(build_dir)
+    my_app = Server(build_dir)
     my_app.run()

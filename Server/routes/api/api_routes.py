@@ -1,4 +1,3 @@
-
 import time
 import os
 from flask import jsonify, request
@@ -13,8 +12,11 @@ from .Diff.getData import get_single_file_internal
 from .Diff.CreatePatch import compare_projects_cid
 from flask import Blueprint
 
+# This page contains all the accessible API routes for users, each function with @api_routes representing an individual route.
 api_routes = Blueprint('api_routes', __name__, url_prefix="/api")
 
+
+# the function initiate necessary data on the project
 class API_Context:
     def __init__(self):
         self.base_path = os.getcwd()
@@ -27,6 +29,7 @@ class API_Context:
 api_context = API_Context()
 
 
+# the functions upload a new project to the IPFS and returns it's CID
 @api_routes.route('/upload', methods=['POST'])
 def upload():
     client = api_context.Start()
@@ -69,7 +72,7 @@ def upload():
         return message
     
 
-
+# the functions downloads a remote project
 @api_routes.route('/download_project', methods=['POST'])
 def download_project():
     client = api_context.Start()
@@ -108,6 +111,7 @@ def download_project():
         client.close()
         return message
 
+# the functions create a changes patch from updated version of a project and a local project
 @api_routes.route('/save_changes', methods=['POST'])
 def save_changes():
     try:
@@ -132,6 +136,7 @@ def save_changes():
         client.close()
         return message
 
+# the functions returns the local changes
 @api_routes.route('/get_my_changes', methods=['POST'])
 def get_my_changes():
     api_context.Start()
@@ -149,6 +154,7 @@ def get_my_changes():
     finally:
         return message
     
+# the functions checks if unsaved changes exist
 def unsaved_changes_internal(change_cids, project_path, client):
     _, files_changes = compare_projects_cid(change_cids, project_path, client)
     if ("+" in str(files_changes) or "-" in str(files_changes) or "?" in str(files_changes)):
@@ -156,6 +162,7 @@ def unsaved_changes_internal(change_cids, project_path, client):
     else:
         return False
 
+# the function upload changes patch to IPFS
 @api_routes.route('/upload_changes', methods=['POST'])
 def upload_changes():
     try:
@@ -184,6 +191,7 @@ def upload_changes():
         client.close()
         return message
 
+# the function update local project
 @api_routes.route('/updateproject', methods=['POST'])
 def update_project():
     client = api_context.Start()
@@ -207,7 +215,7 @@ def update_project():
         client.close()
         return message
 
-
+# the functions returns the status of local project
 @api_routes.route('/check-project', methods=['POST'])
 def check_project():
     api_context.Start()
@@ -235,6 +243,7 @@ def check_project():
         return message
     
 
+# the function returns the tree of files in a remote project
 def get_project_files_internal(changes_cids, client):
     all_files = get_file_paths_in_cid(client, changes_cids[0])
     if len(changes_cids) > 1:
@@ -243,6 +252,7 @@ def get_project_files_internal(changes_cids, client):
     return all_files
 
 
+# the function returns the tree of files in a remote project
 @api_routes.route('/get_project_files', methods=['POST'])
 def get_project_files():
     client = api_context.Start()
@@ -261,6 +271,7 @@ def get_project_files():
         client.close()
         return message
     
+# the function returns a single remote file content
 @api_routes.route('/get_file', methods=['POST'])
 def get_single_file():
     client = api_context.Start()
@@ -272,6 +283,7 @@ def get_single_file():
         message = jsonify({'file': version}), 200
     
     except Exception as e:
+        print(e)
         message = jsonify({'error': str(e)}), 500
     
     finally:

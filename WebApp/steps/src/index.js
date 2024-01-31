@@ -14,6 +14,7 @@ import {
   Route
 } from "react-router-dom";
 
+// webapp's routing
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <WalletProvider>

@@ -9,7 +9,9 @@ import { useNavigate } from 'react-router-dom';
 import CodeEditor from '../components/CodeEditor';
 import ModalDetails from '../components/ModalDetails';
 
+// the project page
 const ProjectPage = () => {
+    // data save on the page
     const { contract } = useWallet();
     const navigate = useNavigate()
     const [project, setProject] = useState({changes: [], projectName: "", state: -1, files: [], path: ''});
@@ -18,6 +20,7 @@ const ProjectPage = () => {
     const [isModalOpen, setModalOpen] = useState(false);
     const [path, setPath] = useState({path: "", openPathInput: false})
 
+    // modal control functions
     const openModal = () => {
       setModalOpen(true);
     };
@@ -29,6 +32,7 @@ const ProjectPage = () => {
       }  
     };
     
+    // control folder ui
     const ClosePathInput = () => {
       if (path.openPathInput === true) {
       setPath({path: "", openPathInput: false})
@@ -56,6 +60,7 @@ const ProjectPage = () => {
       return path.slice(0, lastIndex + 1);
     }
 
+    // the files and folders react component
     const getFilesHtml = () => {
       let folder_files = project.files.filter(comparePaths)
       if (folder_files.length > 0) {
@@ -75,8 +80,11 @@ const ProjectPage = () => {
     else {
       return <div className='ListOfPatchesNo'><h1 className='ListOfPatchesNoText'>[ Empty ]</h1></div>
     }}
+
+    // the functions get the project data like changes, name, etc...
     const getProjectDetails = async () => {
       let changes = await contract.getProjectChangesOrchangeProposals(projectName, true);
+      changes = [...changes].reverse();
       let currentProjectState = {state: -1, projectName: projectName, changes: changes, files: [], path: ''}
       
       try {
@@ -128,6 +136,7 @@ const ProjectPage = () => {
 
   }
 
+  // the function downloads a project to the local machine
   const downloadProject = async () => {
     try {
       await fetch('http://127.0.0.1:8000/api/download_project', {
@@ -143,6 +152,7 @@ const ProjectPage = () => {
     }
   }
 
+  // the functions show remote file content
   const getFileContent = async(file_name) => {
     try {
       let changesWithProposal
@@ -176,6 +186,7 @@ const ProjectPage = () => {
     }
   }
 
+  // initiate the page
   useEffect(() => {
       try {
           getProjectDetails()
@@ -184,6 +195,7 @@ const ProjectPage = () => {
       }
   }, []);
 
+  // the pages jsx
     return (
     <div className='background middle center gapLines lineGap pageOne'>
         <ModalDetails isOpen={isModalOpen} closeModal={closeModal} closeInput={ClosePathInput}>
@@ -192,7 +204,7 @@ const ProjectPage = () => {
             <h1>Changes</h1>
             <div className='modalFlex gap'>
             {project.changes.map((changeCID, index) => (
-              <div className='FileLine centerText' key={index}>
+              <div onClick={() => navigator.clipboard.writeText(changeCID)} className='FileLine centerText' key={index}>
                 <label className='CIDtext FileText'>{changeCID.slice(0, 42)}</label>
               </div>
             ))}

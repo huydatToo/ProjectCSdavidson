@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
+// the function returns the modal of project details
 const ModalDetails = ({ isOpen, closeModal, children, closeInput }) => {
   if (!isOpen) return null;
 

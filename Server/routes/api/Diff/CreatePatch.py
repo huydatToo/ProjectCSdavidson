@@ -6,10 +6,11 @@ import shutil
 from .others import is_text_file, get_local_file_hash
 from .getData import get_single_file_internal
 
+
+# the functions create a local changes patch from local projects
 def create_project_patch_json(old_project_path, new_project_path):
     dirs_changes, files_changes = compare_projects(old_project_path, new_project_path)
-    print((dirs_changes, files_changes))
-    patch_name = "patch-{}".format(old_project_path.split("\\")[-1])
+    patch_name = "patch-{}".format(os.path.basename(old_project_path))
     os.mkdir(patch_name)
     os.mkdir(os.path.join(patch_name, "changes"))
     json_patch = {"Directories_Changes": [], "Changes": []}
@@ -31,7 +32,7 @@ def create_project_patch_json(old_project_path, new_project_path):
             })
     
     for changed_directory in files_changes:
-        if changed_directory[0] != "|+" or changed_directory[0] != "|-":
+        if changed_directory[0] != "|+" and changed_directory[0] != "|-":
             folder = changed_directory[0][abs_len_old:] + "-" + changed_directory[1][abs_len_new:]
         else:
             folder = changed_directory[1][abs_len_new:]
@@ -50,18 +51,19 @@ def create_project_patch_json(old_project_path, new_project_path):
                         "Old_name": data[1],
                         "Hash": hash_file
                     })
-                    new_file = changed_directory[1] + "/" + data[2]
-                    old_file = changed_directory[0] + "/" + data[2]
-                    if is_text_file(new_file):
-                        with open(old_file, 'r') as orig: 
+                    new_file_path = os.path.join(changed_directory[1], data[2])
+                    old_file_path = os.path.join(changed_directory[0], data[2])
+
+                    if is_text_file(new_file_path):
+                        with open(old_file_path, 'r') as orig: 
                             original = orig.read()
-                        with open(new_file, 'r') as modi: 
+                        with open(new_file_path, 'r') as modi: 
                             modified = modi.read()
-                        hash_file_name = hash_file + "." + new_file.split(".")[1]
+                        hash_file_name = hash_file + "." + new_file_path.split(".")[1]
                         with open(os.path.join(patch_name, "changes", hash_file_name), "w") as f:
                             f.write(create_patch(original, modified))
                     else:
-                        shutil.copy(new_file, os.path.join(patch_name, "changes", hash_file + "." + new_file.split(".")[1])) 
+                        shutil.copy(new_file_path, os.path.join(patch_name, "changes", hash_file + "." + new_file_path.split(".")[1])) 
 
                 elif data[0] == "+":
                     hash_file = get_local_file_hash(changed_directory[1] + "/" + data[1])
@@ -74,7 +76,6 @@ def create_project_patch_json(old_project_path, new_project_path):
                     shutil.copy(changed_directory[1] + "/" + data[1], os.path.join(patch_name, "changes", hash_file))
 
                 elif data[0] == "-":
-                    print(data)
                     folder_changes.append({
                         "Sign": data[0],
                         "name": data[1],
@@ -96,9 +97,9 @@ def create_project_patch_json(old_project_path, new_project_path):
 
 # -------------------------------------------------------------------------------------
         
+# the functions create a local changes patch from remote project
 def create_project_patch_json_cid(change_cids, new_project_CID, name, client):
     dirs_changes, files_changes = compare_projects_cid(change_cids, new_project_CID, client)
-    print(dirs_changes, files_changes)
 
     patch_name = "patch-{}".format(name)
     os.mkdir(patch_name)
@@ -121,10 +122,10 @@ def create_project_patch_json_cid(change_cids, new_project_CID, name, client):
             })
     
     for changed_directory in files_changes:
-        if changed_directory[0] != "|+" or changed_directory[0] != "|-":
+        if changed_directory[0] != "|+" and changed_directory[0] != "|-":
             folder = changed_directory[0] + "-" + changed_directory[1][abs_len_new:]
         else:
-            folder = changed_directory[1][abs_len_new:]
+            folder = "-" + changed_directory[1][abs_len_new:]
             if folder == "-":
                 folder = ""
 
@@ -140,17 +141,17 @@ def create_project_patch_json_cid(change_cids, new_project_CID, name, client):
                         "Old_name": data[1].split("\\")[-1],
                         "Hash": hash_file
                     })
-                    new_file = os.path.join(changed_directory[1], data[2])
-                    old_file = os.path.join(changed_directory[0], data[2])
-                    if is_text_file(new_file):
-                        original = get_single_file_internal(change_cids, old_file, client)
-                        with open(new_file, 'r') as modi: 
+                    new_file_path = os.path.join(changed_directory[1], data[2])
+                    old_file_path = os.path.join(changed_directory[0], data[2])
+                    if is_text_file(new_file_path):
+                        original = get_single_file_internal(change_cids, old_file_path, client)
+                        with open(new_file_path, 'r') as modi: 
                             modified = modi.read()
-                        hash_file_name = hash_file + "." + new_file.split(".")[1]
+                        hash_file_name = hash_file + "." + new_file_path.split(".")[1]
                         with open(os.path.join(patch_name, "changes", hash_file_name), "w") as f:
                             f.write(create_patch(original, modified))
                     else:
-                        shutil.copy(new_file, os.path.join(patch_name, "changes", hash_file + "." + new_file.split(".")[1])) 
+                        shutil.copy(new_file_path, os.path.join(patch_name, "changes", hash_file + "." + new_file_path.split(".")[1])) 
 
                 elif data[0] == "+":
                     hash_file = get_local_file_hash(changed_directory[1] + "\\" + data[1])

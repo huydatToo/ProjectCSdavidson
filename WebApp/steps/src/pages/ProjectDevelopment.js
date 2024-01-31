@@ -7,7 +7,7 @@ import { useWallet } from '../utils/WalletContext';
 import HomeSvg from '../assets/home.svg';
 import ModalChanges from '../components/ModalChanges';
 
-
+// the project development page
 const ProjectDevelopment = () => {
     const navigate = useNavigate()
     const { projectName } = useParams();
@@ -17,12 +17,14 @@ const ProjectDevelopment = () => {
     const [isModalOpen, setModalOpen] = useState(false);
     const [clickedChangeProposal, setClickedChangeProposal] = useState(false);
     
-
+    // the function save the change proposals in the project
     const getChangeProposals = async () => {
         const changeProposalsTemp = await contract.getProjectChangesOrchangeProposals(projectName, false);
         setChangeProposals(changeProposalsTemp);
     }
 
+
+    // the functions open\close the modal
     const openModal = () => {
         setModalOpen(true);
       };
@@ -31,6 +33,7 @@ const ProjectDevelopment = () => {
         setModalOpen(false);
     };
 
+    // the functions save the users changes.
     const getMyChanges = async () => {
         try {
           const response = await fetch('http://127.0.0.1:8000/api/get_my_changes', {
@@ -48,11 +51,13 @@ const ProjectDevelopment = () => {
         }
     }
 
+    // the function call the vote in favor of a change function on the smart contract
     const voteForChange = async() => {
       await contract.acceptChangeProposal(clickedChangeProposal, projectName)
       navigate(`/project/${projectName}`)
     }
 
+    // the function upload the local changes of a user IPFS and create a new change proposal
     const uploadChanges = async () => {
       try {
         const response = await fetch('http://127.0.0.1:8000/api/upload_changes', {
@@ -71,6 +76,7 @@ const ProjectDevelopment = () => {
       }
   }
 
+    // the functions saves the users local changes
     const saveChanges = async () => {
         try {
           await fetch('http://127.0.0.1:8000/api/save_changes', {
@@ -88,12 +94,13 @@ const ProjectDevelopment = () => {
         }
     }    
     
-
+    // initiate the page
     useEffect(() => {
       getChangeProposals();
       getMyChanges()
     }, [contract]);
 
+    // returns the page's react component
     return (
         <div className='background middle center lineGap pageOne'>
         <ModalChanges isOpen={isModalOpen} closeModal={closeModal}>

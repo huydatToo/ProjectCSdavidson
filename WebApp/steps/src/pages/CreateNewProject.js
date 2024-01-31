@@ -5,6 +5,7 @@ import CompleteSvg from '../assets/complete-svgrepo-com.svg';
 import HomeSvg from '../assets/homeDark.svg';
 import { useNavigate } from 'react-router-dom';
 
+// the page of creating a new project
 const CreateNewProject = () => {
     const { contract } = useWallet();
     const [step, setStep] = useState(1);
@@ -13,6 +14,7 @@ const CreateNewProject = () => {
     const navigate = useNavigate()
 
 
+    // the function upload a local project and call the create new project on the smart contract
     const createProjectFunction = async () => {
         try {
             const response = await fetch('http://127.0.0.1:8000/api/upload', {
@@ -38,6 +40,7 @@ const CreateNewProject = () => {
         }
     }
 
+    // the functions dictate the ui state
     const nextStep = () => {
         if (step !== 3) {
             setStep(step+1)
@@ -52,6 +55,7 @@ const CreateNewProject = () => {
         setStep(step+1)
     }
     
+    // the function returns the current form step
     const getStep = () => {
         if (step === 1) {
         return (
@@ -93,9 +97,6 @@ const CreateNewProject = () => {
         )}
     }
 
-    useEffect(() => {
-
-    }, []);
 
     return (
     <div className='background center'>

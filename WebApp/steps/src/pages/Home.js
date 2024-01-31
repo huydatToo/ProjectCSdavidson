@@ -4,10 +4,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWallet } from '../utils/WalletContext';
 import { Link } from 'react-scroll';
-import { Scrollbars } from 'react-custom-scrollbars-2';
 
 
 
+// the home page
 function Home() {
   const { contract } = useWallet();
   const navigate = useNavigate()
@@ -15,6 +15,7 @@ function Home() {
   const [lastProjects, setLastProjects]  = useState([])
   const { isConnected, checkWalletConnection, setIsConnected, setAccount } = useWallet();
 
+  // connect smart wallet function
   const connectWallet = async () => {
     if (window.ethereum) {
       try {
@@ -28,6 +29,7 @@ function Home() {
     }
   };
 
+  // the function check whether a user is connected or not
   const checkConnectedOnButtonPress = (buttonPressed) => {
     if (buttonPressed === "createNewProject" && isConnected === false) {
       if (isButtons.new_project === 1) {
@@ -40,12 +42,14 @@ function Home() {
     }
   }
 
+  // TEMP
   const getLastProjects = async () => {
     let lastProjectsNow = await contract.getLastProjects();
     lastProjectsNow = lastProjectsNow.filter(str => str !== "");
     setLastProjects(lastProjectsNow)
   }
 
+  // the function initiate the page
   useEffect(() => {
     checkWalletConnection();
     if (isConnected) {
@@ -54,6 +58,7 @@ function Home() {
     }
   }, [checkWalletConnection, isConnected]);
 
+  // returns the page's react component
   return (
     <div className="background">
       <div name="pageOne" className='pageTwo center'>

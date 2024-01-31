@@ -8,7 +8,9 @@ import "../node_modules/@openzeppelin/contracts/token/ERC1155/extensions/ERC1155
 import "./Changes.sol";
 
 
+
 contract Steps is ERC1155, Ownable, ERC1155Supply {
+    // initiate all the data structures and constants saved on the smart contract
     uint public immutable TimeLockInterval = 60 * 60 * 24 * 30; // One Week
     using Counters for Counters.Counter;
     using ChangesLibrary for ChangesLibrary.ChangesStorage;
@@ -72,6 +74,7 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
         super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
     }
 
+    // the function create a new project with an inital change
     function createProject(string memory _CID, string memory projectName) public {
         uint newProjectID = publicProjects.length;
         NameToID[projectName] = newProjectID;
@@ -85,7 +88,7 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
         emit NewProjectCreated("New project created with ID:", projectName, newProjectID);
     }
 
-
+    // the functions create a change proposal
     function MakeChangeProposal(string memory _changeCID, string memory _projectName) ProjectExist(_projectName) external {
         uint projectIDX = NameToID[_projectName];
         publicProjects[projectIDX].changes.createChangeProposal(_changeCID, balanceOf(msg.sender, NameToID[_projectName]));
@@ -93,12 +96,13 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
         emit NewChangeProposalCreated("New change proposal to the Project with the name and following ID and CID:", _projectName, _changeCID, projectIDX);
     }
 
-
+    // the functions make a go back proposal
     function MakeGoBackProposal(string memory _changeCID, string memory _projectName) external {
         uint projectID = NameToID[_projectName];
         publicProjects[projectID].goBackProposals.push(goBack(_changeCID, msg.sender, balanceOf(msg.sender, NameToID[_projectName])));
     }
 
+    // the function make a go Back 
     function acceptGoBack(string memory _projectName, string memory _changeCID) ProjectExist(_projectName) external {
         uint projectIDX = NameToID[_projectName];
         publicProjects[projectIDX].changes.goBack(_changeCID);
@@ -106,16 +110,19 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
         emit ProjectWentBack("Project changed to change: ", _changeCID, _projectName);
     }
 
+    // the functions accept a change proposal and add it to the list
     function acceptChangeProposal(string memory _proposedChangeCID, string memory _projectName) ProjectExist(_projectName) external {
         uint projectID = NameToID[_projectName];
         publicProjects[projectID].changes.acceptChangeProposal(_proposedChangeCID);
         emit NewChangeIsMadeToProject("A new change has been made to the project: ", _projectName, _proposedChangeCID);
     }
 
-    function getBalance(string memory _projectName) ProjectExist(_projectName) external view returns (uint) {
-        return balanceOf(msg.sender, NameToID[_projectName]);
+    // the function returns the voting power of a user in a certain project
+    function getBalance(string memory _projectName, address _UserAddress) ProjectExist(_projectName) external view returns (uint) {
+        return balanceOf(_UserAddress, NameToID[_projectName]);
     }
 
+    // the function allow user to vote in favor of a change proposal
     function voteForChangeProposal(string memory _changeProposalCID, string memory _projectName) ProjectExist(_projectName) external {
         uint projectID = NameToID[_projectName];
 
@@ -139,11 +146,13 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
         );
     }
 
-    function getProjectChangesOrchangeProposals(string memory _projectName, bool changesOrChangeProposals) ProjectExist(_projectName) external view returns (string[] memory) {
+    // the functions returns the changes/change proposals
+    function getChangesOrProposals(string memory _projectName, bool changesOrChangeProposals) ProjectExist(_projectName) external view returns (string[] memory) {
         uint projectID = NameToID[_projectName];
         return publicProjects[projectID].changes.getChangesOrChangeProposals(changesOrChangeProposals); // true for changes and false for change proposals
     }
 
+    // TEMP
     function getLastProjects() external view returns (string[] memory) {
         uint arr_length = publicProjects.length;
         uint arr_index = publicProjects.length;
@@ -159,6 +168,7 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
         return lastProjects;
     }
 
+    // the functions allow the token distribution when the timelock ends
     function distributeTokens(string memory _projectName) ProjectExist(_projectName) external {
         uint projectID = NameToID[_projectName];
                 

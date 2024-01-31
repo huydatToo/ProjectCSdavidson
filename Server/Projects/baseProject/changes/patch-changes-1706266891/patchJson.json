@@ -1,22 +1,22 @@
 {
   "Directories_Changes": [
     {
-      "sign": "?",
+      "sign": "/",
       "old_path": "foldertwo",
       "new_path": "foldertwo"
     },
     {
       "sign": "+",
-      "path": "foldertwo\\adir"
+      "path": "foldertwo\\foldertwo"
     }
   ],
   "Changes": [
     {
-      "|+-foldertwo\\adir": [
+      "-foldertwo\\foldertwo": [
         {
           "Sign": "+",
-          "name": "one.txt",
-          "Hash": "040805b2df49cf649105e7cf922366d825d6c8da823bb616c1c038ef7fe41d9d"
+          "name": "proof.txt",
+          "Hash": "54efd9114a810f8b8ffccc70d558d8d147fe759df413c049eb54a69125092269"
         }
       ]
     }

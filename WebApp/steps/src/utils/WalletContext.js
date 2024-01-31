@@ -4,6 +4,7 @@ import { ethers } from 'ethers'
 import { CONTRACT_ADDRESS, CONTRACT_ABI } from '../utils/SmartContract';
 const WalletContext = createContext();
 
+// the webapp's context allow access to important user data like wallet address from anywhere in the webapp
 export const WalletProvider = ({ children }) => {
     const [isConnected, setIsConnected] = useState(false);
     const [account, setAccount] = useState(null);
@@ -14,6 +15,7 @@ export const WalletProvider = ({ children }) => {
       return new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer)
     }, [signer])
   
+    // the functions returns wether a user is connected and if it do it save it's address and other data
     const checkWalletConnection = async () => {
         if (window.ethereum) {
           try {
