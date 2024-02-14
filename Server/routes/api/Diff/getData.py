@@ -29,7 +29,6 @@ def compare_files_from_ipfs(client, cid_changes, file_name, local_file_path):
 # the functions compare two directories (one local and one on IPFS)
 def compare_directories_cid(client, changes_cids, file_names, local_dir_path):
     if len(file_names) != len(os.listdir(local_dir_path)):
-        print(len(file_names), len(os.listdir(local_dir_path)))
         return False
     
     for file_name in file_names:
@@ -165,8 +164,6 @@ def get_file_paths_in_cid(client, cid):
 
     list_files = []
     for changed_dir in data["Changes"]:
-        if list(changed_dir.items())[0][0] != "-":
-            list_files.append(list(changed_dir.items())[0][0].replace("-", ""))
 
         for change in list(changed_dir.items())[0][1]:
             if change["Sign"] == "+":            
@@ -174,6 +171,10 @@ def get_file_paths_in_cid(client, cid):
                     list_files.append(os.path.join(list(changed_dir.items())[0][0], change["name"]).replace("-", ""))
                 else:
                     list_files.append(change["name"])
+
+    for changed_dir in data["Directories_Changes"]:
+        if (changed_dir["sign"] == "+"):
+            list_files.append(changed_dir["path"])
     return list_files
 
 # the functions returns the content of a file on a remote project

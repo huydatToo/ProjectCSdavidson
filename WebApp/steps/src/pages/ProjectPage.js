@@ -83,7 +83,7 @@ const ProjectPage = () => {
 
     // the functions get the project data like changes, name, etc...
     const getProjectDetails = async () => {
-      let changes = await contract.getProjectChangesOrchangeProposals(projectName, true);
+      let changes = await contract.getChangesOrProposals(projectName, true);
       changes = [...changes].reverse();
       let currentProjectState = {state: -1, projectName: projectName, changes: changes, files: [], path: ''}
       

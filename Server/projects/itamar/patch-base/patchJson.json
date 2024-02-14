@@ -1,0 +1,32 @@
+{
+  "Directories_Changes": [
+    {
+      "sign": "+",
+      "path": "wefwefwewf"
+    },
+    {
+      "sign": "+",
+      "path": "wefwefwewf\\foldertwo"
+    }
+  ],
+  "Changes": [
+    {
+      "wefwefwewf\\foldertwo": [
+        {
+          "Sign": "+",
+          "name": "proof.txt",
+          "Hash": "54efd9114a810f8b8ffccc70d558d8d147fe759df413c049eb54a69125092269"
+        }
+      ]
+    },
+    {
+      "-": [
+        {
+          "Sign": "+",
+          "name": "text.txt",
+          "Hash": "6f216e33c5cf9add9d70e7cd8c28e3dafe27e7723ea93918b27c60f118532154"
+        }
+      ]
+    }
+  ]
+}

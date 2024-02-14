@@ -1,18 +1,20 @@
 import { motion, AnimatePresence  } from 'framer-motion';
 import downArrow from '../assets/down-arrow-svgrepo-com.svg';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWallet } from '../utils/WalletContext';
+import PageLearn from './PageLearn'
 import { Link } from 'react-scroll';
-
 
 
 // the home page
 function Home() {
   const { contract } = useWallet();
+  const scrollRef = useRef(null)
   const navigate = useNavigate()
   const [isButtons, setIsButtons] = useState({new_project: 0, my: 0})
-  const [lastProjects, setLastProjects]  = useState([])
+  const [lastProjects, setLastProjects]  = useState({lastProjects: [], localProjects: []})
+  const [hoverDown, setHoverDown]  = useState(false)
   const { isConnected, checkWalletConnection, setIsConnected, setAccount } = useWallet();
 
   // connect smart wallet function
@@ -46,7 +48,20 @@ function Home() {
   const getLastProjects = async () => {
     let lastProjectsNow = await contract.getLastProjects();
     lastProjectsNow = lastProjectsNow.filter(str => str !== "");
-    setLastProjects(lastProjectsNow)
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/getLocalProjects', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      const data = await response.json(); 
+      setLastProjects({lastProjects: lastProjectsNow, localProjects: data.projects})
+    } catch (error) {
+      console.error('Error:', error);
+      setLastProjects({lastProjects: lastProjectsNow, localProjects: []})
+    }
   }
 
   // the function initiate the page
@@ -73,10 +88,12 @@ function Home() {
         <div className='line lineGapHome'>
           <div className='box-projects'>
             <h1 className='Title'>Popular Projects</h1>
-            <motion.div whileHover={{scale: 1.05}} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", duration: 0.7 }} className='project-box'>
-              <span className='project-box-header'>Project name</span>
-              <span>creation time | participants</span>
+            {lastProjects.lastProjects.map((item, index) => (
+            <motion.div onClick={() => {navigate(`project/${item}`)}} key={index} whileHover={{scale: 1.05}} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", duration: 0.7 }} className='project-box-load'>
+              <span className='project-box-header'>{item}</span>
+              <span>----------- | -----------</span>
             </motion.div>
+            ))}
           </div>
 
           <div>
@@ -95,16 +112,15 @@ function Home() {
             </div>
 
             <Link to="pageTwo" smooth={true} duration={500}>
-            <motion.div whileHover={{scale: 1.03}} animate={{ scale: 1 }} transition={{ type: "spring", duration: 0.7 }} className='box-arrow-down'>
-              <img className='arrowDown' src={downArrow} alt="" />
+            <motion.div onMouseEnter={() => setHoverDown(true)} onMouseLeave={() => setHoverDown(false)}  whileHover={{scale: 1.03}} transition={{ type: "spring", duration: 0.7 }} className='box-arrow-down'>
+              <motion.img animate={{ y: hoverDown ? 40 : 0 }} transition={{ type: "spring", duration: 0.7 }} className='arrowDown' src={downArrow} alt="" />
             </motion.div>
             </Link>
           </div>
 
           <div className='box-projects'>
             <h1 className='Title'>Recent activity</h1>
-
-            {lastProjects.map((item, index) => (
+            {lastProjects.localProjects.map((item, index) => (
             <motion.div onClick={() => {navigate(`project/${item}`)}} key={index} whileHover={{scale: 1.05}} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", duration: 0.7 }} className='project-box-load'>
               <span className='project-box-header'>{item}</span>
               <span>----------- | -----------</span>
@@ -116,8 +132,8 @@ function Home() {
       </div>
       </div>
 
-      <div name="pageTwo" className='pageTwo background2'>
-        <h1>How it works</h1>
+      <div name="pageTwo" className='pageTwo background2 centerLearn'>
+        <PageLearn scroll={scrollRef}/>
       </div>
     </div>
   );

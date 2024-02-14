@@ -19,7 +19,7 @@ api_routes = Blueprint('api_routes', __name__, url_prefix="/api")
 # the function initiate necessary data on the project
 class API_Context:
     def __init__(self):
-        self.base_path = os.getcwd()
+        self.base_path = "C:\\Users\\User\\Desktop\\תכנות\\davidson\\project\\DavidsonProject\\Server"
         self.client_addr = '/ip4/127.0.0.1/tcp/5001'
     
     def Start(self):
@@ -61,7 +61,6 @@ def upload():
             os.rename("Temp", data["name"])
             message = jsonify({'ipfsCID': ipfs_hash}), 200
         else:
-            print("Invalid file path")
             message = jsonify({'error': 'Invalid file path'}), 400
         
     except Exception as e:
@@ -283,9 +282,21 @@ def get_single_file():
         message = jsonify({'file': version}), 200
     
     except Exception as e:
-        print(e)
         message = jsonify({'error': str(e)}), 500
     
     finally:
         client.close()
         return message
+
+@api_routes.route('/getLocalProjects', methods=['GET'])
+def getLocalProjects():
+    api_context.Start()
+    try:
+        local_projects = os.listdir("projects")
+        message = jsonify({'projects': local_projects}), 200
+
+    except Exception as e:
+        print(e)
+        message = jsonify({'error': str(e)}), 500
+    return message
+

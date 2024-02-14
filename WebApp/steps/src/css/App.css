@@ -55,9 +55,10 @@
   }
 
 .Title {
-  color: var(--color-text);
-  text-shadow: 1px 1px black;
+  color: #f4f4f4;
+  text-shadow: -1px -1px 0 #272727, 1px -1.2px 0 #272727, 1px 2px 0 #272727, 2px 2px 0px #272727;
 }
+
 
 .background {
   position: absolute;
@@ -75,7 +76,6 @@
 }
 
 .background2 {
-  margin-top: -17px;
   position: relative;
   top: 0;
   left: 0;
@@ -163,8 +163,10 @@
   backdrop-filter: blur(2px);
   background-color: #000000b6;
   border-radius: 20.5px;
-  box-shadow: #000000 4px 4px 0px 3px;
+  box-shadow: #000000 4px 4px 0px 2px;
 }
+
+
 
 .box-search input {
   font-size: 20px;
@@ -576,4 +578,72 @@
     background-color: #46464667;
   }
 }
+
+.hoverDownClass {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
 /* projectPage */
+
+/* learn */
+.centerLearn {
+  display: flex;
+  justify-content: center;
+}
+
+.titleLearn {
+  font-size: 60px;
+  color: #f4f4f4;
+}
+
+.explainBox {
+  border: 8px solid var(--color-text-bright);
+  border-radius: 20.5px;
+  padding: 2ch;
+  font-size: 30px;
+  border-image: var(--border-pixel-bright);
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  flex-direction: column;
+  backdrop-filter: blur(2px);
+  background-color: var(--color-text-bright);
+
+}
+.explainBox1 {
+  border: 8px solid var(--color-text-bright);
+  border-radius: 20.5px;
+  padding: 2ch;
+  font-size: 30px;
+  border-image: var(--border-pixel-bright);
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  flex-direction: column;
+  backdrop-filter: blur(2px);
+  background-color: var(--color-text-bright);
+
+}
+
+.explainBox2 {
+  border: 8px solid var(--color-text-bright);
+  border-radius: 20.5px;
+  padding: 2ch;
+  font-size: 30px;
+  border-image: var(--border-pixel-bright);
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  flex-direction: column;
+  backdrop-filter: blur(2px);
+  background-color: var(--color-text-bright);
+
+}
+
+.gridExplains {
+  display: grid;
+  grid-template-columns: repeat(3, 40vh);
+  grid-gap: 20px;
+}
+/* learn */

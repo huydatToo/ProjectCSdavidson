@@ -1,4 +1,4 @@
-export const CONTRACT_ADDRESS = "0xBeDa2f09E14223ae66c2516aabe3fE899BB12a26"
+export const CONTRACT_ADDRESS = "0x0672265b5194071A6553b0B509db5D1F1050Ae5F"
 export const CONTRACT_ABI = [
   {
     "inputs": [],
@@ -321,8 +321,7 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [],
@@ -335,8 +334,7 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
@@ -360,8 +358,7 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
@@ -385,8 +382,7 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
@@ -405,8 +401,7 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
@@ -430,8 +425,7 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [],
@@ -444,8 +438,7 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [],
@@ -555,8 +548,7 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
@@ -575,8 +567,7 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
@@ -608,8 +599,7 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
@@ -707,6 +697,11 @@ export const CONTRACT_ABI = [
         "internalType": "string",
         "name": "_projectName",
         "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "_UserAddress",
+        "type": "address"
       }
     ],
     "name": "getBalance",
@@ -718,8 +713,7 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
@@ -752,7 +746,7 @@ export const CONTRACT_ABI = [
         "type": "bool"
       }
     ],
-    "name": "getProjectChangesOrchangeProposals",
+    "name": "getChangesOrProposals",
     "outputs": [
       {
         "internalType": "string[]",
@@ -761,8 +755,7 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [],
@@ -775,8 +768,7 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [

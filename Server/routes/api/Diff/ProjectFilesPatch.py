@@ -10,7 +10,6 @@ def compare_files(old, new):
 
 # the function compare two local folders by content
 def compare_directories(dir1, dir2):
-    print(dir1, dir2)
     dcmp = filecmp.dircmp(dir1, dir2)
 
     if dcmp.left_only or dcmp.right_only or dcmp.funny_files:
