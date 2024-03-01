@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@bentogrid/core": "^1.1.1",
     "@codaworks/react-glow": "^1.0.6",
     "@monaco-editor/react": "^4.6.0",
     "@testing-library/jest-dom": "^6.1.4",

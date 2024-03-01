@@ -16,6 +16,7 @@ const ProjectDevelopment = () => {
     const [myChanges, setMyChanges] = useState([]);
     const [isModalOpen, setModalOpen] = useState(false);
     const [clickedChangeProposal, setClickedChangeProposal] = useState(false);
+    const [clickedLocalChange, setClickedLocalChange] = useState(false);
     
     // the function save the change proposals in the project
     const getChangeProposals = async () => {
@@ -51,6 +52,7 @@ const ProjectDevelopment = () => {
         }
     }
 
+
     // the function call the vote in favor of a change function on the smart contract
     const voteForChange = async() => {
       await contract.acceptChangeProposal(clickedChangeProposal, projectName)
@@ -58,18 +60,42 @@ const ProjectDevelopment = () => {
     }
 
     // the function upload the local changes of a user IPFS and create a new change proposal
-    const uploadChanges = async () => {
+    const uploadChange = async () => {
       try {
+        if (clickedLocalChange == false) {
+          return -1;
+        }
+        
         const response = await fetch('http://127.0.0.1:8000/api/upload_changes', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ "name": projectName }),
+          body: JSON.stringify({ "name": projectName, "change_name": clickedLocalChange }),
         });
         const data = await response.json(); 
         await contract.MakeChangeProposal(data["ipfsCID"], projectName)
         closeModal()
+         
+      } catch (error) {
+          console.error('Error:', error);
+      }
+  }
+  
+  const deleteChange = async () => {
+      try {
+        if (clickedLocalChange == false) {
+          return -1;
+        }
+        const response = await fetch('http://127.0.0.1:8000/api/delete_change', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ "name": projectName, 'change_name': clickedLocalChange }),
+        });
+        const data = await response.json(); 
+        setMyChanges(data["my_changes"]);
         
       } catch (error) {
           console.error('Error:', error);
@@ -84,7 +110,7 @@ const ProjectDevelopment = () => {
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ "name": projectName }),
+            body: JSON.stringify({ "name": projectName, "change_name": clickedLocalChange }),
           });
 
           getMyChanges()
@@ -109,7 +135,7 @@ const ProjectDevelopment = () => {
             <h1>My Changes</h1>
             <div className='modalFlex gap'>
             {myChanges.map((myChange, index) => (
-              <div className='FileLine centerText' key={index}>
+              <div onClick={() => {clickedLocalChange !== myChange ? setClickedLocalChange(myChange) : setClickedLocalChange(false)}} className={`FileLine centerText ${clickedLocalChange === myChange ? "brightBackground" : null}`} key={index}>
                 <label className='CIDtext FileText'>{myChange}</label>
               </div>
             ))}
@@ -121,8 +147,12 @@ const ProjectDevelopment = () => {
             <img className="HomeButton" src={LeftArrowSvg } alt="" />
             </motion.div>
 
-            <motion.div whileTap={{scale: 0.9}} whileHover={{scale: 1.03}} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} onClick={() => {uploadChanges()}} className='projectHeader HomeButtonDiv'>
-            <h1>Upload Last Changes</h1>
+            <motion.div whileTap={{scale: 0.9}} whileHover={{scale: 1.03}} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} onClick={() => {uploadChange()}} className='projectHeader HomeButtonDiv'>
+            <h1>Upload</h1>
+            </motion.div>
+
+            <motion.div whileTap={{scale: 0.9}} whileHover={{scale: 1.03}} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} onClick={() => {deleteChange()}} className='projectHeader HomeButtonDiv'>
+            <h1>Delete</h1>
             </motion.div>
 
             <motion.div whileTap={{scale: 0.9}} whileHover={{scale: 1.03}} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} onClick={() => {saveChanges()}} className='projectHeader HomeButtonDiv'>
@@ -161,7 +191,7 @@ const ProjectDevelopment = () => {
                 </div> : 
                 <div onClick={() => {setClickedChangeProposal(false)}} className='clickChangeProposal'>
                   <span onClick={(e) => {e.stopPropagation(); voteForChange()}} className='FileText buttonFileLine'>Vote</span>
-                  <span onClick={(e) => {e.stopPropagation(); navigate(`/project/${projectName}/${item}`)}} className='FileText buttonFileLine'>Watch the change proposal</span>
+                  <span onClick={(e) => {e.stopPropagation(); navigate(`/project/${projectName}/changeProposal/${item}`)}} className='FileText buttonFileLine'>Watch the change proposal</span>
                 </div>
               ))) : <h1 className='ListOfPatchesNoText'>[ Change Proposals ]</h1>}
             </div>

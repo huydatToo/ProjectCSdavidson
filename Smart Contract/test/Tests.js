@@ -37,8 +37,8 @@ contract("Steps", accounts => {
 
   it("should get project changes with no errors", async () => {
     const StepsInstance = await Steps.deployed();
-    const resultChanges = await StepsInstance.getProjectChangesOrchangeProposals(ProjectName, true , { from: accounts[0] });
-    const resultChangeProposals = await StepsInstance.getProjectChangesOrchangeProposals(ProjectName, false  , { from: accounts[0] });
+    const resultChanges = await StepsInstance.getChangesOrProposals(ProjectName, true , { from: accounts[0] });
+    const resultChangeProposals = await StepsInstance.getChangesOrProposals(ProjectName, false  , { from: accounts[0] });
     console.log(resultChangeProposals, resultChanges)
     assert.lengthOf(resultChanges, 2, "Project changes length should be two (base change) and the one we just accepted");
     assert.lengthOf(resultChangeProposals, 1, "Project change proposals length should be zero");

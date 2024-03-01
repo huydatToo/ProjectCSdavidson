@@ -75,6 +75,86 @@
   z-index: -2;
 }
 
+.backgroundNew {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-size: 40px 40px;
+  background-image: radial-gradient(circle, rgb(23, 23, 23) 1px, rgb(31, 31, 31) 1px);
+
+  z-index: -2;
+}
+
+.box {
+  border: 8px solid var(--color-four);
+  border-radius: 20.5px;
+  border-image: var(--border-pixel);
+  display: flex;
+  backdrop-filter: blur(2px);
+  background-color: #000000b6;
+  border-radius: 20.5px;
+}
+
+.boxCreateNewProject {
+  display: flex;
+  justify-content: center;
+  justify-items: center;
+  cursor: pointer;
+}
+
+.boxBox-search {
+  flex: 1;
+  padding: 2ch;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  flex-direction: column;
+}
+
+.boxBox-search input {
+  font-size: 20px;
+  width: auto;
+  font-family: 'Pixelify Sans', sans-serif;
+  color: var(--color-one);
+  background-color: rgb(31, 31, 31);
+  padding: 10px;
+  border-color: var(--color-one);
+  border-radius: 20.5px;
+  border: 8px solid var(--color-four);
+  border-image: var(--border-pixel);
+
+  border-style: inherit;
+  transition: border-color 0.3s;  
+  color: var(--color-text);
+  &::placeholder {
+    color: var(--color-four);
+  }
+  &:focus {
+      outline: none;
+      border-color: var(--color-text-bright);
+  }
+}
+
+.boxBox-arrow-down {
+  display: flex;
+  justify-content: center;
+  justify-items: center;  
+}
+
+
+.boxTitle {
+  color: #f4f4f4;
+}
+
+.bentogrid {
+  margin: 20px; /* Adjust the margin as needed */
+  max-width: 1200px; /* Adjust the maximum width as needed */
+
+}
+
 .background2 {
   position: relative;
   top: 0;
@@ -457,6 +537,10 @@
   &:hover {
     background-color: #00000094;
   }
+}
+
+.brightBackground {
+  background-color: #00000094;
 }
 
 .DirLine {

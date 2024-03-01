@@ -1,17 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.2;
 
-import "../node_modules/@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
-import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
 import "../node_modules/@openzeppelin/contracts/utils/Counters.sol";
-import "../node_modules/@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
 import "./Changes.sol";
+import "./ProjectsToken.sol";
 
 
-
-contract Steps is ERC1155, Ownable, ERC1155Supply {
+contract Steps {
     // initiate all the data structures and constants saved on the smart contract
-    uint public immutable TimeLockInterval = 60 * 60 * 24 * 30; // One Week
+    uint public immutable TimeLockInterval = 60 * 60 * 24 * 30; // One Month
     using Counters for Counters.Counter;
     using ChangesLibrary for ChangesLibrary.ChangesStorage;
 
@@ -44,6 +41,9 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
     // -------------------------------------------------------- Lists
     Project[] publicProjects;
 
+    // -------------------------------------------------------- Token
+    ProjectsToken public token;
+
     // -------------------------------------------------------- Events
     event NewProjectCreated(string message, string name, uint value);
     event NewChangeProposalCreated(string message, string Name, string CID, uint indexValue);
@@ -65,20 +65,17 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
 
 
     // -------------------------------------------------------- Constructor
-    constructor() ERC1155("URI") {
-
-    } // change URI to the website's one
+    constructor(address tokenAddress) {
+        token = ProjectsToken(tokenAddress);
+    } 
 
     // -------------------------------------------------------- Functions
-    function _beforeTokenTransfer(address operator, address from, address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data) internal override(ERC1155, ERC1155Supply) {
-        super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
-    }
 
     // the function create a new project with an inital change
     function createProject(string memory _CID, string memory projectName) public {
         uint newProjectID = publicProjects.length;
         NameToID[projectName] = newProjectID;
-        _mint(msg.sender, newProjectID, 10, "");
+        token.mint(msg.sender, newProjectID, 10);
         
         Project storage newProject = publicProjects.push();
         newProject.name = projectName;
@@ -89,21 +86,30 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
     }
 
     // the functions create a change proposal
-    function MakeChangeProposal(string memory _changeCID, string memory _projectName) ProjectExist(_projectName) external {
+    function MakeChangeProposal(
+        string memory _changeCID, 
+        string calldata _projectName
+    ) ProjectExist(_projectName) external {
         uint projectIDX = NameToID[_projectName];
-        publicProjects[projectIDX].changes.createChangeProposal(_changeCID, balanceOf(msg.sender, NameToID[_projectName]));
+        publicProjects[projectIDX].changes.createChangeProposal(_changeCID, token.balanceOf(msg.sender, NameToID[_projectName]));
         publicProjects[projectIDX].Voted[_changeCID][msg.sender] = true;
         emit NewChangeProposalCreated("New change proposal to the Project with the name and following ID and CID:", _projectName, _changeCID, projectIDX);
     }
 
     // the functions make a go back proposal
-    function MakeGoBackProposal(string memory _changeCID, string memory _projectName) external {
+    function MakeGoBackProposal(
+        string memory _changeCID, 
+        string calldata _projectName
+    ) external {
         uint projectID = NameToID[_projectName];
-        publicProjects[projectID].goBackProposals.push(goBack(_changeCID, msg.sender, balanceOf(msg.sender, NameToID[_projectName])));
+        publicProjects[projectID].goBackProposals.push(goBack(_changeCID, msg.sender, token.balanceOf(msg.sender, NameToID[_projectName])));
     }
 
     // the function make a go Back 
-    function acceptGoBack(string memory _projectName, string memory _changeCID) ProjectExist(_projectName) external {
+    function acceptGoBack(
+        string calldata _projectName, 
+        string memory _changeCID
+    ) ProjectExist(_projectName) external {
         uint projectIDX = NameToID[_projectName];
         publicProjects[projectIDX].changes.goBack(_changeCID);
         
@@ -111,24 +117,33 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
     }
 
     // the functions accept a change proposal and add it to the list
-    function acceptChangeProposal(string memory _proposedChangeCID, string memory _projectName) ProjectExist(_projectName) external {
+    function acceptChangeProposal(
+        string memory _proposedChangeCID, 
+        string calldata _projectName
+    ) ProjectExist(_projectName) external {
         uint projectID = NameToID[_projectName];
         publicProjects[projectID].changes.acceptChangeProposal(_proposedChangeCID);
         emit NewChangeIsMadeToProject("A new change has been made to the project: ", _projectName, _proposedChangeCID);
     }
 
     // the function returns the voting power of a user in a certain project
-    function getBalance(string memory _projectName, address _UserAddress) ProjectExist(_projectName) external view returns (uint) {
-        return balanceOf(_UserAddress, NameToID[_projectName]);
+    function getBalance(
+        string calldata _projectName, 
+        address _UserAddress
+    ) ProjectExist(_projectName) external view returns (uint) {
+        return token.balanceOf(_UserAddress, NameToID[_projectName]);
     }
 
     // the function allow user to vote in favor of a change proposal
-    function voteForChangeProposal(string memory _changeProposalCID, string memory _projectName) ProjectExist(_projectName) external {
+    function voteForChangeProposal(
+        string memory _changeProposalCID, 
+        string calldata _projectName
+    ) ProjectExist(_projectName) external {
         uint projectID = NameToID[_projectName];
 
         require(publicProjects[projectID].Voted[_changeProposalCID][msg.sender] == false, "Already voted");
 
-        uint votingPower = balanceOf(msg.sender, projectID);
+        uint votingPower = token.balanceOf(msg.sender, projectID);
         
         if (votingPower <= 0) {
             revert("Voting power is insufficient");
@@ -147,7 +162,10 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
     }
 
     // the functions returns the changes/change proposals
-    function getChangesOrProposals(string memory _projectName, bool changesOrChangeProposals) ProjectExist(_projectName) external view returns (string[] memory) {
+    function getChangesOrProposals(
+        string calldata _projectName, 
+        bool changesOrChangeProposals
+    ) ProjectExist(_projectName) external view returns (string[] memory) {
         uint projectID = NameToID[_projectName];
         return publicProjects[projectID].changes.getChangesOrChangeProposals(changesOrChangeProposals); // true for changes and false for change proposals
     }
@@ -169,10 +187,12 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
     }
 
     // the functions allow the token distribution when the timelock ends
-    function distributeTokens(string memory _projectName) ProjectExist(_projectName) external {
+    function distributeTokens(
+        string memory _projectName
+    ) ProjectExist(_projectName) external {
         uint projectID = NameToID[_projectName];
                 
-        require(block.timestamp >= publicProjects[projectID].lastDistributionTime + TimeLockInterval, "There is still time until the next distribution");
+        require(block.timestamp >= publicProjects[projectID].lastDistributionTime + TimeLockInterval, "not distribution time");
 
         // <token distribution>
         // ...
@@ -181,7 +201,7 @@ contract Steps is ERC1155, Ownable, ERC1155Supply {
         publicProjects[projectID].lastDistributionTime = block.timestamp;
 
         emit TokensDisributed(
-            "Tokens distributed",
+            "Tokens distribution Start",
             publicProjects[projectID].lastDistributionTime
         );
     }

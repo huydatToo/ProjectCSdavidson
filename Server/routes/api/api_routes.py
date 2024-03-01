@@ -11,6 +11,7 @@ from .Diff.getData import get_file_paths_in_cid
 from .Diff.getData import get_single_file_internal
 from .Diff.CreatePatch import compare_projects_cid
 from flask import Blueprint
+import shutil
 
 # This page contains all the accessible API routes for users, each function with @api_routes representing an individual route.
 api_routes = Blueprint('api_routes', __name__, url_prefix="/api")
@@ -168,6 +169,7 @@ def upload_changes():
         client = api_context.Start()
         data = request.get_json()
         project_name = data["name"]
+        change_name = data["change_name"]
         os.chdir("projects")
         os.chdir(project_name)
         with open("project-details.json", 'r') as json_file:
@@ -175,8 +177,8 @@ def upload_changes():
     
         if unsaved_changes_internal(change_cids=project_details["project-changes"], project_path=project_details["project-path"], client=client):
             my_changes = os.listdir("changes")
-            last_change = max(my_changes, key=lambda f: int(f.split("-")[2]))
-            result = client.add(os.path.join("changes", last_change), recursive=True)
+            last_change = my_changes.index(change_name)
+            result = client.add(os.path.join("changes", my_changes[last_change]), recursive=True)
             ipfs_hash = result[-1]["Hash"]
             
             message = jsonify({'ipfsCID': ipfs_hash}), 200
@@ -184,6 +186,7 @@ def upload_changes():
             message = jsonify({'unsaved changes': 357}), 500
             
     except Exception as e:
+        print(e)
         message = jsonify({'error': str(e)}), 500
     
     finally:
@@ -191,7 +194,7 @@ def upload_changes():
         return message
 
 # the function update local project
-@api_routes.route('/updateproject', methods=['POST'])
+@api_routes.route('/update_project', methods=['POST'])
 def update_project():
     client = api_context.Start()
     try:
@@ -200,11 +203,16 @@ def update_project():
         project_name = data["name"]
         os.chdir("projects")
         os.chdir(project_name)
+
+        if (unsaved_changes_internal(change_cids=project_details["project-changes"], project_path=project_details["project-path"], client=client)):
+            pass
+        
         with open("project-details.json", 'r') as json_file:
             project_details = json.load(json_file)
             for i in range(len(changes_cids)):
                 if changes_cids[i] != project_details["project-changes"][i]:
                     apply_project_patch_cid(project_details["project-path"], project_details["project-changes"][i], client)
+        
         message = jsonify({'message': 352}), 200
             
     except Exception as e:
@@ -300,3 +308,23 @@ def getLocalProjects():
         message = jsonify({'error': str(e)}), 500
     return message
 
+@api_routes.route('/delete_change', methods=['POST'])
+def delete_change():
+    client = api_context.Start()
+    try:
+        data = request.get_json()
+        change_name = data["change_name"]
+        project_name = data["name"]
+        
+        os.chdir("projects")
+        os.chdir(project_name)
+        os.chdir("changes")
+
+        shutil.rmtree(change_name)
+        message = jsonify({'my_changes': os.listdir()}), 200
+    except Exception as e:
+        message = jsonify({'error': str(e)}), 500
+    
+    finally:
+        client.close()
+        return message

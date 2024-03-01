@@ -7,6 +7,7 @@ import './css/Modal.css';
 import { WalletProvider } from './utils/WalletContext';
 import ProjectPage from './pages/ProjectPage';
 import ProjectDevelopment from './pages/ProjectDevelopment';
+import NewHome from './pages/NewHome';
 
 import {
   BrowserRouter,
@@ -21,9 +22,11 @@ root.render(
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />}/>
+        <Route path="/new" element={<NewHome />}/>
+        
         <Route path="/createNewProject" element={<CreateNewProject />}/>
         <Route path="/project/:projectName" element={<ProjectPage />}/>
-        <Route path="/project/:projectName/:changeProposal" element={<ProjectPage />}/>
+        <Route path="/project/:projectName/:changeProposalOrGoBack/:value" element={<ProjectPage />}/>
         <Route path="/project/:projectName/development" element={<ProjectDevelopment />}/>
       </Routes>
     </BrowserRouter>

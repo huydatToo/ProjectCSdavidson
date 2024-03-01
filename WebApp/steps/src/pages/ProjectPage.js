@@ -15,7 +15,7 @@ const ProjectPage = () => {
     const { contract } = useWallet();
     const navigate = useNavigate()
     const [project, setProject] = useState({changes: [], projectName: "", state: -1, files: [], path: ''});
-    const { projectName, changeProposal } = useParams();
+    const { projectName, changeProposalOrGoBack, value } = useParams();
     const [fileContent, setFileContent] = useState(false)
     const [isModalOpen, setModalOpen] = useState(false);
     const [path, setPath] = useState({path: "", openPathInput: false})
@@ -85,6 +85,17 @@ const ProjectPage = () => {
     const getProjectDetails = async () => {
       let changes = await contract.getChangesOrProposals(projectName, true);
       changes = [...changes].reverse();
+      let changesWithProposal
+      if (changeProposalOrGoBack === "changeProposal") {
+        changesWithProposal = [...changes]
+        changesWithProposal.push(value)
+        changes = changesWithProposal;
+      } else if (changeProposalOrGoBack === "goBack") {
+        changesWithProposal = [...changes].slice(0, value*1)
+        changes = changesWithProposal;
+      }
+
+      
       let currentProjectState = {state: -1, projectName: projectName, changes: changes, files: [], path: ''}
       
       try {
@@ -106,20 +117,14 @@ const ProjectPage = () => {
           currentProjectState = {...currentProjectState, state: 351}
         }
 
-  
         try {
-          let changesWithProposal
-          if (changeProposal) {
-            changesWithProposal = [...changes]
-            changesWithProposal.push(changeProposal)
-          }
 
           const response = await fetch('http://127.0.0.1:8000/api/get_project_files', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ "changes": changeProposal ? changesWithProposal : changes, 'name': currentProjectState.projectName }),
+            body: JSON.stringify({ "changes": changes, 'name': currentProjectState.projectName }),
           });
 
           const data = await response.json(); 
@@ -155,17 +160,13 @@ const ProjectPage = () => {
   // the functions show remote file content
   const getFileContent = async(file_name) => {
     try {
-      let changesWithProposal
-      if (changeProposal) {
-        changesWithProposal = [...project.changes]
-        changesWithProposal.push(changeProposal)
-      }
+
       const response = await fetch('http://127.0.0.1:8000/api/get_file', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ "changes": changeProposal ? changesWithProposal : project.changes, "file_name": file_name }),
+        body: JSON.stringify({ "changes": project.changes, "file_name": file_name }),
       });
 
       const data = await response.json(); 
@@ -193,7 +194,7 @@ const ProjectPage = () => {
       } catch (error) {
           console.error('Error uploading file:', error);
       }
-  }, []);
+  }, [changeProposalOrGoBack]);
 
   // the pages jsx
     return (
@@ -204,7 +205,7 @@ const ProjectPage = () => {
             <h1>Changes</h1>
             <div className='modalFlex gap'>
             {project.changes.map((changeCID, index) => (
-              <div onClick={() => navigator.clipboard.writeText(changeCID)} className='FileLine centerText' key={index}>
+              <div onClick={() => navigate(`/project/${projectName}/goBack/${index}`)} className='FileLine centerText' key={index}>
                 <label className='CIDtext FileText'>{changeCID.slice(0, 42)}</label>
               </div>
             ))}
