@@ -60,12 +60,12 @@ library ChangesLibrary {
 
     // the function returns the two lists
     function getChangesOrChangeProposals(ChangesStorage storage self, bool ChangesOrChangeProposals) external view returns (string[] memory) {
-        uint256 proposalCount = getChangesOrChangeProposalsCount(self, ChangesOrChangeProposals);
+        uint proposalCount = getChangesOrChangeProposalsCount(self, ChangesOrChangeProposals);
         string[] memory returnedList = new string[](proposalCount);
         
         string memory current = ChangesOrChangeProposals ? self.headChanges : self.headChangeProposals;
 
-        for (uint256 i = 0; i < proposalCount; i++) {
+        for (uint i = 0; i < proposalCount; i++) {
             returnedList[i] = current;
             current = self.changes[current].before;
         }

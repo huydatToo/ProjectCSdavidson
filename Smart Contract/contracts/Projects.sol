@@ -6,7 +6,7 @@ import "./Changes.sol";
 import "./ProjectsToken.sol";
 
 
-contract Steps {
+contract Projects {
     // initiate all the data structures and constants saved on the smart contract
     uint public immutable TimeLockInterval = 30 days;
     using Counters for Counters.Counter;
@@ -190,62 +190,6 @@ contract Steps {
         return lastProjects;
     }
 
-    // the functions allow the token distribution when the timelock ends
-    function distributeTokens(
-        string calldata _projectName
-    ) ProjectExist(_projectName) external {
-        uint projectID = NameToID[_projectName];
-                
-        require(block.timestamp >= publicProjects[projectID].lastDistributionTime + TimeLockInterval, "not distribution time");
-
-        // <token distribution>
-        // ...
-        // <token distribution/>
-
-        publicProjects[projectID].lastDistributionTime = block.timestamp;
-
-        emit TokensDisributed(
-            "Tokens distribution Start",
-            publicProjects[projectID].lastDistributionTime
-        );
-    }
-
-
-    function getSpendedTokens(
-        string calldata _projectName,
-        uint _lastDistributionTime,
-        address usr
-    ) ProjectExist(_projectName) external view returns (uint)  {
-        uint projectID = NameToID[_projectName];
-        return publicProjects[projectID].TokensSpent[usr][_lastDistributionTime];
-    }
-
-    function pendingTokens(
-        string calldata _projectName,
-        address usr
-    ) ProjectExist(_projectName) external view returns (uint)  {
-        uint projectID = NameToID[_projectName];
-        return publicProjects[projectID].pendingTokens[usr];
-    }
-
-    function setSpendedTokens(
-        string calldata _projectName,
-        uint _lastDistributionTime,
-        uint _spendedTokens,
-        address usr
-    ) ProjectExist(_projectName) external  {
-        uint projectID = NameToID[_projectName];
-        publicProjects[projectID].TokensSpent[usr][_lastDistributionTime] -= _spendedTokens;
-    }
-
-    function setPendingTokens(
-        string calldata _projectName,
-        address usr,
-        uint newTokens
-    ) ProjectExist(_projectName) external  {
-        uint projectID = NameToID[_projectName];
-        publicProjects[projectID].pendingTokens[usr] += newTokens;
-    }
 
 
 }
