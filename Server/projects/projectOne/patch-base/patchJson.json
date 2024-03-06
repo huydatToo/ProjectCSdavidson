@@ -2,43 +2,34 @@
   "Directories_Changes": [
     {
       "sign": "+",
-      "path": "folder one"
+      "path": "folderOne"
     },
     {
       "sign": "+",
-      "path": "folder one\\folderTwo"
+      "path": "folderTwo"
     }
   ],
   "Changes": [
     {
-      "folder one": [
+      "folderOne": [
         {
           "Sign": "+",
-          "name": "one.txt",
-          "Hash": "f5774877e0057713a8093078982383cea4165382b584e8a82c9a310e247d928c"
-        }
-      ]
-    },
-    {
-      "folder one\\folderTwo": [
-        {
-          "Sign": "+",
-          "name": "onetext.txt",
-          "Hash": "040805b2df49cf649105e7cf922366d825d6c8da823bb616c1c038ef7fe41d9d"
+          "name": "ad.txt",
+          "Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
         },
         {
           "Sign": "+",
-          "name": "twotext.txt",
-          "Hash": "5feeeadec5620d67897a78be0a5b96b1d63d760426a0d63c79ec6adedde4ce09"
+          "name": "t.txt",
+          "Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
         }
       ]
     },
     {
-      "-": [
+      "folderTwo": [
         {
           "Sign": "+",
-          "name": "itamar.txt",
-          "Hash": "2406e113dead4059874936375b4cd9538740402ea6b2f9629c1c74d2e539a07c"
+          "name": "adf.txt",
+          "Hash": "599afcebba57acc78920e3d3e005791973bcf4e4a31cee662f7c76d9e004bffb"
         }
       ]
     }
