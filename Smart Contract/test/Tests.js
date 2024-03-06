@@ -1,56 +1,97 @@
-const Steps = artifacts.require("./Steps.sol");
+const Projects = artifacts.require("./Projects.sol");
+const TokenDistribution = artifacts.require("./TokenDistribution.sol");
 const { expectRevert, time } = require("@openzeppelin/test-helpers");
 
-contract("Steps", accounts => {
+contract("Projects", accounts => {
 
   const changeProposalName = "changeProposalOne"
   const ProjectName = "ProjectOne"
 
   it("should create a new project without errors", async () => {
-    const StepsInstance = await Steps.deployed();
-    await StepsInstance.createProject("BaseChange", ProjectName, { from: accounts[0] });
+    const Projects = await TokenDistribution.deployed();
+    await Projects.createProject("BaseChange", ProjectName, { from: accounts[0] });
   });
 
   it("should make a change proposal without errors", async () => {
-    const StepsInstance = await Steps.deployed();
-    await StepsInstance.MakeChangeProposal(changeProposalName, ProjectName, { from: accounts[0] });
+    const Projects = await TokenDistribution.deployed();
+    await Projects.MakeChangeProposal(changeProposalName, ProjectName, { from: accounts[0] });
   });
 
   it("should get an error already voted for change proposal", async () => {
-    const StepsInstance = await Steps.deployed();
+    const Projects = await TokenDistribution.deployed();
     await expectRevert(
-      StepsInstance.voteForChangeProposal(changeProposalName, ProjectName, { from: accounts[0] }),
+      Projects.voteForChangeProposal(changeProposalName, ProjectName, { from: accounts[0] }),
       "Already voted"
     )
   });
 
   it("should make a change proposal from other account and vote for it from the main account with no errors", async () => {
-    const StepsInstance = await Steps.deployed();
-    await StepsInstance.MakeChangeProposal(changeProposalName + "1", ProjectName, { from: accounts[1] });
-    await StepsInstance.voteForChangeProposal(changeProposalName + "1", ProjectName, { from: accounts[0] });
+    const Projects = await TokenDistribution.deployed();
+    await Projects.MakeChangeProposal(changeProposalName + "1", ProjectName, { from: accounts[1] });
+    await Projects.voteForChangeProposal(changeProposalName + "1", ProjectName, { from: accounts[0] });
   });
 
   it("should accept the last change proposal with no errors", async () => {
-    const StepsInstance = await Steps.deployed();
-    await StepsInstance.acceptChangeProposal(changeProposalName + "1", ProjectName, { from: accounts[0] });
+    const Projects = await TokenDistribution.deployed();
+    await Projects.acceptChangeProposal(changeProposalName + "1", ProjectName, { from: accounts[0] });
   });
 
   it("should get project changes with no errors", async () => {
-    const StepsInstance = await Steps.deployed();
-    const resultChanges = await StepsInstance.getChangesOrProposals(ProjectName, true , { from: accounts[0] });
-    const resultChangeProposals = await StepsInstance.getChangesOrProposals(ProjectName, false  , { from: accounts[0] });
-    console.log(resultChangeProposals, resultChanges)
+    const Projects = await TokenDistribution.deployed();
+    const resultChanges = await Projects.getChangesOrProposals(ProjectName, true , { from: accounts[0] });
+    const resultChangeProposals = await Projects.getChangesOrProposals(ProjectName, false  , { from: accounts[0] });
     assert.lengthOf(resultChanges, 2, "Project changes length should be two (base change) and the one we just accepted");
     assert.lengthOf(resultChangeProposals, 1, "Project change proposals length should be zero");
   });
 
-  it("should run a token distribution a week later two times", async () => {
-    const StepsInstance = await Steps.deployed();
-    await time.increase(time.duration.days(31));
-    await StepsInstance.distributeTokens(ProjectName);
-    await time.increase(time.duration.days(31));
-    await StepsInstance.distributeTokens(ProjectName);
+})
+
+contract("Distribution", accounts => {
+
+  const changeProposalName = "changeProposalOne"
+  const ProjectName = "ProjectOne"
+  
+  
+
+  it("should start distribution with no errors", async () => {
+    const Projects = await TokenDistribution.deployed();
+    await Projects.createProject("BaseChange", ProjectName, { from: accounts[0] });
+
+    await time.increase(time.duration.days(33));
+    await Projects.startDistribution(ProjectName);
 
   });
 
+  it("should get distribution balance with no errors", async () => {
+    const Projects = await TokenDistribution.deployed();
+    await Projects.getDistributionBalanceOf(accounts[0], ProjectName);
+    
+  });
+
+  it("should make distribution to two users with no errors", async () => {
+    const Projects = await TokenDistribution.deployed();
+    await Projects.distribute([accounts[2], accounts[1]], [20, 30], ProjectName, { from: accounts[0] });
+    
+  });
+
+  it("should claim tokens after distribution ends", async () => {
+    const Projects = await TokenDistribution.deployed();
+    await time.increase(time.duration.days(33));
+    await Projects.claimPendingTokens(ProjectName, { from: accounts[1] });
+    await Projects.claimPendingTokens(ProjectName, { from: accounts[2] });
+    await Projects.startDistribution(ProjectName);  
+    
+    const one = await Projects.getDistributionBalanceOf(accounts[1], ProjectName)
+    const two = await Projects.getDistributionBalanceOf(accounts[0], ProjectName)
+    const three = await Projects.getDistributionBalanceOf(accounts[2], ProjectName)
+
+    const one_1 = await Projects.getBalance(accounts[1], ProjectName)
+    const two_1 = await Projects.getBalance(accounts[0], ProjectName)
+    const three_1 = await Projects.getBalance(accounts[2], ProjectName)
+
+    console.log(one.toNumber(), two.toNumber(), three.toNumber())
+    console.log(one_1.toNumber(), two_1.toNumber(), three_1.toNumber())
+    
+  });
+  
 });

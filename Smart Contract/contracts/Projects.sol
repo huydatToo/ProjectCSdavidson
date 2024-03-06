@@ -33,6 +33,7 @@ contract Projects {
         uint lastDistributionTime;
 
         // distribution
+        uint newTokens;
         mapping(address => uint) pendingTokens;
         mapping(address => mapping(uint => uint)) TokensSpent; // user => time => tokens spent
 
@@ -58,12 +59,8 @@ contract Projects {
 
     // -------------------------------------------------------- Modifiers
     modifier ProjectExist(string memory _Name) {
-        uint id = NameToID[_Name];
-        if (id == 0) {
-            require(keccak256(abi.encodePacked(publicProjects[id].name)) == keccak256(abi.encodePacked(_Name)), "Project do not exist");
-        } else {
-            require(id < publicProjects.length, "Project do not exist");
-        }
+        uint idx = NameToID[_Name];
+        require(token.exists(idx), "Project do not exist");
         _;
     }
 
@@ -79,7 +76,7 @@ contract Projects {
     function createProject(string memory _CID, string memory projectName) public {
         uint newProjectID = publicProjects.length;
         NameToID[projectName] = newProjectID;
-        token.mint(msg.sender, newProjectID, 10);
+        token.mint(msg.sender, newProjectID, 100);
         
         Project storage newProject = publicProjects.push();
         newProject.name = projectName;
@@ -130,14 +127,6 @@ contract Projects {
         emit NewChangeIsMadeToProject("A new change has been made to the project: ", _projectName, _proposedChangeCID);
     }
 
-    // the function returns the voting power of a user in a certain project
-    function getBalance(
-        string calldata _projectName, 
-        address _UserAddress
-    ) ProjectExist(_projectName) external view returns (uint) {
-        return token.balanceOf(_UserAddress, NameToID[_projectName]);
-    }
-
     // the function allow user to vote in favor of a change proposal
     function voteForChangeProposal(
         string memory _changeProposalCID, 
@@ -163,6 +152,13 @@ contract Projects {
             msg.sender,
             publicProjects[projectID].changes.getChangeProposalVotes(_changeProposalCID)
         );
+    }
+
+    function getBalance(
+        address _UserAddress,
+        string calldata _projectName
+    ) ProjectExist(_projectName) external view returns (uint) {
+        return token.balanceOf(_UserAddress, NameToID[_projectName]);
     }
 
     // the functions returns the changes/change proposals

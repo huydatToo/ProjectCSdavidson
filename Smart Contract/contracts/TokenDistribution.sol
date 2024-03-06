@@ -3,65 +3,71 @@ pragma solidity ^0.8.2;
 import "./Projects.sol";
 import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
 
-// each user has an array of his mints, and every new mint you check how much time left and how many he spent from his calculated amount
 contract TokenDistribution is Projects, Ownable {
-
-    struct payTokens {
-        address recipient;
-        uint amount;
-    }
 
     constructor(address _tokenAddress) Projects(_tokenAddress) {} 
 
-    function sum(payTokens[] memory _tokens) internal pure returns(uint _sum) {
+    function sum(uint[] memory _tokens) internal pure returns(uint _sum) {
 		for (uint i = 0; i < _tokens.length; i++)
-			_sum += _tokens[i].amount;
+			_sum += _tokens[i];
 	}
 
     function getDistributionBalanceOf(
         address usr, 
         string calldata projectName
     ) public view ProjectExist(projectName) returns (uint) {
-        // calculate the proportion of tokens you have
         uint projectIDX = NameToID[projectName];
         uint lastDistributionTime = publicProjects[projectIDX].lastDistributionTime;
-        uint tokens = publicProjects[projectIDX].TokensSpent[usr][lastDistributionTime];
+        uint balanceOf = token.balanceOf(usr, projectIDX);
+
+        // calculate the proportion of tokens you have
+        uint tokens = (balanceOf * 100) / token.totalSupply(projectIDX);
+        if (tokens == 0) {
+            return 0;
+        }
+        tokens = (publicProjects[projectIDX].newTokens * tokens) / 100;
+        tokens -= publicProjects[projectIDX].TokensSpent[usr][lastDistributionTime];
         return tokens;
     }
 
     function distribute(
-        payTokens[] memory recipients, 
+        address[] memory recipients,
+        uint[] memory amounts,  
         string calldata projectName
-    ) external onlyOwner ProjectExist(projectName) {
+    ) external ProjectExist(projectName) {
         uint projectIDX = NameToID[projectName];
-        uint tokensSpent = sum(recipients);
+        uint tokensToSpend = sum(amounts);
 
+        require(recipients.length == amounts.length, "not same amounts as a recepients");
         require(publicProjects[projectIDX].lastDistributionTime + TimeLockInterval > block.timestamp, "not distribution time");
-        require(tokensSpent <= getDistributionBalanceOf(msg.sender, projectName), "Unsufficent amount of tokens");
+        require(tokensToSpend <= getDistributionBalanceOf(msg.sender, projectName), "Unsufficent amount of tokens");
         
         uint lastDistributionTime = publicProjects[projectIDX].lastDistributionTime;
 
         for (uint i=0; i<recipients.length; i++) {
-            publicProjects[projectIDX].pendingTokens[recipients[i].recipient] += recipients[i].amount;
+            publicProjects[projectIDX].pendingTokens[recipients[i]] += amounts[i];
         }
-        publicProjects[projectIDX].TokensSpent[msg.sender][lastDistributionTime] += tokensSpent;
+
+        publicProjects[projectIDX].TokensSpent[msg.sender][lastDistributionTime] += tokensToSpend;
     }
 
     function startDistribution(
         string calldata projectName
     ) external ProjectExist(projectName) {
         uint projectIDX = NameToID[projectName];
-        require(block.timestamp > publicProjects[projectIDX].lastDistributionTime + TimeLockInterval, "not distribution time");
-
+        require(block.timestamp > publicProjects[projectIDX].lastDistributionTime + TimeLockInterval + 1 days, "not distribution time");
+        publicProjects[projectIDX].newTokens = 100;
         publicProjects[projectIDX].lastDistributionTime = block.timestamp;
     }
 
     function claimPendingTokens(
         string calldata projectName
-    ) external {
+    ) external ProjectExist(projectName) {
+        require(block.timestamp > publicProjects[NameToID[projectName]].lastDistributionTime + TimeLockInterval, "not claiming time");
+
         uint projectIDX = NameToID[projectName];
         token.mint(msg.sender, projectIDX, publicProjects[projectIDX].pendingTokens[msg.sender]);
-        publicProjects[projectIDX].pendingTokens[msg.sender] = 0;
+        delete publicProjects[projectIDX].pendingTokens[msg.sender];
     }
 
 }
