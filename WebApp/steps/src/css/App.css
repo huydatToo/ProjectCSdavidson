@@ -11,10 +11,16 @@
   --color-text-bright: #e6e6e6;
   --color-text: rgb(255, 255, 255);  
   --load: #636363;
+  --load: #161413;
   --border-pixel: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M16 0H8v4H4v4H0v8h4v4h4v4h8v-4h4v-4h4V8h-4V4h-4V0zm0 4v4h4v8h-4v4H8v-4H4V8h4V4h8z' fill='%23000000'/%3E%3C/svg%3E")
+  8 stretch;
+  --border-pixel-brown: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M16 0H8v4H4v4H0v8h4v4h4v4h8v-4h4v-4h4V8h-4V4h-4V0zm0 4v4h4v8h-4v4H8v-4H4V8h4V4h8z' fill='%23161413'/%3E%3C/svg%3E")
   8 stretch;
   --border-pixel-bright: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M16 0H8v4H4v4H0v8h4v4h4v4h8v-4h4v-4h4V8h-4V4h-4V0zm0 4v4h4v8h-4v4H8v-4H4V8h4V4h8z' fill='%23e6e6e6'/%3E%3C/svg%3E")
   8 stretch;
+
+  --brown-bright: #58514e;
+  --brown-bright-text: #c2b2ac;
 
   ::selection {
     background: #000000a4;
@@ -83,7 +89,7 @@
   height: 100%;
   background-size: cover;
   background-size: 40px 40px;
-  background-image: radial-gradient(circle, rgb(23, 23, 23) 1px, rgb(31, 31, 31) 1px);
+  background-image: radial-gradient(circle, rgb(23, 23, 23) 1px, hsl(0, 0%, 5%) 1px);
 
   z-index: -2;
 }
@@ -94,15 +100,41 @@
   border-image: var(--border-pixel);
   display: flex;
   backdrop-filter: blur(2px);
-  background-color: #000000b6;
+  background-color: hsla(0, 0%, 8%, 0.411);
   border-radius: 20.5px;
 }
 
 .boxCreateNewProject {
   display: flex;
   justify-content: center;
-  justify-items: center;
   cursor: pointer;
+  text-align: center;
+}
+
+.BoxProject-box-load {
+  background-color: var(--color-three);
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  justify-items: center;
+  flex-direction: column;
+  padding: 10px;
+  border-radius: 20.5px;
+  color: #c2b2ac;
+  text-align: left;
+  border: 8px solid var(--color-four);
+  border-image: var(--border-pixel);
+
+}
+
+
+.Boxbox-projects {
+  text-align: center;
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 2ch;
 }
 
 .boxBox-search {
@@ -119,7 +151,7 @@
   width: auto;
   font-family: 'Pixelify Sans', sans-serif;
   color: var(--color-one);
-  background-color: rgb(31, 31, 31);
+  background-color: #161413;
   padding: 10px;
   border-color: var(--color-one);
   border-radius: 20.5px;
@@ -143,16 +175,27 @@
   justify-content: center;
   justify-items: center;  
 }
+.boxBox-newProject {
+  padding: 62.5px;
+  display: flex;
+  justify-content: center;
+  justify-items: center;  
+}
 
 
 .boxTitle {
-  color: #f4f4f4;
+  color: #c2b2ac;
+}
+.BoxboxTitle {
+  margin-top: auto;
+  margin-bottom: auto;
+  color: #c2b2ac;
 }
 
 .bentogrid {
-  margin: 20px; /* Adjust the margin as needed */
-  max-width: 1200px; /* Adjust the maximum width as needed */
-
+  margin: auto; 
+  width: 120vh; 
+  box-shadow: #ffffff 0px 0px 200px -200px;
 }
 
 .background2 {
@@ -222,11 +265,12 @@
   display: flex;
   flex-direction: column;
   justify-content: center;  
+  margin: auto;
 }
 
 .pageTwo {
   height: 100vh;
-  }
+}
 
    
 /* box SEARCH ------------------------------------------------------- */
@@ -273,7 +317,7 @@
 }
 /* box SEARCH ------------------------------------------------------- */
 
-/* box projects ------------------------------------------------------- */
+/* box ` ------------------------------------------------------- */
 .box-projects {
   text-align: center;
   flex: 2;
@@ -291,6 +335,7 @@
   box-shadow: #000000 4px 4px 0px 3px;
 
 }
+
 /* box projects ------------------------------------------------------- */
 
 /* box create project ------------------------------------------------------- */
