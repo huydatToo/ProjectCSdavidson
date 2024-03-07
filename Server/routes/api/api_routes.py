@@ -1,5 +1,6 @@
 import time
 import os
+import flask
 from flask import jsonify, request
 import ipfshttpclient2
 from .Diff.ApplyPatch import apply_project_patch_cid
@@ -32,7 +33,7 @@ api_context = API_Context()
 
 # the functions upload a new project to the IPFS and returns it's CID
 @api_routes.route('/upload', methods=['POST'])
-def upload():
+def upload() -> flask.Response:
     client = api_context.Start()
     try:
         data = request.get_json()
@@ -74,7 +75,7 @@ def upload():
 
 # the functions downloads a remote project
 @api_routes.route('/download_project', methods=['POST'])
-def download_project():
+def download_project() -> flask.Response:
     client = api_context.Start()
     try:
         data = request.get_json()
@@ -113,7 +114,7 @@ def download_project():
 
 # the functions create a changes patch from updated version of a project and a local project
 @api_routes.route('/save_changes', methods=['POST'])
-def save_changes():
+def save_changes() -> flask.Response:
     try:
         client = api_context.Start()
         data = request.get_json()
@@ -138,7 +139,7 @@ def save_changes():
 
 # the functions returns the local changes
 @api_routes.route('/get_my_changes', methods=['POST'])
-def get_my_changes():
+def get_my_changes() -> flask.Response:
     api_context.Start()
     try:
         data = request.get_json()
@@ -155,7 +156,7 @@ def get_my_changes():
         return message
     
 # the functions checks if unsaved changes exist
-def unsaved_changes_internal(change_cids, project_path, client):
+def unsaved_changes_internal(change_cids, project_path, client) -> flask.Response:
     _, files_changes = compare_projects_cid(change_cids, project_path, client)
     if ("+" in str(files_changes) or "-" in str(files_changes) or "?" in str(files_changes)):
         return True
@@ -164,7 +165,7 @@ def unsaved_changes_internal(change_cids, project_path, client):
 
 # the function upload changes patch to IPFS
 @api_routes.route('/upload_changes', methods=['POST'])
-def upload_changes():
+def upload_changes() -> flask.Response:
     try:
         client = api_context.Start()
         data = request.get_json()
@@ -195,7 +196,7 @@ def upload_changes():
 
 # the function update local project
 @api_routes.route('/update_project', methods=['POST'])
-def update_project():
+def update_project() -> flask.Response:
     client = api_context.Start()
     try:
         data = request.get_json()
@@ -224,7 +225,7 @@ def update_project():
 
 # the functions returns the status of local project
 @api_routes.route('/check-project', methods=['POST'])
-def check_project():
+def check_project() -> flask.Response:
     api_context.Start()
     try:
         os.chdir("projects")
@@ -251,7 +252,7 @@ def check_project():
     
 
 # the function returns the tree of files in a remote project
-def get_project_files_internal(changes_cids, client):
+def get_project_files_internal(changes_cids, client) -> list:
     all_files = get_file_paths_in_cid(client, changes_cids[0])
     if len(changes_cids) > 1:
         for change in changes_cids[1:]:
@@ -261,7 +262,7 @@ def get_project_files_internal(changes_cids, client):
 
 # the function returns the tree of files in a remote project
 @api_routes.route('/get_project_files', methods=['POST'])
-def get_project_files():
+def get_project_files() -> flask.Response:
     client = api_context.Start()
     try:
         os.chdir("projects")
@@ -280,7 +281,7 @@ def get_project_files():
     
 # the function returns a single remote file content
 @api_routes.route('/get_file', methods=['POST'])
-def get_single_file():
+def get_single_file() -> flask.Response:
     client = api_context.Start()
     try:
         data = request.get_json()
@@ -297,7 +298,7 @@ def get_single_file():
         return message
 
 @api_routes.route('/getLocalProjects', methods=['GET'])
-def getLocalProjects():
+def getLocalProjects() -> flask.Response:
     api_context.Start()
     try:
         local_projects = os.listdir("projects")
@@ -309,7 +310,7 @@ def getLocalProjects():
     return message
 
 @api_routes.route('/delete_change', methods=['POST'])
-def delete_change():
+def delete_change() -> flask.Response:
     client = api_context.Start()
     try:
         data = request.get_json()

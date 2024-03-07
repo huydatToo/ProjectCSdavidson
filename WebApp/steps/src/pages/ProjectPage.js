@@ -238,7 +238,7 @@ const ProjectPage = () => {
             <h1>{project.projectName}</h1>
           </motion.div>
 
-          <motion.div  initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} className='projectHeader'>
+          <motion.div  initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} className='projectHeader toTheEnd'>
             <h1>{getState()}</h1>
           </motion.div>
 

@@ -99,7 +99,7 @@
   border-radius: 20.5px;
   border-image: var(--border-pixel);
   display: flex;
-  backdrop-filter: blur(2px);
+  backdrop-filter: blur(5px);
   background-color: hsla(0, 0%, 8%, 0.411);
   border-radius: 20.5px;
 }
@@ -109,6 +109,30 @@
   justify-content: center;
   cursor: pointer;
   text-align: center;
+}
+
+.BoxUser {
+  display: flex;
+  height: fit-content;
+  width: fit-content;
+  margin: auto;
+}
+
+.BoxUserData {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.centerSquare {
+  display: flex;
+  justify-content: center;
+}
+
+.square {
+  width: fit-content;
+  height: fit-content;
+
 }
 
 .BoxProject-box-load {
@@ -195,7 +219,10 @@
 .bentogrid {
   margin: auto; 
   width: 120vh; 
-  box-shadow: #ffffff 0px 0px 200px -200px;
+  background: 0;
+  border-radius: 20px;
+  box-shadow: #ffedc6 0px 0px 200px -200px, 
+              inset #ffedc6 0px 0px 190px -200px;
 }
 
 .background2 {
@@ -221,6 +248,39 @@
   margin-right: auto;
 }
 
+.lineShort {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 15px;
+  height: 100%;
+  width: 80vh;
+  
+}
+
+.lineShorter {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 15px;
+  height: 100%;
+  width: 42vh;
+  
+}
+
+.DistributionAndDev {
+  display: flex;
+  justify-content: center;
+  height: 100%;
+}
+
+.onSide {
+  display: flex;
+  margin-block: auto;
+  gap: 15px;
+  height: 90%;
+}
+
 .lineGapHome {
   margin: 2rem auto;
 }
@@ -229,10 +289,31 @@
   row-gap: 1rem;
 }
 
+.distribution {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border: 9px solid var(--color-four);
+  border-image: var(--border-pixel);
+  backdrop-filter: blur(2px);
+  background-color: #000000a8;
+  border-radius: 20.5px;
+  color: var(--color-text-bright);
+  box-shadow: #000000 4px 4px 0px 3px;
+}
+
 .projectHeaderLine {
   display: flex;
-  flex: start;
-  height: fit-content;
+  justify-content: start;
+  gap: 15px;
+  
+}
+
+.projectHeaderLineProposals {
+  display: flex;
+  justify-content: start;
+  gap: 15px;
+  width: 100%;
 }
 
 .DownloadInput {
@@ -289,8 +370,6 @@
   border-radius: 20.5px;
   box-shadow: #000000 4px 4px 0px 2px;
 }
-
-
 
 .box-search input {
   font-size: 20px;
@@ -553,7 +632,22 @@
   flex-direction: column;
   padding: 10px;
   height: 75%;
-  margin-bottom: 20px;
+  border: 9px solid var(--color-four);
+  border-radius: 20.5px;
+  border-image: var(--border-pixel);
+  backdrop-filter: blur(2px);
+  background-color: #000000a8;
+  border-radius: 20.5px;
+  color: var(--color-text-bright);
+  box-shadow: #000000 4px 4px 0px 3px;
+  
+}
+
+.projectListProposals {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  height: 100%;
   border: 9px solid var(--color-four);
   border-radius: 20.5px;
   border-image: var(--border-pixel);
@@ -616,6 +710,7 @@
 .toTheEnd {
   display: flex;
   justify-content: center;
+  flex-grow: 1
 }
 
 .modalFlex {

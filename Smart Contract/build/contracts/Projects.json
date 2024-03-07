@@ -191,7 +191,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -204,7 +205,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -217,7 +219,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -349,7 +352,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -373,7 +377,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -386,7 +391,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     }
   ],
   "metadata": "{\"compiler\":{\"version\":\"0.8.13+commit.abaa5c0e\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"tokenAddress\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"message\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"projectName\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"changeCID\",\"type\":\"string\"}],\"name\":\"NewChangeIsMadeToProject\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"message\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"Name\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"CID\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"indexValue\",\"type\":\"uint256\"}],\"name\":\"NewChangeProposalCreated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"message\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"NewProjectCreated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"message\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"projectName\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"changeProposalCID\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"voter\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"votes\",\"type\":\"uint256\"}],\"name\":\"NewVoteForChangeProposal\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"message\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"changeCID\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"ProjectName\",\"type\":\"string\"}],\"name\":\"ProjectWentBack\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"message\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"lastDistributionTime\",\"type\":\"uint256\"}],\"name\":\"TokensDisributed\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"_changeCID\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"_projectName\",\"type\":\"string\"}],\"name\":\"MakeChangeProposal\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"_changeCID\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"_projectName\",\"type\":\"string\"}],\"name\":\"MakeGoBackProposal\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"NameToID\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"TimeLockInterval\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"_proposedChangeCID\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"_projectName\",\"type\":\"string\"}],\"name\":\"acceptChangeProposal\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"_projectName\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"_changeCID\",\"type\":\"string\"}],\"name\":\"acceptGoBack\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"_CID\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"projectName\",\"type\":\"string\"}],\"name\":\"createProject\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_UserAddress\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"_projectName\",\"type\":\"string\"}],\"name\":\"getBalance\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"_projectName\",\"type\":\"string\"},{\"internalType\":\"bool\",\"name\":\"changesOrChangeProposals\",\"type\":\"bool\"}],\"name\":\"getChangesOrProposals\",\"outputs\":[{\"internalType\":\"string[]\",\"name\":\"\",\"type\":\"string[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getLastProjects\",\"outputs\":[{\"internalType\":\"string[]\",\"name\":\"\",\"type\":\"string[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"token\",\"outputs\":[{\"internalType\":\"contract ProjectsToken\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"_changeProposalCID\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"_projectName\",\"type\":\"string\"}],\"name\":\"voteForChangeProposal\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/Projects.sol\":\"Projects\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/Changes.sol\":{\"keccak256\":\"0x3bac823ae58bd9e1a8e76145982594e59105a5729e484d835205c96d3f97af7a\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://302ecbb2eacbe313fc654d6108f4e1e4e4ae675da3fe03e7d6dd8593abb28f10\",\"dweb:/ipfs/QmdrE46QCrzhCbN2aoAFztZYYGNeUqNjwJy5JKiWarQZbB\"]},\"project:/contracts/Projects.sol\":{\"keccak256\":\"0x8f4483fdab89f3e05a42ed9b6c148a8a254cadcffb89d3cd5278ae84ab59bd87\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://ad55e76a10117e1e35260671c9c55c1fc4b28bd492dac08a17f69a63c1939de7\",\"dweb:/ipfs/QmZiyAUK4kuctjEjoD2jdzU5xhvu14CUTNtJJQ16e8GgTD\"]},\"project:/contracts/ProjectsToken.sol\":{\"keccak256\":\"0x917c040e1955608dd2594ca888659589ac1570be4415a84700a9e49febccd0fb\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://15f445d271b6832cbe071772ac4f29e7da0771f7649eb641b85763ea5404c146\",\"dweb:/ipfs/QmcySdhcrnNRLR41AtqZRfViTNSR4rsyTR7YrzDW4dP2zo\"]},\"project:/node_modules/@openzeppelin/contracts/access/Ownable.sol\":{\"keccak256\":\"0xba43b97fba0d32eb4254f6a5a297b39a19a247082a02d6e69349e071e2946218\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://fc980984badf3984b6303b377711220e067722bbd6a135b24669ff5069ef9f32\",\"dweb:/ipfs/QmPHXMSXj99XjSVM21YsY6aNtLLjLVXDbyN76J5HQYvvrz\"]},\"project:/node_modules/@openzeppelin/contracts/token/ERC1155/ERC1155.sol\":{\"keccak256\":\"0x81149353c99ccf8ff18af7701bc3f38665c7a97e344cdc0d27f927f03d22af0e\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://b488da93995672b613897afa8ed85bb10442351ed54124001832bf2944108601\",\"dweb:/ipfs/QmP2fX6BzbgZyskxXqckeMzC1C3g7wKEbdtZfMegHoGW3j\"]},\"project:/node_modules/@openzeppelin/contracts/token/ERC1155/IERC1155.sol\":{\"keccak256\":\"0xcab667ddad478ff0d39c2053ca77fac778af8483c18ab07d810277b4216fd582\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://919c7ea27c77275c3c341da0c4a26a66a20ed27605fbe8becf11f58ec3bc65bf\",\"dweb:/ipfs/QmRLKyVE2n7e2Jo4bLNn8eLgqqhNGYnVQyjJPWdr8poskf\"]},\"project:/node_modules/@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol\":{\"keccak256\":\"0xeb373f1fdc7b755c6a750123a9b9e3a8a02c1470042fd6505d875000a80bde0b\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://0e28648f994abf1d6bc345644a361cc0b7efa544f8bc0c8ec26011fed85a91ec\",\"dweb:/ipfs/QmVVE7AiRjKaQYYji7TkjmTeVzGpNmms5eoxqTCfvvpj6D\"]},\"project:/node_modules/@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol\":{\"keccak256\":\"0xe3deb5f3b0c9d12944f62ab680f041bbf1910d9d3ac6b545b4b8e399643c538d\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://e1f5bc920c2f9859b02dce02d7d0211608398287c643d42ad048555c9b204dc8\",\"dweb:/ipfs/QmSu2MFkCSPNG6pRsXxMai7Do7EDqLwpnnHVDB7q2wHJnr\"]},\"project:/node_modules/@openzeppelin/contracts/token/ERC1155/extensions/IERC1155MetadataURI.sol\":{\"keccak256\":\"0xa66d18b9a85458d28fc3304717964502ae36f7f8a2ff35bc83f6f85d74b03574\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://e46c80ea068989111d6103e5521223f9ef337e93de76deed8b03f75c6f7b2797\",\"dweb:/ipfs/QmNoSE6knNfFncdDDLTb3fGR6oSQty1srG96Vsx3E9wQdw\"]},\"project:/node_modules/@openzeppelin/contracts/utils/Address.sol\":{\"keccak256\":\"0x006dd67219697fe68d7fbfdea512e7c4cb64a43565ed86171d67e844982da6fa\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://2455248c8ddd9cc6a7af76a13973cddf222072427e7b0e2a7d1aff345145e931\",\"dweb:/ipfs/QmfYjnjRbWqYpuxurqveE6HtzsY1Xx323J428AKQgtBJZm\"]},\"project:/node_modules/@openzeppelin/contracts/utils/Context.sol\":{\"keccak256\":\"0xe2e337e6dde9ef6b680e07338c493ebea1b5fd09b43424112868e9cc1706bca7\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://6df0ddf21ce9f58271bdfaa85cde98b200ef242a05a3f85c2bc10a8294800a92\",\"dweb:/ipfs/QmRK2Y5Yc6BK7tGKkgsgn3aJEQGi5aakeSPZvS65PV8Xp3\"]},\"project:/node_modules/@openzeppelin/contracts/utils/Counters.sol\":{\"keccak256\":\"0xf0018c2440fbe238dd3a8732fa8e17a0f9dce84d31451dc8a32f6d62b349c9f1\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://59e1c62884d55b70f3ae5432b44bb3166ad71ae3acd19c57ab6ddc3c87c325ee\",\"dweb:/ipfs/QmezuXg5GK5oeA4F91EZhozBFekhq5TD966bHPH18cCqhu\"]},\"project:/node_modules/@openzeppelin/contracts/utils/introspection/ERC165.sol\":{\"keccak256\":\"0xd10975de010d89fd1c78dc5e8a9a7e7f496198085c151648f20cba166b32582b\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://fb0048dee081f6fffa5f74afc3fb328483c2a30504e94a0ddd2a5114d731ec4d\",\"dweb:/ipfs/QmZptt1nmYoA5SgjwnSgWqgUSDgm4q52Yos3xhnMv3MV43\"]},\"project:/node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol\":{\"keccak256\":\"0x447a5f3ddc18419d41ff92b3773fb86471b1db25773e07f877f548918a185bf1\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://be161e54f24e5c6fae81a12db1a8ae87bc5ae1b0ddc805d82a1440a68455088f\",\"dweb:/ipfs/QmP7C3CHdY9urF4dEMb9wmsp1wMxHF6nhA2yQE5SKiPAdy\"]}},\"version\":1}",
@@ -24080,9 +24086,19 @@
     "name": "solc",
     "version": "0.8.13+commit.abaa5c0e.Emscripten.clang"
   },
-  "networks": {},
+  "networks": {
+    "1709818923318": {
+      "events": {},
+      "links": {
+        "ChangesLibrary": "0xD49aB323fb6DF2dfDd13Bf9E6b62f89d2275Df8C"
+      },
+      "address": "0x0bDEFaCE7216cd35b68174f6425D9e1742Eab572",
+      "transactionHash": "0x2df02cafa6ada3a2d3a5b8ac49c6bfb0d0835370298d19cba3c2b94f6e7a207b"
+    }
+  },
   "schemaVersion": "3.4.7",
-  "updatedAt": "2024-03-06T20:09:31.676Z",
+  "updatedAt": "2024-03-07T13:42:14.131Z",
+  "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
     "methods": {},

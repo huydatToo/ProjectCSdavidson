@@ -126,9 +126,18 @@ const ProjectDevelopment = () => {
       getMyChanges()
     }, [contract]);
 
+    function getFormatAddress(address, startLength = 10, endLength = 4) {
+      if (!address) return '';
+    
+      const start = address.substring(0, startLength);
+      const end = address.substring(address.length - endLength);
+    
+      return `${start}...${end}`;
+    }
+
     // returns the page's react component
     return (
-        <div className='background middle center lineGap pageOne'>
+        <div className='background pageOne'>
         <ModalChanges isOpen={isModalOpen} closeModal={closeModal}>
         <div className='modalFlex'>
           <div className=''>
@@ -162,8 +171,11 @@ const ProjectDevelopment = () => {
           </div>
         </div>
         </ModalChanges>
-
-            <div className='line projectHeaderLine'>
+        
+        <div className='DistributionAndDev'>
+          <div className='onSide'>
+          <div className='lineShort'>
+            <div className='projectHeaderLineProposals'>
                 <motion.div whileTap={{scale: 0.9}} whileHover={{scale: 1.03}} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} onClick={() => {navigate('/')}} className='projectHeader HomeButtonDiv'>
                     <img className="HomeButton" src={HomeSvg} alt="" />
                 </motion.div>
@@ -181,11 +193,11 @@ const ProjectDevelopment = () => {
                 </motion.div>
             </div>
 
-            <div className={ChangeProposals.length > 0 ? "line projectListFiles" : "line projectListFiles ListOfPatchesNo"}> 
+            <div className={ChangeProposals.length > 0 ? "projectListProposals" : "projectListProposals ListOfPatchesNo"}> 
             {ChangeProposals.length > 0 ? ChangeProposals.map((item, index) => (
                 (item != clickedChangeProposal ?
                 <div onClick={() => {setClickedChangeProposal(item)}} className='FileLine'>
-                <span className='FileText'>{item}</span>
+                <span className='FileText'>{getFormatAddress(item)}</span>
                 <span className='FileText'>|</span>
                 <span className='FileText'>Change Proposal</span>
                 </div> : 
@@ -195,6 +207,15 @@ const ProjectDevelopment = () => {
                 </div>
               ))) : <h1 className='ListOfPatchesNoText'>[ Change Proposals ]</h1>}
             </div>
+          </div>
+          
+          <div className='lineShorter'>
+            <div className='distribution'> 
+              <h1>Token Distribution</h1>
+            </div>
+          </div>
+        </div>
+        </div>
 
         </div>
     );

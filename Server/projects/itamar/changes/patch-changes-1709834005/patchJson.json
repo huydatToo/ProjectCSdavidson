@@ -1,0 +1,25 @@
+{
+  "Directories_Changes": [
+    {
+      "sign": "/",
+      "old_path": "folderOne",
+      "new_path": "folderOne"
+    },
+    {
+      "sign": "*",
+      "old_path": "folderTwo",
+      "new_path": "folderOne"
+    }
+  ],
+  "Changes": [
+    {
+      "-": [
+        {
+          "Sign": "+",
+          "name": "weffwefe.txt",
+          "Hash": "8685fbcf0edd839f3bcd831eb8b5d043a8daee85aa50fdc55108582b86381f61"
+        }
+      ]
+    }
+  ]
+}
