@@ -1,5 +1,5 @@
 // WalletContext.js
-import React, { createContext, useContext, useState, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { ethers } from 'ethers'
 import { CONTRACT_ADDRESS, CONTRACT_ABI } from '../utils/SmartContract';
 const WalletContext = createContext();
@@ -29,7 +29,10 @@ export const WalletProvider = ({ children }) => {
           }
         }
     };
-    
+
+    useEffect(() => {
+      checkWalletConnection();
+    }, []);
 
   const values = {
     account,

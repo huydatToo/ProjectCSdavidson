@@ -1,0 +1,46 @@
+{
+  "Directories_Changes": [
+    {
+      "sign": "+",
+      "path": "folderOne"
+    },
+    {
+      "sign": "+",
+      "path": "folderTwo"
+    }
+  ],
+  "Changes": [
+    {
+      "folderOne": [
+        {
+          "Sign": "+",
+          "name": "ad.txt",
+          "Hash": "518727031a1fc572792697d8c51214e1a5b74a6696f81ceb9df8b2c331b130e7"
+        },
+        {
+          "Sign": "+",
+          "name": "t.txt",
+          "Hash": "0cc9ba20f893a086bff2c1feb049e90f4a9d32b53b67fe570337c8c36022586c"
+        }
+      ]
+    },
+    {
+      "folderTwo": [
+        {
+          "Sign": "+",
+          "name": "adf.txt",
+          "Hash": "67be6efd98e39fed6aca82ee0ffee7af875e33fbda9f06c3eebfbfeefa543d6a"
+        }
+      ]
+    },
+    {
+      "-": [
+        {
+          "Sign": "+",
+          "name": "weffwefe.txt",
+          "Hash": "8685fbcf0edd839f3bcd831eb8b5d043a8daee85aa50fdc55108582b86381f61"
+        }
+      ]
+    }
+  ]
+}

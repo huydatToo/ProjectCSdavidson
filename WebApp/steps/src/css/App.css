@@ -78,6 +78,7 @@
   linear-gradient(-45deg, transparent 20%, rgb(0, 0, 0, 0.3) 25%, transparent 25%), 
   linear-gradient(-45deg, transparent 75%, rgba(0, 0, 0, 0.432) 80%, transparent 0);  
   background-size: 30px 30px, 30px 30px;
+  
   z-index: -2;
 }
 
@@ -291,6 +292,7 @@
 
 .distribution {
   display: flex;
+  text-align: center;
   flex-direction: column;
   height: 100%;
   border: 9px solid var(--color-four);
@@ -300,20 +302,103 @@
   border-radius: 20.5px;
   color: var(--color-text-bright);
   box-shadow: #000000 4px 4px 0px 3px;
+  justify-content: space-between;
+}
+
+.distributeButton {
+  border: 9px solid var(--color-four);
+  border-image: var(--border-pixel);
+  backdrop-filter: blur(2px);
+  background-color: #000000a8;
+  border-radius: 20.5px;
+  margin: 10px;
+  color: var(--color-text-bright);
+  cursor: pointer;
 }
 
 .projectHeaderLine {
   display: flex;
-  justify-content: start;
+  justify-content: flex-start;
   gap: 15px;
   
 }
 
 .projectHeaderLineProposals {
   display: flex;
-  justify-content: start;
+  justify-content: flex-start;
   gap: 15px;
   width: 100%;
+}
+
+.payTokens {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.payTokensIncrementor {
+  display: flex;
+  gap: 10px;
+  text-align: center;
+  justify-items: center;
+  height: fit-content;
+  padding-inline: 10px;
+}
+
+.payTokensIncrementor input[type=number] {
+  width: 70px;
+  margin-block: auto;
+  color: white;
+  padding: 5px;
+  border: 9px solid var(--color-four);
+  border-image: var(--border-pixel);
+  backdrop-filter: blur(2px);
+  background-color: #1a1a1aa8;
+  font-family: 'Pixelify Sans', sans-serif;
+  font-size: 21px;
+  border-radius: 20.5px;
+
+  outline: 0 !important;
+  height: fit-content;
+  text-align: center;
+  appearance: none; 
+  -moz-appearance: textfield; 
+  -webkit-appearance: none; 
+}
+
+.incDec {
+  cursor: pointer;
+  padding-inline: 10px;
+}
+
+.payTokensIncrementor input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+}
+
+.payTokensDiv {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  border: 9px solid var(--color-four);
+  border-image: var(--border-pixel);
+  backdrop-filter: blur(2px);
+  background-color: #000000a8;
+  border-radius: 20.5px;
+  color: var(--color-text-bright);
+}
+
+.payTokensDetails {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+}
+
+.justDetails {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
 }
 
 .DownloadInput {
@@ -625,6 +710,7 @@
   border-radius: 22.5px;
   color: var(--color-text-bright);
   box-shadow: #000000 4px 4px 0px 3px;
+
 }
 
 .projectListFiles {

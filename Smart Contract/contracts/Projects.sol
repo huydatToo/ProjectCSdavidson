@@ -81,6 +81,7 @@ contract Projects {
         Project storage newProject = publicProjects.push();
         newProject.name = projectName;
         newProject.changes.initialize(_CID);
+        newProject.newTokens = 100;
         newProject.lastDistributionTime = block.timestamp;
 
         emit NewProjectCreated("New project created with ID:", projectName, newProjectID);
@@ -170,6 +171,13 @@ contract Projects {
         return publicProjects[projectID].changes.getChangesOrChangeProposals(changesOrChangeProposals); // true for changes and false for change proposals
     }
 
+    function getAddresses(
+        string calldata _projectName
+    ) ProjectExist(_projectName) external view returns (address[] memory) {
+        uint projectID = NameToID[_projectName];
+        return publicProjects[projectID].changes.getAddresses(); // true for changes and false for change proposals
+    }
+
     // TEMP
     function getLastProjects() external view returns (string[] memory) {
         uint arr_length = publicProjects.length;
@@ -184,6 +192,11 @@ contract Projects {
             lastProjects[arr_index - 1 - i] = publicProjects[i].name; 
         }}
         return lastProjects;
+    }
+
+    function getLastDistriubtionTime(string calldata projectName) external view ProjectExist(projectName) returns (uint)  {
+        uint projectID = NameToID[projectName];
+        return publicProjects[projectID].lastDistributionTime;
     }
 
 

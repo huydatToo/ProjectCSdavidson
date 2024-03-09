@@ -19,31 +19,48 @@ library ChangesLibrary {
     }
 
     // create new linkedList
-    function initialize(ChangesStorage storage self, string memory baseChangeCID) external {
+    function initialize(
+        ChangesStorage storage self, 
+        string memory baseChangeCID
+    ) external {
         self.changes[baseChangeCID] = Change(msg.sender, 10, "Changes", "Changes");
         self.headChanges = baseChangeCID;
         self.headChangeProposals = "ChangeProposals";
     }
 
     // create a change proposal and add it to the list
-    function createChangeProposal(ChangesStorage storage self, string memory changeCID, uint votes) external {
+    function createChangeProposal(
+        ChangesStorage storage self, 
+        string memory changeCID, 
+        uint votes
+    ) external {
         self.changes[changeCID] = Change({changeMaker: msg.sender, votes: votes, next: "ChangeProposals", before: self.headChangeProposals});
         self.changes[self.headChangeProposals].next = changeCID;
         self.headChangeProposals = changeCID;
     }
 
     // add voting power to the amount of votes in a change proposal
-    function voteForChangeProposal(ChangesStorage storage self, string memory changeCID, uint votes) external {
+    function voteForChangeProposal(
+        ChangesStorage storage self, 
+        string memory changeCID, 
+        uint votes
+    ) external {
         self.changes[changeCID].votes += votes; 
     }
 
     // the function returns the amount of votes a change proposal recived
-    function getChangeProposalVotes(ChangesStorage storage self, string memory changeCID) external view returns (uint) {
+    function getChangeProposalVotes(
+        ChangesStorage storage self, 
+        string memory changeCID
+    ) external view returns (uint) {
         return self.changes[changeCID].votes;
     }
 
     // the function create a new change by moving a change proposal from it's list to the changes list
-    function acceptChangeProposal(ChangesStorage storage self, string memory changeCID) external {
+    function acceptChangeProposal(
+        ChangesStorage storage self, 
+        string memory changeCID
+    ) external {
         
         if (self.changes[self.changes[changeCID].next].changeMaker != address(0)) {
             self.changes[self.changes[changeCID].next].before = self.changes[changeCID].before;
@@ -59,7 +76,10 @@ library ChangesLibrary {
     }
 
     // the function returns the two lists
-    function getChangesOrChangeProposals(ChangesStorage storage self, bool ChangesOrChangeProposals) external view returns (string[] memory) {
+    function getChangesOrChangeProposals(
+        ChangesStorage storage self, 
+        bool ChangesOrChangeProposals
+    ) external view returns (string[] memory) {
         uint proposalCount = getChangesOrChangeProposalsCount(self, ChangesOrChangeProposals);
         string[] memory returnedList = new string[](proposalCount);
         
@@ -74,7 +94,10 @@ library ChangesLibrary {
     }
 
     // the function returns the number of changes/change proposals in a project
-    function getChangesOrChangeProposalsCount(ChangesStorage storage self, bool ChangesOrChangeProposals) public view returns (uint) {
+    function getChangesOrChangeProposalsCount(
+        ChangesStorage storage self, 
+        bool ChangesOrChangeProposals
+    ) public view returns (uint) {
         uint count = 0;
 
         string memory currentProposal = ChangesOrChangeProposals ? self.headChanges : self.headChangeProposals;
@@ -84,6 +107,29 @@ library ChangesLibrary {
             currentProposal = self.changes[currentProposal].before;
         }
         return count;
+    }
+
+    // the function returns the number of changes/change proposals in a project
+    function getAddresses(
+        ChangesStorage storage self
+    ) public view returns (address[] memory) {
+        uint count = 0;
+        uint proposalCount = getChangesOrChangeProposalsCount(self, true) + getChangesOrChangeProposalsCount(self, false);
+        address[] memory returnedList = new address[](proposalCount);
+        string memory currentProposal = self.headChanges;
+        while (self.changes[currentProposal].changeMaker != address(0)) {
+            returnedList[count] = self.changes[currentProposal].changeMaker;
+            count++;
+            currentProposal = self.changes[currentProposal].before;
+        }
+
+        currentProposal = self.headChangeProposals;
+        while (self.changes[currentProposal].changeMaker != address(0)) {
+            returnedList[count] = self.changes[currentProposal].changeMaker;
+            count++;
+            currentProposal = self.changes[currentProposal].before;
+        }
+        return returnedList;
     }
 
     // the function make a go back

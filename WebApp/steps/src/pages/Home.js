@@ -66,7 +66,6 @@ function Home() {
 
   // the function initiate the page
   useEffect(() => {
-    checkWalletConnection();
     if (isConnected) {
       setIsButtons({new_project: 0, new: 2})
       getLastProjects()
