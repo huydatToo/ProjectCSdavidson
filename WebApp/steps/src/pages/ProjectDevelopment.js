@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import LeftArrowSvg from '../assets/leftArrow.svg';
@@ -8,187 +8,239 @@ import HomeSvg from '../assets/home.svg';
 import ModalChanges from '../components/ModalChanges';
 import { MetaMaskAvatar } from 'react-metamask-avatar';
 
-// the project development page
-const ProjectDevelopment = () => {
-    const navigate = useNavigate()
-    const { projectName } = useParams();
-    const { contract, account, isConnected, checkWalletConnection } = useWallet();
-    const [ChangeProposals, setChangeProposals] = useState([]);
-    const [myChanges, setMyChanges] = useState([]);
-    const [distribution, setDistribution] = useState({open: null, addresses: [], myBalance: null})
-    const [isModalOpen, setModalOpen] = useState(false);
-    const [clickedChangeProposal, setClickedChangeProposal] = useState(false);
-    const [clickedLocalChange, setClickedLocalChange] = useState(false);
-    
-    // the function save the change proposals in the project
-    const getChangeProposals = async () => {
-        const changeProposalsTemp = await contract.getChangesOrProposals(projectName, false);
-        setChangeProposals(changeProposalsTemp);
-    }
+// Project development page component
+function ProjectDevelopment() {
+  const navigate = useNavigate();
+  const { projectName } = useParams();
+  const { contract, account, isConnected, checkWalletConnection } = useWallet();
+  const [ChangeProposals, setChangeProposals] = useState([]);
+  const [myChanges, setMyChanges] = useState([]);
+  const [distribution, setDistribution] = useState({
+    open: null,
+    addresses: [],
+    myBalance: null,
+  });
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [clickedChangeProposal, setClickedChangeProposal] = useState(false);
+  const [clickedLocalChange, setClickedLocalChange] = useState(false);
 
-    const getTimeInSeconds = () => {
-      return Math.floor(Date.now() / 1000);
-    }
-
-
-    // the functions open\close the modal
-    const openModal = () => {
-        setModalOpen(true);
-      };
-    
-    const closeModal = () => {
-        setModalOpen(false);
-    };
-
-    // the functions save the users changes.
-    const getMyChanges = async () => {
-        try {
-          const response = await fetch('http://127.0.0.1:8000/api/get_my_changes', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ "name": projectName }),
-          });
-          const data = await response.json(); 
-          setMyChanges(data["my_changes"])
-          
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    }
-
-
-    // the function call the vote in favor of a change function on the smart contract
-    const voteForChange = async() => {
-      await contract.acceptChangeProposal(clickedChangeProposal, projectName)
-      navigate(`/project/${projectName}`)
-    }
-
-    // the function upload the local changes of a user IPFS and create a new change proposal
-    const uploadChange = async () => {
-      try {
-        if (clickedLocalChange === false) {
-          return -1;
-        }
-        
-        const response = await fetch('http://127.0.0.1:8000/api/upload_changes', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ "name": projectName, "change_name": clickedLocalChange }),
-        });
-        const data = await response.json(); 
-        await contract.MakeChangeProposal(data["ipfsCID"], projectName)
-        await getChangeProposals();
-        closeModal()
-         
-      } catch (error) {
-          console.error('Error:', error);
-      }
-  }
-  
-  const deleteChange = async () => {
-      try {
-        if (clickedLocalChange === false) {
-          return -1;
-        }
-        const response = await fetch('http://127.0.0.1:8000/api/delete_change', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ "name": projectName, 'change_name': clickedLocalChange }),
-        });
-        const data = await response.json(); 
-        setMyChanges(data["my_changes"]);
-        
-      } catch (error) {
-          console.error('Error:', error);
-      }
+  // Function to get change proposals for the project
+  async function getChangeProposals() {
+    const changeProposalsTemp = await contract.getChangesOrProposals(projectName, false);
+    setChangeProposals(changeProposalsTemp);
   }
 
-    // the functions saves the users local changes
-    const saveChanges = async () => {
-        try {
-          await fetch('http://127.0.0.1:8000/api/save_changes', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ "name": projectName, "change_name": clickedLocalChange }),
-          });
+  function getTimeInSeconds() {
+    return Math.floor(Date.now() / 1000);
+  }
 
-          getMyChanges()
-          
-        } catch (error) {
-            console.error('Error saving changes:', error);
-        }
+  // Functions to open/close the modal
+  function openModal() {
+    setModalOpen(true);
+  }
+
+  function closeModal() {
+    setModalOpen(false);
+  }
+
+  // Function to get user's changes
+  async function getMyChanges() {
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/get_my_changes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: projectName }),
+      });
+      const data = await response.json();
+      setMyChanges(data['my_changes']);
+    } catch (error) {
+      console.error('Error:', error);
     }
+  }
 
-    const getDistributionState = async () => {
-      const lastDistributionTime = await contract.getLastDistriubtionTime(projectName);
+  // Function to vote in favor of a change
+  async function voteForChange() {
+    await contract.acceptChangeProposal(clickedChangeProposal, projectName);
+    navigate(`/project/${projectName}`);
+  }
+
+  // Function to upload local changes and create a new change proposal
+  async function uploadChange() {
+    try {
+      if (!clickedLocalChange) {
+        return -1;
+      }
+
+      const response = await fetch('http://127.0.0.1:8000/api/upload_changes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: projectName, change_name: clickedLocalChange }),
+      });
+
+      const data = await response.json();
+      await contract.MakeChangeProposal(data['ipfsCID'], projectName);
+      await getChangeProposals();
+      closeModal();
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+
+  // Function to delete a local change
+  async function deleteChange() {
+    try {
+      if (!clickedLocalChange) {
+        return -1;
+      }
+
+      const response = await fetch('http://127.0.0.1:8000/api/delete_change', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: projectName, change_name: clickedLocalChange }),
+      });
+
+      const data = await response.json();
+      setMyChanges(data['my_changes']);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+
+  // Function to save user's local changes
+  async function saveChanges() {
+    try {
+      await fetch('http://127.0.0.1:8000/api/save_changes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: projectName, change_name: clickedLocalChange }),
+      });
+
+      getMyChanges();
+    } catch (error) {
+      console.error('Error saving changes:', error);
+    }
+  }
+
+  // Function to get the distribution state
+  async function getDistributionState() {
+    var lastDistributionTime = await contract.getLastDistriubtionTime(projectName);
+    var timeInterval = await contract.TimeLockInterval();
+    var myBalance = await contract.getDistributionBalanceOf(account, projectName);
+
+    timeInterval = timeInterval.toNumber()
+    lastDistributionTime = lastDistributionTime.toNumber()
+    myBalance = myBalance.toNumber()
+
+    if (lastDistributionTime + timeInterval < getTimeInSeconds()) {
       const projectAddresses = await contract.getAddresses(projectName);
-      const myBalance = await contract.getDistributionBalanceOf(account, projectName)
-      const projectAddressesFiltered = [...new Set(projectAddresses)]
-      
-      let contributors = []
-      for (let i = 0; i<projectAddressesFiltered.length; i++) {
-        contributors.push({address: projectAddressesFiltered[i], sendTo: 0, changesOrProposalsCount: projectAddresses.filter(element => element === projectAddresses[i]).length})
+      const projectAddressesFiltered = [...new Set(projectAddresses)];
+
+      let contributors = [];
+      for (let i = 0; i < projectAddressesFiltered.length; i++) {
+        contributors.push({
+          address: projectAddressesFiltered[i],
+          sendTo: 0,
+          changesOrProposalsCount: projectAddresses.filter((element) => element === projectAddresses[i]).length,
+        });
       }
-      setDistribution({...distribution, myBalance: myBalance.toNumber(), lastDistributionTime: lastDistributionTime, addresses: contributors});
+
+      setDistribution({
+        ...distribution,
+        myBalance: myBalance,
+        lastDistributionTime: lastDistributionTime,
+        addresses: contributors,
+        timeInterval: timeInterval,
+      });
+    } else {
+      var myPendingTokens = await contract.getPendingTokens(account, projectName)
+      myPendingTokens = myPendingTokens.toNumber()
+
+      setDistribution({ 
+        ...distribution, 
+        myBalance: myBalance, 
+        lastDistributionTime: lastDistributionTime,
+        myPendingTokens: myPendingTokens,
+        timeInterval: timeInterval,
+      });
+    }
+  }
+
+  // Function to calculate time until the next distribution
+  function timeForDistribution() {
+    const timeNow = getTimeInSeconds();
+    if (distribution.lastDistributionTime + distribution.timeInterval + (distribution.timeInterval/5) > timeNow) {
+      const timeUntilNextDistribution = (distribution.timeInterval - (timeNow - distribution.lastDistributionTime)) / (60 * 60 * 24);
+      return timeUntilNextDistribution;
+    } else {
+      return false;
+    }
+  }
+
+  // Function to distribute tokens
+  async function distribute() {
+    var amounts = distribution.addresses.map((usr) => usr.sendTo);
+    var addresses = distribution.addresses.map((usr) => usr.address);
+
+    addresses = addresses.filter((_, index) => amounts[index] !== 0);
+    amounts = amounts.filter((element) => element !== 0);
+
+    if (amounts.length + addresses.length > 0) {
+      await contract.distribute(addresses, amounts, projectName);
+    }
+  }
+
+  // Function to update payTo
+  function updatePayTo(index, change) {
+    const changeInBalance = distribution.addresses[index].sendTo - change;
+
+    if (distribution.myBalance + changeInBalance < 0 || change < 0) {
+      return null;
     }
 
-    const distributionOrClaiming = () => {
-      const timeNow = getTimeInSeconds();
-      if (distribution.lastDistributionTime + 60*60*24*30 > timeNow) {
-        const timeUntilNextDistribution = ((60*60*24*30) - (timeNow - distribution.lastDistributionTime)) / (60*60*24)
-        return <h2>{`${Math.floor(timeUntilNextDistribution)} days until distribution ends`}</h2>;
-      } else {
-        return <h2>claiming time</h2>;
-      }
-    }
+    const newDistributionAddresses = [...distribution.addresses];
+    newDistributionAddresses[index] = { ...newDistributionAddresses[index], sendTo: change };
 
-    const distribute = async () => {
-      var amounts = distribution.addresses.map(usr => usr.sendTo)
-      var addresses = distribution.addresses.map(usr => usr.address)
-    
-      addresses = addresses.filter((_, index) => amounts[index] !== 0);
-      amounts = amounts.filter((element) => element !== 0);
-    
-      if (amounts.length + addresses.length > 0) {
-        await contract.distribute(addresses, amounts, projectName)
-      }
-    }
+    setDistribution({ ...distribution, myBalance: distribution.myBalance + changeInBalance, addresses: newDistributionAddresses });
+  }
 
-    const updatePayTo = (index, change) => {
-      const changeInBalance = distribution.addresses[index].sendTo - change
-      if (distribution.myBalance+changeInBalance < 0 || change < 0) {
-        return null;
-      }
-      const newDistributionAddresses = [...distribution.addresses];
-      newDistributionAddresses[index] = { ...newDistributionAddresses[index], sendTo: change };
-      setDistribution({...distribution, myBalance: distribution.myBalance+changeInBalance, addresses: newDistributionAddresses})
+  // Initialize the page
+  useEffect(() => {
+    if (isConnected) {
+      getChangeProposals();
+      getMyChanges();
+      getDistributionState();
     }
-    
-    // initiate the page
-    useEffect(() => {
-      if (isConnected) {
-        getChangeProposals();
-        getMyChanges()
-        getDistributionState()
-      }
-    }, [checkWalletConnection, isConnected]);
+  }, [checkWalletConnection, isConnected]);
 
-    function getFormatAddress(address, startLength = 10, endLength = 4) {
-      if (!address) return '';
-    
-      const start = address.substring(0, startLength);
-      const end = address.substring(address.length - endLength);
-    
-      return `${start}...${end}`;
-    }
+  // Function to format address
+  function getFormatAddress(address, startLength = 10, endLength = 4) {
+    if (!address) return '';
+
+    const start = address.substring(0, startLength);
+    const end = address.substring(address.length - endLength);
+
+    return `${start}...${end}`;
+  }
+
+  // Function to claim tokens
+  const claimTokens = async() => {
+    await contract.claimPendingTokens(projectName);
+    await getDistributionState();
+  }
+
+  // Function to start distribution
+  const startDistribution = async() => {
+    await contract.startDistribution(projectName);
+    await getDistributionState();
+  }
 
     // returns the page's react component
     return (
@@ -266,9 +318,11 @@ const ProjectDevelopment = () => {
           
           <div className='lineShorter'>
             <div className='distribution'> 
+              {distribution.lastDistributionTime + distribution.timeInterval > getTimeInSeconds() ? (
+              <>
               <div className=''>
               <div className='distributionData'>
-                  {distributionOrClaiming()}
+                  <h2>{`${Math.floor(timeForDistribution())} days until distribution ends`}</h2>
                   <h2>balance: {distribution.myBalance}</h2>
               </div>
 
@@ -295,6 +349,16 @@ const ProjectDevelopment = () => {
               </div>
               </div>
               <h2 onClick={() => {distribute()}} className='distributeButton'>Distribute</h2>
+              </>
+              ) : (
+              <>
+              <div className='center'>
+                <h1>{distribution.myPendingTokens}</h1>
+                <h1 onClick={() => {claimTokens()}} className='StartDistributeButtonOrClaim'>Claim Tokens</h1>
+                <h1 onClick={() => {startDistribution()}} className='StartDistributeButtonOrClaim'>Start Distribution</h1>
+              </div>
+              </>
+              )}
             </div>
           </div>
         </div>

@@ -316,6 +316,20 @@
   cursor: pointer;
 }
 
+.StartDistributeButtonOrClaim {
+  border: 9px solid var(--color-four);
+  border-image: var(--border-pixel);
+  backdrop-filter: blur(2px);
+  background-color: #000000a8;
+  border-radius: 20.5px;
+  padding: 10px;
+  padding-inline: 20px;
+  color: #dadada;
+  margin: 10px;
+  color: var(--color-text-bright);
+  cursor: pointer;
+}
+
 .projectHeaderLine {
   display: flex;
   justify-content: flex-start;

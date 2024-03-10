@@ -7,6 +7,10 @@
     {
       "sign": "+",
       "path": "folderTwo"
+    },
+    {
+      "sign": "+",
+      "path": "folderTwo\\hello"
     }
   ],
   "Changes": [
@@ -29,7 +33,7 @@
         {
           "Sign": "+",
           "name": "adf.txt",
-          "Hash": "67be6efd98e39fed6aca82ee0ffee7af875e33fbda9f06c3eebfbfeefa543d6a"
+          "Hash": "d6a59ed14ab6537588c3f7a11b9b1114f8eeb80dabe7edada6de82b8170a67c9"
         }
       ]
     },
@@ -38,7 +42,7 @@
         {
           "Sign": "+",
           "name": "weffwefe.txt",
-          "Hash": "8685fbcf0edd839f3bcd831eb8b5d043a8daee85aa50fdc55108582b86381f61"
+          "Hash": "dea2ea71f76f66c337badea6706f32df0b6bfac5e3d58db2534076ebb7b7aeb1"
         }
       ]
     }

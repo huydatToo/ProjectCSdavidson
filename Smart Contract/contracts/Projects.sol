@@ -8,7 +8,7 @@ import "./ProjectsToken.sol";
 
 contract Projects {
     // initiate all the data structures and constants saved on the smart contract
-    uint public immutable TimeLockInterval = 30 days;
+    uint public immutable TimeLockInterval = 5 minutes;
     using Counters for Counters.Counter;
     using ChangesLibrary for ChangesLibrary.ChangesStorage;
 
@@ -199,6 +199,8 @@ contract Projects {
         return publicProjects[projectID].lastDistributionTime;
     }
 
-
-
+    function getPendingTokens(address usr, string calldata projectName) ProjectExist(projectName) external view returns (uint) {
+        uint projectID = NameToID[projectName];
+        return publicProjects[projectID].pendingTokens[usr];
+    }
 }

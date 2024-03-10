@@ -55,7 +55,7 @@ contract TokenDistribution is Projects, Ownable {
         string calldata projectName
     ) external ProjectExist(projectName) {
         uint projectIDX = NameToID[projectName];
-        require(block.timestamp > publicProjects[projectIDX].lastDistributionTime + TimeLockInterval + 1 days, "not distribution time");
+        require(block.timestamp > publicProjects[projectIDX].lastDistributionTime + TimeLockInterval + (TimeLockInterval/5), "not claiming time");
         publicProjects[projectIDX].newTokens = 100;
         publicProjects[projectIDX].lastDistributionTime = block.timestamp;
     }
