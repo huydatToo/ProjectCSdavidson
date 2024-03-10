@@ -8,7 +8,7 @@ import "./ProjectsToken.sol";
 
 contract Projects {
     // initiate all the data structures and constants saved on the smart contract
-    uint public immutable TimeLockInterval = 5 minutes;
+    uint public immutable TimeLockInterval = 4 minutes;
     using Counters for Counters.Counter;
     using ChangesLibrary for ChangesLibrary.ChangesStorage;
 
@@ -82,7 +82,7 @@ contract Projects {
         newProject.name = projectName;
         newProject.changes.initialize(_CID);
         newProject.newTokens = 100;
-        newProject.lastDistributionTime = block.timestamp;
+        newProject.lastDistributionTime = block.timestamp; 
 
         emit NewProjectCreated("New project created with ID:", projectName, newProjectID);
     }

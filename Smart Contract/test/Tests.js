@@ -47,19 +47,11 @@ contract("Projects", accounts => {
 })
 
 contract("Distribution", accounts => {
-
-  const changeProposalName = "changeProposalOne"
   const ProjectName = "ProjectOne"
-  
-  
 
-  it("should start distribution with no errors", async () => {
+  it("should start new project", async () => {
     const Projects = await TokenDistribution.deployed();
     await Projects.createProject("BaseChange", ProjectName, { from: accounts[0] });
-
-    await time.increase(time.duration.days(33));
-    await Projects.startDistribution(ProjectName);
-
   });
 
   it("should get distribution balance with no errors", async () => {

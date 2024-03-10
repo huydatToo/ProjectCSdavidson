@@ -55,7 +55,8 @@ contract TokenDistribution is Projects, Ownable {
         string calldata projectName
     ) external ProjectExist(projectName) {
         uint projectIDX = NameToID[projectName];
-        require(block.timestamp > publicProjects[projectIDX].lastDistributionTime + TimeLockInterval + (TimeLockInterval/5), "not claiming time");
+        
+        require((block.timestamp - publicProjects[projectIDX].lastDistributionTime > TimeLockInterval), "not claiming time");
         publicProjects[projectIDX].newTokens = 100;
         publicProjects[projectIDX].lastDistributionTime = block.timestamp;
     }
@@ -63,11 +64,9 @@ contract TokenDistribution is Projects, Ownable {
     function claimPendingTokens(
         string calldata projectName
     ) external ProjectExist(projectName) {
-        require(block.timestamp > publicProjects[NameToID[projectName]].lastDistributionTime + TimeLockInterval, "not claiming time");
-
         uint projectIDX = NameToID[projectName];
+        require(publicProjects[projectIDX].lastDistributionTime + TimeLockInterval < block.timestamp, "not claiming time");
         token.mint(msg.sender, projectIDX, publicProjects[projectIDX].pendingTokens[msg.sender]);
         delete publicProjects[projectIDX].pendingTokens[msg.sender];
     }
-
 }

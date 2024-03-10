@@ -134,16 +134,18 @@ function ProjectDevelopment() {
     var lastDistributionTime = await contract.getLastDistriubtionTime(projectName);
     var timeInterval = await contract.TimeLockInterval();
     var myBalance = await contract.getDistributionBalanceOf(account, projectName);
-
+    var myPendingTokens = await contract.getPendingTokens(account, projectName)
+    
+    myPendingTokens = myPendingTokens.toNumber()
     timeInterval = timeInterval.toNumber()
     lastDistributionTime = lastDistributionTime.toNumber()
     myBalance = myBalance.toNumber()
-
-    if (lastDistributionTime + timeInterval < getTimeInSeconds()) {
+    
+    let contributors = [];
+    if (lastDistributionTime + timeInterval > getTimeInSeconds()) {
       const projectAddresses = await contract.getAddresses(projectName);
       const projectAddressesFiltered = [...new Set(projectAddresses)];
 
-      let contributors = [];
       for (let i = 0; i < projectAddressesFiltered.length; i++) {
         contributors.push({
           address: projectAddressesFiltered[i],
@@ -151,33 +153,22 @@ function ProjectDevelopment() {
           changesOrProposalsCount: projectAddresses.filter((element) => element === projectAddresses[i]).length,
         });
       }
-
-      setDistribution({
-        ...distribution,
-        myBalance: myBalance,
-        lastDistributionTime: lastDistributionTime,
-        addresses: contributors,
-        timeInterval: timeInterval,
-      });
-    } else {
-      var myPendingTokens = await contract.getPendingTokens(account, projectName)
-      myPendingTokens = myPendingTokens.toNumber()
-
-      setDistribution({ 
-        ...distribution, 
-        myBalance: myBalance, 
-        lastDistributionTime: lastDistributionTime,
-        myPendingTokens: myPendingTokens,
-        timeInterval: timeInterval,
-      });
     }
+
+    setDistribution({
+      ...distribution,
+      myBalance: myBalance,
+      lastDistributionTime: lastDistributionTime,
+      addresses: contributors,
+      timeInterval: timeInterval,
+    });
   }
 
   // Function to calculate time until the next distribution
   function timeForDistribution() {
     const timeNow = getTimeInSeconds();
-    if (distribution.lastDistributionTime + distribution.timeInterval + (distribution.timeInterval/5) > timeNow) {
-      const timeUntilNextDistribution = (distribution.timeInterval - (timeNow - distribution.lastDistributionTime)) / (60 * 60 * 24);
+    if (distribution.lastDistributionTime + distribution.timeInterval > getTimeInSeconds()) {
+      const timeUntilNextDistribution = (distribution.timeInterval - (timeNow - distribution.lastDistributionTime));
       return timeUntilNextDistribution;
     } else {
       return false;

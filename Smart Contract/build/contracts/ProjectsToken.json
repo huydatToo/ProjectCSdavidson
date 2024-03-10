@@ -18301,34 +18301,34 @@
     "absolutePath": "project:/contracts/ProjectsToken.sol",
     "exportedSymbols": {
       "Address": [
-        3556
+        3550
       ],
       "Context": [
-        3578
+        3572
       ],
       "ERC1155": [
-        2891
+        2885
       ],
       "ERC1155Supply": [
-        3211
+        3205
       ],
       "ERC165": [
-        3676
+        3670
       ],
       "IERC1155": [
-        3013
+        3007
       ],
       "IERC1155MetadataURI": [
-        3226
+        3220
       ],
       "IERC1155Receiver": [
-        3054
+        3048
       ],
       "IERC165": [
-        3688
+        3682
       ],
       "Ownable": [
-        1668
+        1662
       ],
       "ProjectsToken": [
         1225
@@ -18356,7 +18356,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 1226,
-        "sourceUnit": 2892,
+        "sourceUnit": 2886,
         "src": "57:75:2",
         "symbolAliases": [],
         "unitAlias": ""
@@ -18368,7 +18368,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 1226,
-        "sourceUnit": 1669,
+        "sourceUnit": 1663,
         "src": "133:68:2",
         "symbolAliases": [],
         "unitAlias": ""
@@ -18380,7 +18380,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 1226,
-        "sourceUnit": 3212,
+        "sourceUnit": 3206,
         "src": "202:92:2",
         "symbolAliases": [],
         "unitAlias": ""
@@ -18393,7 +18393,7 @@
               "id": 1163,
               "name": "ERC1155",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 2891,
+              "referencedDeclaration": 2885,
               "src": "322:7:2"
             },
             "id": 1164,
@@ -18405,7 +18405,7 @@
               "id": 1165,
               "name": "ERC1155Supply",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 3211,
+              "referencedDeclaration": 3205,
               "src": "331:13:2"
             },
             "id": 1166,
@@ -18417,7 +18417,7 @@
               "id": 1167,
               "name": "Ownable",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 1668,
+              "referencedDeclaration": 1662,
               "src": "346:7:2"
             },
             "id": 1168,
@@ -18432,14 +18432,14 @@
         "id": 1225,
         "linearizedBaseContracts": [
           1225,
-          1668,
-          3211,
-          2891,
-          3226,
-          3013,
-          3676,
-          3688,
-          3578
+          1662,
+          3205,
+          2885,
+          3220,
+          3007,
+          3670,
+          3682,
+          3572
         ],
         "name": "ProjectsToken",
         "nameLocation": "305:13:2",
@@ -18481,7 +18481,7 @@
                   "id": 1170,
                   "name": "ERC1155",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 2891,
+                  "referencedDeclaration": 2885,
                   "src": "374:7:2"
                 },
                 "nodeType": "ModifierInvocation",
@@ -18511,8 +18511,8 @@
           },
           {
             "baseFunctions": [
-              2715,
-              3210
+              2709,
+              3204
             ],
             "body": {
               "id": 1206,
@@ -18641,7 +18641,7 @@
                       "lValueRequested": false,
                       "memberName": "_beforeTokenTransfer",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 3210,
+                      "referencedDeclaration": 3204,
                       "src": "596:26:2",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_address_$_t_address_$_t_address_$_t_array$_t_uint256_$dyn_memory_ptr_$_t_array$_t_uint256_$dyn_memory_ptr_$_t_bytes_memory_ptr_$returns$__$",
@@ -18684,14 +18684,14 @@
                   "id": 1191,
                   "name": "ERC1155",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 2891,
+                  "referencedDeclaration": 2885,
                   "src": "562:7:2"
                 },
                 {
                   "id": 1192,
                   "name": "ERC1155Supply",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 3211,
+                  "referencedDeclaration": 3205,
                   "src": "571:13:2"
                 }
               ],
@@ -18984,7 +18984,7 @@
                       "name": "_mint",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2325,
+                      "referencedDeclaration": 2319,
                       "src": "751:5:2",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_address_$_t_uint256_$_t_uint256_$_t_bytes_memory_ptr_$returns$__$",
@@ -19134,153 +19134,33 @@
     "version": "0.8.13+commit.abaa5c0e.Emscripten.clang"
   },
   "networks": {
-    "1710091758615": {
-      "events": {
-        "0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "account",
-              "type": "address"
-            },
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "operator",
-              "type": "address"
-            },
-            {
-              "indexed": false,
-              "internalType": "bool",
-              "name": "approved",
-              "type": "bool"
-            }
-          ],
-          "name": "ApprovalForAll",
-          "type": "event"
-        },
-        "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "previousOwner",
-              "type": "address"
-            },
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "newOwner",
-              "type": "address"
-            }
-          ],
-          "name": "OwnershipTransferred",
-          "type": "event"
-        },
-        "0x4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "operator",
-              "type": "address"
-            },
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "from",
-              "type": "address"
-            },
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "to",
-              "type": "address"
-            },
-            {
-              "indexed": false,
-              "internalType": "uint256[]",
-              "name": "ids",
-              "type": "uint256[]"
-            },
-            {
-              "indexed": false,
-              "internalType": "uint256[]",
-              "name": "values",
-              "type": "uint256[]"
-            }
-          ],
-          "name": "TransferBatch",
-          "type": "event"
-        },
-        "0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "operator",
-              "type": "address"
-            },
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "from",
-              "type": "address"
-            },
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "to",
-              "type": "address"
-            },
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "id",
-              "type": "uint256"
-            },
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "value",
-              "type": "uint256"
-            }
-          ],
-          "name": "TransferSingle",
-          "type": "event"
-        },
-        "0x6bb7ff708619ba0610cba295a58592e0451dee2622938c8755667688daf3529b": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "string",
-              "name": "value",
-              "type": "string"
-            },
-            {
-              "indexed": true,
-              "internalType": "uint256",
-              "name": "id",
-              "type": "uint256"
-            }
-          ],
-          "name": "URI",
-          "type": "event"
-        }
-      },
+    "1710102115748": {
+      "events": {},
       "links": {},
-      "address": "0x031627536401f8bcaDE2a5a3CbA8345b054bfe2b",
-      "transactionHash": "0xd383186452a99de0a2bf271dc5e43eaf31c00301c53d64d5ad5b6db3b91d631b"
+      "address": "0xB0e30a245Ae02E48cc67a6Eb15D180a6e33fb222",
+      "transactionHash": "0x826250c556dc87b7e69c735bfe3529722628043d7011e1cedd24e044ef4e9243"
+    },
+    "1710106733554": {
+      "events": {},
+      "links": {},
+      "address": "0xAFaF206fa65C3a59b539d317405044d2ec1FCb15",
+      "transactionHash": "0x599b0eab8a345f7e69054e74589c357fa8857b25824719b31aedbe4dc5f18fb3"
+    },
+    "1710108236545": {
+      "events": {},
+      "links": {},
+      "address": "0x90383e0794a9eD7Aeb3A1EDeD5dd5A731da630b6",
+      "transactionHash": "0x309135d31e979e4a54c2f42016d6e48f7f65b6bee226355c936a20e7afaf2223"
+    },
+    "1710108345476": {
+      "events": {},
+      "links": {},
+      "address": "0xB9722F98BF83102c0ABB2784602b7fd57525a27f",
+      "transactionHash": "0xf91a81bb05c6c31a40324f2c06e370d0662a6a4629092137468d06436418432c"
     }
   },
   "schemaVersion": "3.4.7",
-  "updatedAt": "2024-03-10T19:17:02.326Z",
+  "updatedAt": "2024-03-10T22:05:56.735Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
