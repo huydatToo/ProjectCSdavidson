@@ -1,5 +1,5 @@
-export const CONTRACT_ADDRESS = "0x29fe1d11112d70502200a8c6b0e7ae1b48348B7a"
-export const CONTRACT_ABI = [
+export const CONTRACT_ADDRESS = "0x732e11Dad26cfC001cE9ADDcEb0EA7BB95D52951"
+export const CONTRACT_ABI =  [
   {
     "inputs": [
       {
@@ -245,7 +245,8 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -258,7 +259,8 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [
@@ -331,7 +333,8 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [
@@ -355,7 +358,8 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [
@@ -379,7 +383,8 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [
@@ -398,7 +403,8 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -411,7 +417,8 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [
@@ -435,7 +442,8 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -448,7 +456,8 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -468,7 +477,8 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [
@@ -523,7 +533,8 @@ export const CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [

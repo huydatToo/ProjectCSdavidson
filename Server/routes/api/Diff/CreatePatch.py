@@ -8,7 +8,7 @@ from .getData import get_single_file_internal
 
 
 # the functions create a local changes patch from local projects
-def create_project_patch_json(old_project_path, new_project_path):
+def create_project_patch_json(old_project_path: str, new_project_path: str) -> None:
     dirs_changes, files_changes = compare_projects(old_project_path, new_project_path)
     patch_name = "patch-{}".format(os.path.basename(old_project_path))
     os.mkdir(patch_name)
@@ -98,7 +98,7 @@ def create_project_patch_json(old_project_path, new_project_path):
 # -------------------------------------------------------------------------------------
         
 # the functions create a local changes patch from remote project
-def create_project_patch_json_cid(change_cids, new_project_CID, name, client):
+def create_project_patch_json_cid(change_cids: list, new_project_CID: str, name: str, client) -> None:
     dirs_changes, files_changes = compare_projects_cid(change_cids, new_project_CID, client)
 
     patch_name = "patch-{}".format(name)

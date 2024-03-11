@@ -68,7 +68,7 @@ contract("Distribution", accounts => {
 
   it("should claim tokens after distribution ends", async () => {
     const Projects = await TokenDistribution.deployed();
-    await time.increase(time.duration.days(33));
+    await time.increase(time.duration.minutes(5));
     await Projects.claimPendingTokens(ProjectName, { from: accounts[1] });
     await Projects.claimPendingTokens(ProjectName, { from: accounts[2] });
     await Projects.startDistribution(ProjectName);  

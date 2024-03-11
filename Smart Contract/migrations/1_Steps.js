@@ -11,7 +11,6 @@ module.exports = async function (deployer) {
   await deployer.link(ChangesLibrary, Projects);
   await deployer.link(ChangesLibrary, TokenDistribution);
 
-  await deployer.deploy(Projects, TokenInstance.address);
   await deployer.deploy(TokenDistribution, TokenInstance.address)
 
 };

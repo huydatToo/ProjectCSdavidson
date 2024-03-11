@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.2;
+pragma solidity ^0.8.13;
 
 import "../node_modules/@openzeppelin/contracts/utils/Counters.sol";
 import "./Changes.sol";
@@ -8,7 +8,8 @@ import "./ProjectsToken.sol";
 
 contract Projects {
     // initiate all the data structures and constants saved on the smart contract
-    uint public immutable TimeLockInterval = 4 minutes;
+    uint public constant TimeLockInterval = 2 minutes;
+
     using Counters for Counters.Counter;
     using ChangesLibrary for ChangesLibrary.ChangesStorage;
 
@@ -30,7 +31,7 @@ contract Projects {
         goBack[] goBackProposals;
 
         // time lock
-        uint lastDistributionTime;
+        uint DistributionTime;
 
         // distribution
         uint newTokens;
@@ -82,7 +83,7 @@ contract Projects {
         newProject.name = projectName;
         newProject.changes.initialize(_CID);
         newProject.newTokens = 100;
-        newProject.lastDistributionTime = block.timestamp; 
+        newProject.DistributionTime = block.timestamp + TimeLockInterval; 
 
         emit NewProjectCreated("New project created with ID:", projectName, newProjectID);
     }
@@ -196,7 +197,7 @@ contract Projects {
 
     function getLastDistriubtionTime(string calldata projectName) external view ProjectExist(projectName) returns (uint)  {
         uint projectID = NameToID[projectName];
-        return publicProjects[projectID].lastDistributionTime;
+        return publicProjects[projectID].DistributionTime;
     }
 
     function getPendingTokens(address usr, string calldata projectName) ProjectExist(projectName) external view returns (uint) {

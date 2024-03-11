@@ -7,7 +7,7 @@ from .textFilePatch import apply_patch
 
 
 # The function returns the hash of a file in a remote project
-def get_ipfs_file_hash(client, changes_cids, file_name):
+def get_ipfs_file_hash(client, changes_cids: list, file_name: str) -> str:
     file_content = get_single_file_internal(changes_cids, file_name, client)
 
     if isinstance(file_content, list):
@@ -21,13 +21,13 @@ def get_ipfs_file_hash(client, changes_cids, file_name):
     return hasher.hexdigest()
 
 # the functions compare two files (one local and one on IPFS)
-def compare_files_from_ipfs(client, cid_changes, file_name, local_file_path):
+def compare_files_from_ipfs(client, cid_changes: list, file_name: str, local_file_path: str) -> bool:
     ipfs_hash = get_ipfs_file_hash(client, cid_changes, file_name)
     local_hash = get_local_file_hash(local_file_path)
     return ipfs_hash == local_hash
 
 # the functions compare two directories (one local and one on IPFS)
-def compare_directories_cid(client, changes_cids, file_names, local_dir_path):
+def compare_directories_cid(client, changes_cids: list, file_names: list, local_dir_path: str) -> bool:
     if len(file_names) != len(os.listdir(local_dir_path)):
         return False
     
@@ -39,7 +39,7 @@ def compare_directories_cid(client, changes_cids, file_names, local_dir_path):
     return True
 
 # the function returns the list of files in a local project from an existing list
-def get_project_files(old_list, patch):
+def get_project_files(old_list: list, patch: str) -> None:
     with open(os.path.join(patch, "patchJson.json"), 'r') as conf:
         data = json.load(conf)
 
@@ -62,7 +62,7 @@ def get_project_files(old_list, patch):
 
 
 # the function returns the list of files in a remote project from an existing list
-def get_project_files_cid(old_list, patch_cid, client):
+def get_project_files_cid(old_list: list, patch_cid: str, client) -> list:
     files_list = client.ls(patch_cid)
     
     for i in files_list["Objects"]:
@@ -101,7 +101,7 @@ def get_project_files_cid(old_list, patch_cid, client):
 
 
 # the functions returns the content of a file on a single change
-def get_file_content(file_name, change_cid, client):
+def get_file_content(file_name: str, change_cid: str, client):
     files_list = client.ls(change_cid)
     
     for i in files_list["Objects"]:

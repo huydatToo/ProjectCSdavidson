@@ -142,7 +142,7 @@ function ProjectDevelopment() {
     myBalance = myBalance.toNumber()
     
     let contributors = [];
-    if (lastDistributionTime + timeInterval > getTimeInSeconds()) {
+    if (lastDistributionTime > getTimeInSeconds()) {
       const projectAddresses = await contract.getAddresses(projectName);
       const projectAddressesFiltered = [...new Set(projectAddresses)];
 
@@ -161,14 +161,15 @@ function ProjectDevelopment() {
       lastDistributionTime: lastDistributionTime,
       addresses: contributors,
       timeInterval: timeInterval,
+      myPendingTokens: myPendingTokens
     });
   }
 
   // Function to calculate time until the next distribution
   function timeForDistribution() {
     const timeNow = getTimeInSeconds();
-    if (distribution.lastDistributionTime + distribution.timeInterval > getTimeInSeconds()) {
-      const timeUntilNextDistribution = (distribution.timeInterval - (timeNow - distribution.lastDistributionTime));
+    if (distribution.lastDistributionTime > getTimeInSeconds()) {
+      const timeUntilNextDistribution = distribution.lastDistributionTime - timeNow;
       return timeUntilNextDistribution;
     } else {
       return false;
@@ -294,7 +295,7 @@ function ProjectDevelopment() {
             <div className={ChangeProposals.length > 0 ? "projectListProposals" : "projectListProposals ListOfPatchesNo"}> 
             {ChangeProposals.length > 0 ? ChangeProposals.map((item, index) => (
                 (item !== clickedChangeProposal ?
-                <div onClick={() => {setClickedChangeProposal(item)}} className='FileLine'>
+                <div onClick={() => {setClickedChangeProposal(item)}} className='FileLine gapLine'>
                 <span className='FileText'>{getFormatAddress(item)}</span>
                 <span className='FileText'>|</span>
                 <span className='FileText'>Change Proposal</span>
@@ -309,7 +310,7 @@ function ProjectDevelopment() {
           
           <div className='lineShorter'>
             <div className='distribution'> 
-              {distribution.lastDistributionTime + distribution.timeInterval > getTimeInSeconds() ? (
+              {distribution.lastDistributionTime > getTimeInSeconds() ? (
               <>
               <div className=''>
               <div className='distributionData'>

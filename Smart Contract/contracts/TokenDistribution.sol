@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.2;
+pragma solidity ^0.8.13;
 import "./Projects.sol";
 import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
 
@@ -17,7 +17,7 @@ contract TokenDistribution is Projects, Ownable {
         string calldata projectName
     ) public view ProjectExist(projectName) returns (uint) {
         uint projectIDX = NameToID[projectName];
-        uint lastDistributionTime = publicProjects[projectIDX].lastDistributionTime;
+        uint endDistributionTime = publicProjects[projectIDX].DistributionTime;
         uint balanceOf = token.balanceOf(usr, projectIDX);
 
         // calculate the proportion of tokens you have
@@ -26,7 +26,7 @@ contract TokenDistribution is Projects, Ownable {
             return 0;
         }
         tokens = (publicProjects[projectIDX].newTokens * tokens) / 100;
-        tokens -= publicProjects[projectIDX].TokensSpent[usr][lastDistributionTime];
+        tokens -= publicProjects[projectIDX].TokensSpent[usr][endDistributionTime];
         return tokens;
     }
 
@@ -39,33 +39,34 @@ contract TokenDistribution is Projects, Ownable {
         uint tokensToSpend = sum(amounts);
 
         require(recipients.length == amounts.length, "not same amounts as a recepients");
-        require(publicProjects[projectIDX].lastDistributionTime + TimeLockInterval > block.timestamp, "not distribution time");
+        require(publicProjects[projectIDX].DistributionTime > block.timestamp, "not distribution time");
         require(tokensToSpend <= getDistributionBalanceOf(msg.sender, projectName), "Unsufficent amount of tokens");
         
-        uint lastDistributionTime = publicProjects[projectIDX].lastDistributionTime;
+        uint endDistributionTime = publicProjects[projectIDX].DistributionTime;
 
         for (uint i=0; i<recipients.length; i++) {
             publicProjects[projectIDX].pendingTokens[recipients[i]] += amounts[i];
         }
 
-        publicProjects[projectIDX].TokensSpent[msg.sender][lastDistributionTime] += tokensToSpend;
+        publicProjects[projectIDX].TokensSpent[msg.sender][endDistributionTime] += tokensToSpend;
     }
 
     function startDistribution(
         string calldata projectName
     ) external ProjectExist(projectName) {
         uint projectIDX = NameToID[projectName];
-        
-        require((block.timestamp - publicProjects[projectIDX].lastDistributionTime > TimeLockInterval), "not claiming time");
+        if (block.timestamp < publicProjects[projectIDX].DistributionTime) {
+            revert("not starting distribution time");
+        }
         publicProjects[projectIDX].newTokens = 100;
-        publicProjects[projectIDX].lastDistributionTime = block.timestamp;
+        publicProjects[projectIDX].DistributionTime = block.timestamp + TimeLockInterval;
     }
 
     function claimPendingTokens(
         string calldata projectName
     ) external ProjectExist(projectName) {
         uint projectIDX = NameToID[projectName];
-        require(publicProjects[projectIDX].lastDistributionTime + TimeLockInterval < block.timestamp, "not claiming time");
+        require(block.timestamp >= publicProjects[projectIDX].DistributionTime, "not claiming time");
         token.mint(msg.sender, projectIDX, publicProjects[projectIDX].pendingTokens[msg.sender]);
         delete publicProjects[projectIDX].pendingTokens[msg.sender];
     }
