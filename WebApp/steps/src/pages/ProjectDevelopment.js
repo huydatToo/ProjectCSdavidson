@@ -170,8 +170,16 @@ function ProjectDevelopment() {
     const timeNow = getTimeInSeconds();
     if (distribution.lastDistributionTime > getTimeInSeconds()) {
       const timeUntilNextDistribution = distribution.lastDistributionTime - timeNow;
-      return timeUntilNextDistribution;
-    } else {
+      if (timeUntilNextDistribution > 60 * 60 * 24) {
+        return <h2>{`${Math.floor(timeUntilNextDistribution / (60 * 60 * 24))} days until distribution ends`}</h2>
+      } else if (timeUntilNextDistribution < 60 * 60 * 24 && timeUntilNextDistribution > 60 * 60) {
+        return <h2>{`${Math.floor(timeUntilNextDistribution / (60 * 60))} hours until distribution ends`}</h2>
+      } else if (timeUntilNextDistribution < 60 * 60 && timeUntilNextDistribution > 60) {
+        return <h2>{`${Math.floor(timeUntilNextDistribution / (60))} minutes until distribution ends`}</h2>
+      } else {
+        return <h2>{`${Math.floor(timeUntilNextDistribution)} seconds until distribution ends`}</h2>
+      }
+      } else {
       return false;
     }
   }
@@ -309,15 +317,17 @@ function ProjectDevelopment() {
           </div>
           
           <div className='lineShorter'>
+
+            <div className='distributionData'>
+                {timeForDistribution()}
+                <h3>Distribution Balance: {distribution.myBalance}</h3>
+                <h3>{distribution.myPendingTokens} Unclaimed Tokens</h3>
+            </div>
+
             <div className='distribution'> 
               {distribution.lastDistributionTime > getTimeInSeconds() ? (
               <>
               <div className=''>
-              <div className='distributionData'>
-                  <h2>{`${Math.floor(timeForDistribution())} days until distribution ends`}</h2>
-                  <h2>balance: {distribution.myBalance}</h2>
-              </div>
-
               <div className='payTokens'>
                   {distribution.addresses.map((item, index) => (
                   <div key={index} className='payTokensDiv'>
@@ -345,7 +355,6 @@ function ProjectDevelopment() {
               ) : (
               <>
               <div className='center'>
-                <h1>{distribution.myPendingTokens}</h1>
                 <h1 onClick={() => {claimTokens()}} className='StartDistributeButtonOrClaim'>Claim Tokens</h1>
                 <h1 onClick={() => {startDistribution()}} className='StartDistributeButtonOrClaim'>Start Distribution</h1>
               </div>

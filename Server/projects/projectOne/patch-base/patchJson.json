@@ -2,38 +2,16 @@
   "Directories_Changes": [
     {
       "sign": "+",
-      "path": "folderOne"
-    },
-    {
-      "sign": "+",
-      "path": "folderTwo"
-    },
-    {
-      "sign": "+",
-      "path": "folderTwo\\hello"
+      "path": "morefolder"
     }
   ],
   "Changes": [
     {
-      "folderOne": [
+      "morefolder": [
         {
           "Sign": "+",
-          "name": "ad.txt",
-          "Hash": "518727031a1fc572792697d8c51214e1a5b74a6696f81ceb9df8b2c331b130e7"
-        },
-        {
-          "Sign": "+",
-          "name": "t.txt",
-          "Hash": "0cc9ba20f893a086bff2c1feb049e90f4a9d32b53b67fe570337c8c36022586c"
-        }
-      ]
-    },
-    {
-      "folderTwo": [
-        {
-          "Sign": "+",
-          "name": "adf.txt",
-          "Hash": "d6a59ed14ab6537588c3f7a11b9b1114f8eeb80dabe7edada6de82b8170a67c9"
+          "name": "adir.txt",
+          "Hash": "947eea6e89cf16ab9836c4d64d3b429a7402583bf8fc77cdb5d9a2565f910447"
         }
       ]
     },
@@ -41,8 +19,8 @@
       "-": [
         {
           "Sign": "+",
-          "name": "weffwefe.txt",
-          "Hash": "040805b2df49cf649105e7cf922366d825d6c8da823bb616c1c038ef7fe41d9d"
+          "name": "weffe.txt",
+          "Hash": "53479ef439e570d9ff1bc14ee03eea08fbe2d843733399706e1b77654a8a839e"
         }
       ]
     }

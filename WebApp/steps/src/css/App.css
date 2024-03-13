@@ -743,6 +743,22 @@ input[type=number]::-webkit-outer-spin-button {
   
 }
 
+.distributionData {
+  background-color: #000000;
+  display: flex;
+  text-align: center;
+  flex-direction: column;
+  border: 9px solid var(--color-four);
+  border-image: var(--border-pixel);
+  backdrop-filter: blur(2px);
+  background-color: #000000ee;
+  border-radius: 20.5px;
+  padding: 10px;
+  color: var(--color-text-bright);
+  box-shadow: #000000 4px 4px 0px 3px;
+  justify-content: space-between;
+}
+
 .projectListProposals {
   display: flex;
   flex-direction: column;
