@@ -244,7 +244,7 @@ function ProjectDevelopment() {
 
     // returns the page's react component
     return (
-        <div className='background pageOne'>
+        <div className='background'>
         <ModalChanges isOpen={isModalOpen} closeModal={closeModal}>
         <div className='modalFlex'>
           <div className=''>

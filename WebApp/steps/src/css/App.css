@@ -256,7 +256,16 @@
   gap: 15px;
   height: 100%;
   width: 80vh;
-  
+}
+
+.lineProjectPage {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 15px;
+  height: 90%;
+  width: 123.6vh;
+  margin: auto;
 }
 
 .lineShorter {

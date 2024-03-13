@@ -198,7 +198,7 @@ const ProjectPage = () => {
 
   // the pages jsx
     return (
-    <div className='background middle center gapLines lineGap pageOne'>
+    <div className='background center'>
         <ModalDetails isOpen={isModalOpen} closeModal={closeModal} closeInput={ClosePathInput}>
         <div className='modalFlex'>
           <div className=''>
@@ -227,22 +227,23 @@ const ProjectPage = () => {
           </div>
         </div>
         </ModalDetails>
-        
-        <div className='line projectHeaderLine'>
-        <motion.div whileTap={{scale: 0.9}} whileHover={{scale: 1.03}} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} onClick={() => {navigate('/')}} className='projectHeader HomeButtonDiv'>
+      
+        <div className='lineProjectPage'>
+        <div className='projectHeaderLineProposals'>
+        <motion.div whileTap={{y: 6}} whileHover={{y: 3}} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} onClick={() => {navigate('/')}} className='projectHeader HomeButtonDiv'>
             <img className="HomeButton" src={HomeSvg} alt="" />
         </motion.div>
 
 
-          <motion.div  initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} className='projectHeader'>
+          <motion.div  whileTap={{y: 6}} whileHover={{y: 3}} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} className='projectHeader'>
             <h1>{project.projectName}</h1>
           </motion.div>
 
-          <motion.div  initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} className='projectHeader toTheEnd'>
+          <motion.div  whileTap={{y: 6}} whileHover={{y: 3}} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} className='projectHeader toTheEnd'>
             <h1>{getState()}</h1>
           </motion.div>
 
-          <motion.div onClick={() => {openModal()}} whileTap={{scale: 0.9}} whileHover={{scale: 1.03}} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} className='projectHeader changesButton'>
+          <motion.div onClick={() => {openModal()}} whileTap={{y: 6}} whileHover={{y: 3}} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} className='projectHeader changesButton'>
             <h1>Details</h1>
           </motion.div>
 
@@ -251,7 +252,7 @@ const ProjectPage = () => {
           </motion.div>
         </div>
 
-        <div className={project.files.length > 0 ? "line projectListFiles" : 'projectListFiles ListOfPatchesNo line'}> 
+        <div className={project.files.length > 0 ? "projectListProposals" : 'projectListProposals ListOfPatchesNo'}> 
         {fileContent === false ? <>
         {project.path.length > 1 ? 
         <div onClick={() => {setProject({...project, path: goBackOneLevel(project.path)})}} className='FileLine'>
@@ -263,6 +264,7 @@ const ProjectPage = () => {
         {typeof fileContent !== "object" ? CodeEditor(fileContent) : <img src={`https://ipfs.infura.io/ipfs/${fileContent[0]}/`} alt=""/>}
         <div onClick={() => {setFileContent(false)}}>Go back</div>
         </>}
+        </div>
         </div>
 
     </div>
