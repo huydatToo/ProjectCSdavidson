@@ -86,7 +86,6 @@ def get_single_text_file_ipfs(
                 break
         except NotFoundOnIPFS:
             continue
-
     if files_creation_patch == -1:
         raise NotFoundOnIPFS
     

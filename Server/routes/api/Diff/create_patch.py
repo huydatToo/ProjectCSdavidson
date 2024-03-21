@@ -44,9 +44,11 @@ def create_project_patch_json(
         for file_change in folder_change.diff_list:
             if (file_change.diff_type == "?" or file_change.diff_type == "+"):
                 file_name = file_change.new_name
-            else:
+            elif file_change.diff_type == "-":
                 file_name = file_change.old_name
-
+            else:
+                continue
+            
             absolute_path_new = os.path.join(new_project_path, folder_change.new_name, file_name)
             absolute_path_old = os.path.join(old_project_path, folder_change.new_name, file_name)
 
@@ -114,9 +116,11 @@ def create_project_patch_from_remote_project(
         for file_change in folder_change.diff_list:
             if (file_change.diff_type == "?" or file_change.diff_type == "+"):
                 file_name = file_change.new_name
-            else:
+            elif file_change.diff_type == "-":
                 file_name = file_change.old_name
-
+            else:
+                continue
+            
             absolute_path_new = os.path.join(new_project_path, folder_change.new_name, file_name)
             absolute_path_old = os.path.join(folder_change.new_name, file_name)
 

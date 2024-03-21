@@ -29905,10 +29905,200 @@
       },
       "address": "0x2eE629eCDd9beaC8594926551B932209E43E5D12",
       "transactionHash": "0x3f7270fe637e00851b6ce95803e893ec3a640724124ed60289d98277f72a6e88"
+    },
+    "1711060960482": {
+      "events": {
+        "0xa59a33e81abf86b25a561f609013d867f28b3c0cbc2cdf98e852b0c0c041eb6c": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "message",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "projectName",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "changeCID",
+              "type": "string"
+            }
+          ],
+          "name": "NewChangeIsMadeToProject",
+          "type": "event"
+        },
+        "0x7b7acf540aac5e16ce3dfbd4d106c203a301da603c18502d179f60282962e5c4": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "message",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "Name",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "CID",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "indexValue",
+              "type": "uint256"
+            }
+          ],
+          "name": "NewChangeProposalCreated",
+          "type": "event"
+        },
+        "0xe224389b386caecb8e3b38edc39361c7227e3ef820a8276bc31ac9cf1ba69fcd": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "message",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "value",
+              "type": "uint256"
+            }
+          ],
+          "name": "NewProjectCreated",
+          "type": "event"
+        },
+        "0x0defd832aa647eb845ac2ed5e414ba9da1d13d7c3b2028fea20853913891174d": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "message",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "projectName",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "changeProposalCID",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "voter",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "votes",
+              "type": "uint256"
+            }
+          ],
+          "name": "NewVoteForChangeProposal",
+          "type": "event"
+        },
+        "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "previousOwner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "OwnershipTransferred",
+          "type": "event"
+        },
+        "0x718a982b61bc723a0c68281b0eb10e1cff37bd89888841ae545c98cd5493a056": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "message",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "changeCID",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "ProjectName",
+              "type": "string"
+            }
+          ],
+          "name": "ProjectWentBack",
+          "type": "event"
+        },
+        "0x7288f707ccc9ad8e6342e2220545e85e8971083cf158175f547d9567688b65ff": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "message",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "lastDistributionTime",
+              "type": "uint256"
+            }
+          ],
+          "name": "TokensDisributed",
+          "type": "event"
+        }
+      },
+      "links": {
+        "ChangesLibrary": "0xA3b3042b0CD3D430687a44F3aDFe713a617fF8c3"
+      },
+      "address": "0x3B166f05db013dfbDccC384FdA19F879696A61C8",
+      "transactionHash": "0xec385ced88987dd18c12d343f75d879e7bdc771f6ff8bfffbb30a4f265bd9d46"
     }
   },
   "schemaVersion": "3.4.7",
-  "updatedAt": "2024-03-13T20:47:58.027Z",
+  "updatedAt": "2024-03-21T22:42:53.285Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",

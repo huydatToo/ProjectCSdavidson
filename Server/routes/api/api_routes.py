@@ -120,7 +120,7 @@ def save_changes() -> flask.Response:
         project_name = data["name"]
         os.chdir("projects")
         os.chdir(project_name)
-        with open("project-details.json", 'r') as json_file:
+        with open("project_details.json", 'r') as json_file:
             project_details = json.load(json_file)
             os.chdir("changes")
             if (unsaved_changes_internal(change_cids=project_details["project-changes"], project_path=project_details["project-path"], client=client)):
@@ -173,7 +173,7 @@ def upload_changes() -> flask.Response:
         change_name = data["change_name"]
         os.chdir("projects")
         os.chdir(project_name)
-        with open("project-details.json", 'r') as json_file:
+        with open("project_details.json", 'r') as json_file:
             project_details = json.load(json_file)
     
         if unsaved_changes_internal(change_cids=project_details["project-changes"], project_path=project_details["project-path"], client=client):
@@ -208,7 +208,7 @@ def update_project() -> flask.Response:
         if (unsaved_changes_internal(change_cids=project_details["project-changes"], project_path=project_details["project-path"], client=client)):
             pass
         
-        with open("project-details.json", 'r') as json_file:
+        with open("project_details.json", 'r') as json_file:
             project_details = json.load(json_file)
             for i in range(len(changes_cids)):
                 if changes_cids[i] != project_details["project-changes"][i]:
@@ -237,7 +237,7 @@ def check_project() -> flask.Response:
         
         else:
             os.chdir(data["name"])
-            with open("project-details.json", 'r') as json_file:
+            with open("project_details.json", 'r') as json_file:
                 project_details = json.load(json_file)
             if (project_details["project-changes"] == changes_cids):
                 message = {'message': 354}
@@ -260,6 +260,7 @@ def get_project_files_internal(changes_cids, client) -> list:
         folder_files.append(folder)
         project_tree_list.extend(folder_files)
     
+    project_tree_list.remove("")
     return project_tree_list
 
 
@@ -294,6 +295,7 @@ def get_single_file() -> flask.Response:
         message = jsonify({'file': version}), 200
     
     except Exception as e:
+        print(e)
         message = jsonify({'error': str(e)}), 500
     
     finally:
