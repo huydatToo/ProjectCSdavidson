@@ -44,9 +44,10 @@ def get_files_type_in_patch(
     changed_files = data["changed_files"]
     for changed_folder in changed_files.keys():
         for changed_file in changed_files[changed_folder]:
-            new_file_path = os.path.join(changed_folder, changed_file["new_name"])
-            if new_file_path == file_name:
-                return changed_file["sign"]
+            if changed_file["sign"] == "+" or changed_file["sign"] == "?":
+                new_file_path = os.path.join(changed_folder, changed_file["new_name"])
+                if new_file_path == file_name:
+                    return changed_file["sign"]
                     
     return False
 
@@ -65,11 +66,10 @@ def get_changed_file_cid_from_patch(
 
     for changed_folder in changed_files.keys():
         for changed_file in changed_files[changed_folder]:
-            if file_name == os.path.join(changed_folder, changed_file["new_name"]) and (changed_file["sign"] == "+" or changed_file["sign"] == "?"):
+            if (changed_file["sign"] == "+" or changed_file["sign"] == "?") and file_name == os.path.join(changed_folder, changed_file["new_name"]):
                 changed_file_cid = get_file_cid_from_patch(client, changes_folder_cid, changed_file["hash"] + "." + changed_file["new_name"].split(".")[1])
                 return changed_file_cid
-    
-    raise NotFoundOnIPFS("The File Was Not Found or Changed/Added")
+    return ""
 
 
 def get_single_text_file_ipfs(
@@ -89,12 +89,17 @@ def get_single_text_file_ipfs(
     if files_creation_patch == -1:
         raise NotFoundOnIPFS
     
-    content = client.cat(get_changed_file_cid_from_patch(client, file_name, change_cid)).decode('utf-8')
+    content = client.cat(get_changed_file_cid_from_patch(client, file_name, changes_cids[len(changes_cids) - files_creation_patch - 1])).decode('utf-8')
 
     for change_cid in changes_cids[(len(changes_cids) - files_creation_patch):]:
-        patch = client.cat(get_changed_file_cid_from_patch(client, file_name, change_cid)).decode('utf-8')
-        content = apply_patch(content, patch)
+        patch_cid = get_changed_file_cid_from_patch(client, file_name, change_cid)
 
+        if patch_cid == "":
+            continue
+        else:
+            patch = client.cat(patch_cid).decode('utf-8')
+            content = apply_patch(content, patch).replace("\r", "")
+            
     return content
 
 
@@ -122,7 +127,7 @@ def get_project_files_patch(
                 tree_dict[changed_folder].append(changed_file["new_name"])
                                  
             elif (changed_file["sign"] == "-"):
-                tree_dict[changed_folder].remove(changed_file["new_name"])
+                tree_dict[changed_folder].remove(changed_file["old_name"])
 
     return tree_dict
 

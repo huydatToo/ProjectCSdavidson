@@ -109,6 +109,13 @@ library ChangesLibrary {
         return count;
     }
 
+    function getChangeMaker(
+        ChangesStorage storage self, 
+        string calldata patch
+    ) external view returns (address) {
+        return self.changes[patch].changeMaker;
+    }
+
     // the function returns the number of changes/change proposals in a project
     function getAddresses(
         ChangesStorage storage self

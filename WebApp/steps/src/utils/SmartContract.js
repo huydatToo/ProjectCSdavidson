@@ -1,4 +1,4 @@
-export const CONTRACT_ADDRESS = "0x3B166f05db013dfbDccC384FdA19F879696A61C8"
+export const CONTRACT_ADDRESS = "0x7c6DD9009Cb0d3665Adb0ab5f5482541f61be36b"
 export const CONTRACT_ABI =  [
   {
     "inputs": [
@@ -193,6 +193,19 @@ export const CONTRACT_ABI =  [
     "type": "event"
   },
   {
+    "inputs": [],
+    "name": "ClaimingInterval",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "string",
@@ -245,8 +258,7 @@ export const CONTRACT_ABI =  [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [],
@@ -259,8 +271,7 @@ export const CONTRACT_ABI =  [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
@@ -333,8 +344,7 @@ export const CONTRACT_ABI =  [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
@@ -358,8 +368,31 @@ export const CONTRACT_ABI =  [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_projectName",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "change",
+        "type": "string"
+      }
+    ],
+    "name": "getChangeMaker",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
     "inputs": [
@@ -383,8 +416,7 @@ export const CONTRACT_ABI =  [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
@@ -403,8 +435,7 @@ export const CONTRACT_ABI =  [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [],
@@ -417,8 +448,7 @@ export const CONTRACT_ABI =  [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
@@ -442,8 +472,7 @@ export const CONTRACT_ABI =  [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [],
@@ -456,8 +485,7 @@ export const CONTRACT_ABI =  [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [],
@@ -477,8 +505,7 @@ export const CONTRACT_ABI =  [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
@@ -533,8 +560,7 @@ export const CONTRACT_ABI =  [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [

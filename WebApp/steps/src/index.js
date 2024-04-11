@@ -14,6 +14,7 @@ import {
   Routes,
   Route
 } from "react-router-dom";
+import AccountPage from './pages/AccountPage';
 
 // webapp's routing
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -26,6 +27,7 @@ root.render(
         
         <Route path="/createNewProject" element={<CreateNewProject />}/>
         <Route path="/project/:projectName" element={<ProjectPage />}/>
+        <Route path="/:accountAddress" element={<AccountPage />}/>
         <Route path="/project/:projectName/:changeProposalOrGoBack/:value" element={<ProjectPage />}/>
         <Route path="/project/:projectName/development" element={<ProjectDevelopment />}/>
       </Routes>

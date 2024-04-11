@@ -3,9 +3,12 @@ import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import LeftArrowSvg from '../assets/leftArrow.svg';
+import {ReactComponent as FlagUnSavedChanges} from '../assets/flag-svgrepo-com.svg';
+
 import { useWallet } from '../utils/WalletContext';
 import HomeSvg from '../assets/home.svg';
 import ModalChanges from '../components/ModalChanges';
+import ModalUpdate from '../components/ModalUpdate';
 import { MetaMaskAvatar } from 'react-metamask-avatar';
 
 // Project development page component
@@ -14,13 +17,18 @@ function ProjectDevelopment() {
   const { projectName } = useParams();
   const { contract, account, isConnected, checkWalletConnection } = useWallet();
   const [ChangeProposals, setChangeProposals] = useState([]);
-  const [myChanges, setMyChanges] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [projectState, setProjectState] = useState(null);
+  
+  const [time, setTime] = useState(null);
+  const [localProject, setLocalProject] = useState({unSavedChanges: false, myChanges: [], changesCIDs: []})
   const [distribution, setDistribution] = useState({
     open: null,
     addresses: [],
     myBalance: null,
   });
   const [isModalOpen, setModalOpen] = useState(false);
+  const [isModalUpdateOpen, setModalUpdateOpen] = useState(false);
   const [clickedChangeProposal, setClickedChangeProposal] = useState(false);
   const [clickedLocalChange, setClickedLocalChange] = useState(false);
 
@@ -28,10 +36,11 @@ function ProjectDevelopment() {
   async function getChangeProposals() {
     const changeProposalsTemp = await contract.getChangesOrProposals(projectName, false);
     setChangeProposals(changeProposalsTemp);
+    setLoading(false)
   }
 
   function getTimeInSeconds() {
-    return Math.floor(Date.now() / 1000);
+    setTime(Math.floor(Date.now() / 1000));
   }
 
   // Functions to open/close the modal
@@ -43,28 +52,62 @@ function ProjectDevelopment() {
     setModalOpen(false);
   }
 
+  // Functions to open/close the modal update
+  async function openModalUpdate() {
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/check-project', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: projectName, changes: localProject.changesCIDs }),
+      });
+      const data = await response.json();
+      setProjectState(data["message"])
+
+    } catch (error) {
+      console.error('Error:', error);
+    }
+
+    setModalUpdateOpen(true);
+  }
+
+  function closeModalUpdate() {
+    setModalUpdateOpen(false);
+  }
+
   // Function to get user's changes
   async function getMyChanges() {
+    const changesCIDsTemp = await contract.getChangesOrProposals(projectName, true);
+
     try {
       const response = await fetch('http://127.0.0.1:8000/api/get_my_changes', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name: projectName }),
+        body: JSON.stringify({ name: projectName, patches: changesCIDsTemp }),
       });
       const data = await response.json();
-      setMyChanges(data['my_changes']);
+      setLocalProject({...localProject, myChanges: data['my_changes'], unSavedChanges: data["unSavedChanges"], changesCIDs: changesCIDsTemp});
+
     } catch (error) {
       console.error('Error:', error);
     }
   }
 
-  // Function to vote in favor of a change
-  async function voteForChange() {
+
+  async function acceptChange() {
     await contract.acceptChangeProposal(clickedChangeProposal, projectName);
     navigate(`/project/${projectName}`);
   }
+
+
+  // Function to vote in favor of a change
+  async function voteForChange() {
+    await contract.vote(clickedChangeProposal, projectName);
+  }
+
 
   // Function to upload local changes and create a new change proposal
   async function uploadChange() {
@@ -84,7 +127,9 @@ function ProjectDevelopment() {
       const data = await response.json();
       await contract.MakeChangeProposal(data['ipfsCID'], projectName);
       await getChangeProposals();
+      await getMyChanges();
       closeModal();
+
     } catch (error) {
       console.error('Error:', error);
     }
@@ -106,21 +151,24 @@ function ProjectDevelopment() {
       });
 
       const data = await response.json();
-      setMyChanges(data['my_changes']);
+      setLocalProject({...localProject, myChanges: data['my_changes']});
     } catch (error) {
       console.error('Error:', error);
     }
+
+    getMyChanges()
   }
 
   // Function to save user's local changes
   async function saveChanges() {
+    let reversedChangesCIDs = [...localProject.changesCIDs].reverse()
     try {
       await fetch('http://127.0.0.1:8000/api/save_changes', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name: projectName, change_name: clickedLocalChange }),
+        body: JSON.stringify({ name: projectName, changes: reversedChangesCIDs }),
       });
 
       getMyChanges();
@@ -142,7 +190,7 @@ function ProjectDevelopment() {
     myBalance = myBalance.toNumber()
     
     let contributors = [];
-    if (lastDistributionTime > getTimeInSeconds()) {
+    if (lastDistributionTime > time) {
       const projectAddresses = await contract.getAddresses(projectName);
       const projectAddressesFiltered = [...new Set(projectAddresses)];
 
@@ -167,8 +215,8 @@ function ProjectDevelopment() {
 
   // Function to calculate time until the next distribution
   function timeForDistribution() {
-    const timeNow = getTimeInSeconds();
-    if (distribution.lastDistributionTime > getTimeInSeconds()) {
+    const timeNow = time;
+    if (distribution.lastDistributionTime > time) {
       const timeUntilNextDistribution = distribution.lastDistributionTime - timeNow;
       if (timeUntilNextDistribution > 60 * 60 * 24) {
         return <h2>{`${Math.floor(timeUntilNextDistribution / (60 * 60 * 24))} days until distribution ends`}</h2>
@@ -211,14 +259,29 @@ function ProjectDevelopment() {
     setDistribution({ ...distribution, myBalance: distribution.myBalance + changeInBalance, addresses: newDistributionAddresses });
   }
 
-  // Initialize the page
+
   useEffect(() => {
-    if (isConnected) {
-      getChangeProposals();
-      getMyChanges();
-      getDistributionState();
-    }
+    async function fetchData() {
+      if (isConnected) {
+      await getDistributionState();
+      await getChangeProposals();
+      await getMyChanges();
+    }}
+
+    getTimeInSeconds()
+    fetchData()
   }, [checkWalletConnection, isConnected]);
+
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      getTimeInSeconds()
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
+
 
   // Function to format address
   function getFormatAddress(address, startLength = 10, endLength = 4) {
@@ -248,9 +311,12 @@ function ProjectDevelopment() {
         <ModalChanges isOpen={isModalOpen} closeModal={closeModal}>
         <div className='modalFlex'>
           <div className=''>
-            <h1>My Changes</h1>
+            <div className='headerModalChanges'>
+            <h1>Local Patches</h1>
+            {localProject.unSavedChanges ? <><h1>|</h1> <h1>Un Saved Changes Found</h1></> : null}
+            </div>
             <div className='modalFlex gap'>
-            {myChanges.map((myChange, index) => (
+            {localProject.myChanges.map((myChange, index) => (
               <div onClick={() => {clickedLocalChange !== myChange ? setClickedLocalChange(myChange) : setClickedLocalChange(false)}} className={`FileLine centerText ${clickedLocalChange === myChange ? "brightBackground" : null}`} key={index}>
                 <label className='CIDtext FileText'>{myChange}</label>
               </div>
@@ -259,48 +325,55 @@ function ProjectDevelopment() {
           </div>
 
           <div className='boxesDownload'>
-            <motion.div whileTap={{scale: 0.9}} whileHover={{scale: 1.03}} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} onClick={() => {closeModal()}} className='projectHeader HomeButtonDiv'>
+            <motion.div whileTap={{scale: 0.9}} whileHover={{scale: 1.03}} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}  transition={{ type: "spring", duration: 0.6 }} onClick={() => {closeModal()}} className='projectHeader HomeButtonDiv'>
             <img className="HomeButton" src={LeftArrowSvg } alt="" />
             </motion.div>
 
-            <motion.div whileTap={{scale: 0.9}} whileHover={{scale: 1.03}} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} onClick={() => {uploadChange()}} className='projectHeader HomeButtonDiv'>
+            <motion.div whileTap={{scale: 0.9}} whileHover={{scale: 1.03}} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}  transition={{ type: "spring", duration: 0.6 }} onClick={() => {uploadChange()}} className='projectHeader HomeButtonDiv'>
             <h1>Upload</h1>
             </motion.div>
 
-            <motion.div whileTap={{scale: 0.9}} whileHover={{scale: 1.03}} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} onClick={() => {deleteChange()}} className='projectHeader HomeButtonDiv'>
+            <motion.div whileTap={{scale: 0.9}} whileHover={{scale: 1.03}} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}  transition={{ type: "spring", duration: 0.6 }} onClick={() => {deleteChange()}} className='projectHeader HomeButtonDiv'>
             <h1>Delete</h1>
             </motion.div>
 
-            <motion.div whileTap={{scale: 0.9}} whileHover={{scale: 1.03}} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} onClick={() => {saveChanges()}} className='projectHeader HomeButtonDiv'>
+            <motion.div whileTap={{scale: 0.9}} whileHover={{scale: 1.03}} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}  transition={{ type: "spring", duration: 0.6 }} onClick={() => {saveChanges()}} className={localProject.unSavedChanges ? 'projectHeader HomeButtonDiv' : "HomeButtonDiv projectHeaderOpacity"}>
             <h1>Save Changes</h1>
             </motion.div>
 
           </div>
         </div>
         </ModalChanges>
+
+        <ModalUpdate isOpen={isModalUpdateOpen} closeModal={closeModalUpdate}>
+        <div className='modalFlex'>
+          {projectState === 351 ? "Need Update" : "Not Need Update"}
+        </div>
+        </ModalUpdate>
         
         <div className='DistributionAndDev'>
           <div className='onSide'>
           <div className='lineShort'>
             <div className='projectHeaderLineProposals'>
-                <motion.div whileTap={{y: 6}} whileHover={{y: 3}} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} onClick={() => {navigate('/')}} className='projectHeader HomeButtonDiv'>
+                <motion.div whileTap={{y: 6}} whileHover={{y: 3}}  transition={{ type: "spring", duration: 0.6 }} onClick={() => {navigate('/')}} className='projectHeader HomeButtonDiv'>
                     <img className="HomeButton" src={HomeSvg} alt="" />
                 </motion.div>
 
-                <motion.div whileTap={{y: 6}} whileHover={{y: 3}} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} onClick={() => {navigate(`/project/${projectName}`)}} className='projectHeader HomeButtonDiv'>
+                <motion.div whileTap={{y: 6}} whileHover={{y: 3}}  transition={{ type: "spring", duration: 0.6 }} onClick={() => {navigate(`/project/${projectName}`)}} className='projectHeader HomeButtonDiv'>
                     <img className="HomeButton" src={LeftArrowSvg} alt="" />
                 </motion.div>
 
-                <motion.div whileTap={{y: 6}} whileHover={{y: 3}} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} className='projectHeader toTheEnd changesButton'>
-                    <h1>Update</h1>
+                <motion.div onClick={() => {!localProject.unSavedChanges ? openModalUpdate() : openModal()}} whileTap={{y: 6}} whileHover={{y: 3}}   transition={{ type: "spring", duration: 0.6 }} className='projectHeader toTheEnd changesButton'>
+                    {localProject.unSavedChanges ? <FlagUnSavedChanges style={{"fill": "#dedede"}} width={60} height={80} /> : <h1>Update</h1>}
                 </motion.div>
 
-                <motion.div onClick={() => {openModal()}} whileTap={{y: 6}} whileHover={{y: 3}} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} className='projectHeader toTheEnd changesButton'>
+                <motion.div onClick={() => {openModal()}} whileTap={{y: 6}} whileHover={{y: 3}}   transition={{ type: "spring", duration: 0.6 }} className='projectHeader toTheEnd changesButton'>
                     <h1>My changes</h1>
                 </motion.div>
             </div>
 
             <div className={ChangeProposals.length > 0 ? "projectListProposals" : "projectListProposals ListOfPatchesNo"}> 
+            {!loading ? <>
             {ChangeProposals.length > 0 ? ChangeProposals.map((item, index) => (
                 (item !== clickedChangeProposal ?
                 <div onClick={() => {setClickedChangeProposal(item)}} className='FileLine gapLine'>
@@ -310,9 +383,11 @@ function ProjectDevelopment() {
                 </div> : 
                 <div onClick={() => {setClickedChangeProposal(false)}} className='clickChangeProposal'>
                   <span onClick={(e) => {e.stopPropagation(); voteForChange()}} className='FileText buttonFileLine'>Vote</span>
-                  <span onClick={(e) => {e.stopPropagation(); navigate(`/project/${projectName}/changeProposal/${item}`)}} className='FileText buttonFileLine'>Watch the change proposal</span>
+                  <span onClick={(e) => {e.stopPropagation(); navigate(`/project/${projectName}/changeProposal/${item}`)}} className='FileText buttonFileLine'>Watch</span>
+                  <span onClick={(e) => {e.stopPropagation(); acceptChange()}} className='FileText buttonFileLine'>Accept</span>
                 </div>
                 ))) : <h1 className='ListOfPatchesNoText'>[ Change Proposals ]</h1>}
+            </> : <div id="loader"></div>}
             </div>
           </div>
           
@@ -320,12 +395,11 @@ function ProjectDevelopment() {
 
             <div className='distributionData'>
                 {timeForDistribution()}
-                <h3>Distribution Balance: {distribution.myBalance}</h3>
-                <h3>{distribution.myPendingTokens} Unclaimed Tokens</h3>
+                <h2>Distribution Balance: {distribution.myBalance}</h2>
             </div>
 
             <div className='distribution'> 
-              {distribution.lastDistributionTime > getTimeInSeconds() ? (
+              {distribution.lastDistributionTime > time ? (
               <>
               <div className=''>
               <div className='payTokens'>
@@ -355,8 +429,10 @@ function ProjectDevelopment() {
               ) : (
               <>
               <div className='center'>
-                <h1 onClick={() => {claimTokens()}} className='StartDistributeButtonOrClaim'>Claim Tokens</h1>
-                <h1 onClick={() => {startDistribution()}} className='StartDistributeButtonOrClaim'>Start Distribution</h1>
+                {distribution.myPendingTokens !== 0 ?
+                <h1 onClick={() => {claimTokens()}} className='StartDistributeButtonOrClaim'>Claim {distribution.myPendingTokens} Tokens</h1>
+                : null}
+                <h1 onClick={() => {startDistribution()}} className={distribution.lastDistributionTime > time ? 'StartDistributeButtonOrClaim' : 'StartDistributeButtonOrClaim'}>Start Distribution</h1>
               </div>
               </>
               )}

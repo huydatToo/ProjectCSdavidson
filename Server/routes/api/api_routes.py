@@ -25,6 +25,9 @@ class API_Context:
     def Start(self: str) -> ipfshttpclient2.Client:
         os.chdir(self.base_path)
         return ipfshttpclient2.connect(self.client_addr)
+    
+    def reset_path(self) -> None:
+        os.chdir(self.base_path)
 
 api_context = API_Context()
 
@@ -85,24 +88,26 @@ def download_project() -> flask.Response:
         if (project_name not in os.listdir()):
             os.mkdir(project_name)
             os.chdir(project_name)
-            all_files = get_project_files_internal(patches_cids, client)
-            folders = sorted([j for j in all_files if "." not in j], key=lambda x: x.count("\\"))
-            files = [j for j in all_files if "." in j]
+
+            project_tree = get_remote_project_tree(client, patches_cids)
+            
+            folders = sorted(project_tree.keys(), key=lambda x: x.count("\\"))
+            
             for folder_name in folders:
-                if ("." not in folder_name):
+                if folder_name != "":
                     os.mkdir(folder_name)
             
-            for file_name in files:
-                file_temp = get_single_text_file_ipfs(client, file_name, patches_cids)
-                if (isinstance(file_temp, list)):
-                    client.get(file_temp[0], file_name)
-                else:
-                    with open(file_name, 'w') as new_file:
+            for folder in folders:
+                for file_name in project_tree[folder]:
+                    file_path = os.path.join(folder, file_name)
+                    file_temp = get_single_text_file_ipfs(client, file_path, patches_cids)
+                    with open(file_path, 'w') as new_file:
                         new_file.write(file_temp)
 
-            return jsonify({'message': 352}), 200
+            message = jsonify({'message': 352}), 200
         
-        message = jsonify({'message': 354}), 200
+        else:
+            message = jsonify({'message': 354}), 200
     
     except Exception as e:
         message = jsonify({'error': str(e)}), 500
@@ -118,46 +123,75 @@ def save_changes() -> flask.Response:
         client = api_context.Start()
         data = request.get_json()
         project_name = data["name"]
+        changes_cids = data["changes"]
         os.chdir("projects")
         os.chdir(project_name)
+
         with open("project_details.json", 'r') as json_file:
             project_details = json.load(json_file)
-            os.chdir("changes")
-            if (unsaved_changes_internal(change_cids=project_details["project-changes"], project_path=project_details["project-path"], client=client)):
-                create_project_patch_from_remote_project(client, project_details["project-changes"], project_details["project-path"], str(round(time.time())))
-                message = jsonify({'message': 355}), 200
-            else:
-                message = jsonify({"message": 356}, 200)
+            
+        os.chdir("changes")
+        if (unsaved_changes_internal(change_cids=changes_cids, project_path=project_details["project-path"], client=client, project_name=project_name)):
+            create_project_patch_from_remote_project(client, changes_cids, project_details["project-path"], str(round(time.time())))
+            message = jsonify({'message': 355}), 200
+        else:
+            message = jsonify({"message": 356}), 200
             
     except Exception as e:
+        print(e)
         message = jsonify({'error': str(e)}), 500
     
     finally:
         client.close()
         return message
 
+
 # the functions returns the local changes
 @api_routes.route('/get_my_changes', methods=['POST'])
 def get_my_changes() -> flask.Response:
-    api_context.Start()
+    client = api_context.Start()
     try:
         data = request.get_json()
         project_name = data["name"]
+        project_patches = data["patches"]
         os.chdir("projects")
         os.chdir(project_name)
+
+        with open("project_details.json", 'r') as json_file:
+            project_details = json.load(json_file)
+
         my_changes = os.listdir("changes")
-        message = jsonify({'my_changes': my_changes}), 200
+        
+        un_saved_changes = unsaved_changes_internal(change_cids=project_patches, project_path=project_details["project-path"], client=client, project_name=project_name)
+        message = jsonify({'my_changes': my_changes, "unSavedChanges": un_saved_changes}), 200
             
     except Exception as e:
+        print(e)
         message = jsonify({'error': str(e)}), 500
 
     finally:
         return message
     
+
 # the functions checks if unsaved changes exist
-def unsaved_changes_internal(change_cids, project_path, client) -> flask.Response:
+def unsaved_changes_internal(change_cids, project_path, client, project_name) -> flask.Response:
+    initial_path = os.getcwd()
+    
+    api_context.reset_path()
+    os.chdir("projects")
+    os.chdir(project_name)
+    os.chdir("changes")
+    
+    my_changes = os.listdir()
+    if (len(my_changes) != 0):
+        last_change = max(my_changes, key=lambda x: int(x.split("-")[1]))
+        result = client.add(last_change, recursive=True)
+        change_cids.append(result[-1]["Hash"])
+
     folder_changes = compare_remote_project_folder_changes(client, change_cids, project_path)
     filtered = list(filter(lambda folder: folder.diff_type != "/", folder_changes))
+
+    os.chdir(initial_path)
     if (len(filtered) != 0):
         return True
     else:
@@ -176,10 +210,10 @@ def upload_changes() -> flask.Response:
         with open("project_details.json", 'r') as json_file:
             project_details = json.load(json_file)
     
-        if unsaved_changes_internal(change_cids=project_details["project-changes"], project_path=project_details["project-path"], client=client):
+        if unsaved_changes_internal(change_cids=project_details["project-changes"], project_path=project_details["project-path"], client=client, project_name=project_name):
             my_changes = os.listdir("changes")
-            last_change = my_changes.index(change_name)
-            result = client.add(os.path.join("changes", my_changes[last_change]), recursive=True)
+            selected_save = my_changes.index(change_name)
+            result = client.add(os.path.join("changes", my_changes[selected_save]), recursive=True)
             ipfs_hash = result[-1]["Hash"]
             
             message = jsonify({'ipfsCID': ipfs_hash}), 200
@@ -187,13 +221,13 @@ def upload_changes() -> flask.Response:
             message = jsonify({'unsaved changes': 357}), 500
             
     except Exception as e:
-        print(e)
         message = jsonify({'error': str(e)}), 500
     
     finally:
         client.close()
         return message
-
+        
+    
 # the function update local project
 @api_routes.route('/update_project', methods=['POST'])
 def update_project() -> flask.Response:
@@ -205,7 +239,7 @@ def update_project() -> flask.Response:
         os.chdir("projects")
         os.chdir(project_name)
 
-        if (unsaved_changes_internal(change_cids=project_details["project-changes"], project_path=project_details["project-path"], client=client)):
+        if (unsaved_changes_internal(change_cids=project_details["project-changes"], project_path=project_details["project-path"], client=client, project_name=project_name)):
             pass
         
         with open("project_details.json", 'r') as json_file:
@@ -222,6 +256,7 @@ def update_project() -> flask.Response:
     finally:
         client.close()
         return message
+    
 
 # the functions returns the status of local project
 @api_routes.route('/check-project', methods=['POST'])
@@ -231,7 +266,7 @@ def check_project() -> flask.Response:
         os.chdir("projects")
         data = request.get_json()
         changes_cids = data["changes"]
-        message = ""
+
         if (data["name"] not in os.listdir()):
             message = {'message': 353}
         
@@ -283,9 +318,11 @@ def get_project_files() -> flask.Response:
         client.close()
         return message
     
+    
 # the function returns a single remote file content
 @api_routes.route('/get_file', methods=['POST'])
 def get_single_file() -> flask.Response:
+
     client = api_context.Start()
     try:
         data = request.get_json()
@@ -295,12 +332,12 @@ def get_single_file() -> flask.Response:
         message = jsonify({'file': version}), 200
     
     except Exception as e:
-        print(e)
         message = jsonify({'error': str(e)}), 500
     
     finally:
         client.close()
         return message
+    
 
 @api_routes.route('/getLocalProjects', methods=['GET'])
 def getLocalProjects() -> flask.Response:
@@ -310,9 +347,9 @@ def getLocalProjects() -> flask.Response:
         message = jsonify({'projects': local_projects}), 200
 
     except Exception as e:
-        print(e)
         message = jsonify({'error': str(e)}), 500
     return message
+
 
 @api_routes.route('/delete_change', methods=['POST'])
 def delete_change() -> flask.Response:

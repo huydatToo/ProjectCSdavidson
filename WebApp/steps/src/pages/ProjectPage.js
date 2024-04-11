@@ -8,16 +8,22 @@ import CompleteSvg from '../assets/complete-svgrepo-com.svg';
 import { useNavigate } from 'react-router-dom';
 import CodeEditor from '../components/CodeEditor';
 import ModalDetails from '../components/ModalDetails';
+import { MetaMaskAvatar } from 'react-metamask-avatar';
+import {ReactComponent as DocumentSvg} from '../assets/document-svgrepo-com.svg';
+import {ReactComponent as FolderSvg} from '../assets/folder-svgrepo-com.svg';
+import {ReactComponent as DownloadSvg} from '../assets/download-svgrepo-com.svg';
+import "../css/spinner.css"
 
 // the project page
 const ProjectPage = () => {
     // data save on the page
-    const { contract } = useWallet();
+    const { contract, account } = useWallet();
     const navigate = useNavigate()
     const [project, setProject] = useState({changes: [], projectName: "", state: -1, files: [], path: ''});
     const { projectName, changeProposalOrGoBack, value } = useParams();
-    const [fileContent, setFileContent] = useState(false)
+    const [fileContent, setFileContent] = useState({content: false, fileName: ""})
     const [isModalOpen, setModalOpen] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [path, setPath] = useState({path: "", openPathInput: false})
 
     // modal control functions
@@ -67,12 +73,19 @@ const ProjectPage = () => {
       return folder_files.map((fileName, index) => (
         fileName.includes(".") ? (
             <div onClick={() => {getFileContent(fileName)}} className='FileLine' key={index}>
-                <span className='FileText'>{getFileNameFromPath(fileName)}</span>
+                <div className='centerFileLine'>
+                  <DocumentSvg className="fileSvgFileLine" width={25} height={25} />
+                  <span className='FileText'>{getFileNameFromPath(fileName)}</span>
+                </div>
+
                 <span className='FileText'>Date</span>
             </div>
         ) : (
             <div onClick={() => setProject({...project, path: fileName + "\\"})} className='DirLine' key={index}>
-                <span className='FileText'>{getFileNameFromPath(fileName)}</span>
+                <div className='centerFileLine'>
+                  <FolderSvg className="fileSvgFolderLine" width={25} height={25} />
+                  <span className='FileText'>{getFileNameFromPath(fileName)}</span>
+                </div>
                 <span className='FileText'>Date</span>
             </div>
         )
@@ -83,6 +96,7 @@ const ProjectPage = () => {
 
     // the functions get the project data like changes, name, etc...
     const getProjectDetails = async () => {
+      setLoading(true)
       let changes = await contract.getChangesOrProposals(projectName, true);
       changes = [...changes].reverse();
       let changesWithProposal
@@ -138,6 +152,7 @@ const ProjectPage = () => {
           console.error("Can't get project details", error);
       }
       setProject(currentProjectState)
+      setLoading(false)
 
   }
 
@@ -149,7 +164,7 @@ const ProjectPage = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ "changes": project.changes, "file_name": project.projectName, "path": path }),
+        body: JSON.stringify({ "changes": project.changes, "file_name": project.projectName, "path": path.path }),
       });
       
     } catch (error) {
@@ -170,7 +185,7 @@ const ProjectPage = () => {
       });
 
       const data = await response.json(); 
-      setFileContent(data["file"])
+      setFileContent({content: data["file"], fileName: file_name})
       
     } catch (error) {
         console.error('Error uploading file:', error);
@@ -196,9 +211,28 @@ const ProjectPage = () => {
       }
   }, [changeProposalOrGoBack]);
 
+  const generateRandomText = (size) => {
+    // Function to generate random text
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let randomText = '';
+    for (let i = 0; i < size; i++) {
+      randomText += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return randomText;
+  };
+
+  const getClassFoldersOrText = () => {
+    if (fileContent.content == false) {
+      return project.files.length > 0 ? "projectListProposals" : 'projectListProposals ListOfPatchesNo'
+    } else {
+      return "projectListProposalsCode"
+    }
+  }
+
+
   // the pages jsx
     return (
-    <div className='background center'>
+    <div className='background'>
         <ModalDetails isOpen={isModalOpen} closeModal={closeModal} closeInput={ClosePathInput}>
         <div className='modalFlex'>
           <div className=''>
@@ -218,8 +252,8 @@ const ProjectPage = () => {
             </motion.div>
 
             {!path.openPathInput ?
-            <motion.div onClick={() => setPath({...path, openPathInput: !path.openPathInput})} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} className='projectHeader cursorPointer'>
-              <h1>Download</h1>
+            <motion.div onClick={() => setPath({...path, openPathInput: !path.openPathInput})} whileTap={{scale: 0.9}} whileHover={{scale: 1.03}} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} className='projectHeader cursorPointer'>
+              <DownloadSvg height={77} width={77} style={{  "fill": "#dedede" }}/>
             </motion.div> :
             <motion.div onClick={e => {e.stopPropagation()}} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} className='projectHeader'>
             <input onChange={(e) => {setPath({...path, path: e.target.value})}} type="text" placeholder='Project Path' className="DownloadInput" />
@@ -229,41 +263,58 @@ const ProjectPage = () => {
         </ModalDetails>
       
         <div className='lineProjectPage'>
+        <div className='onSideProjectPage'>
         <div className='projectHeaderLineProposals'>
-        <motion.div whileTap={{y: 6}} whileHover={{y: 3}} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} onClick={() => {navigate('/')}} className='projectHeader HomeButtonDiv'>
-            <img className="HomeButton" src={HomeSvg} alt="" />
-        </motion.div>
-
-
-          <motion.div  whileTap={{y: 6}} whileHover={{y: 3}} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} className='projectHeader'>
-            <h1>{project.projectName}</h1>
+          <motion.div whileTap={{y: 6}} whileHover={{y: 3}} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} onClick={() => {navigate('/')}} className='projectHeader HomeButtonDiv'>
+              <img className="HomeButton" src={HomeSvg} alt="" />
           </motion.div>
 
-          <motion.div  whileTap={{y: 6}} whileHover={{y: 3}} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} className='projectHeader toTheEnd'>
-            <h1>{getState()}</h1>
+          <motion.div  whileTap={{y: 6}} whileHover={{y: 3}} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} className='projectHeader'>
+            {project.projectName !== "" && <h1>{project.projectName}</h1>}
+            {project.projectName === "" && <h1>{generateRandomText(6)}</h1>}
           </motion.div>
 
-          <motion.div onClick={() => {openModal()}} whileTap={{y: 6}} whileHover={{y: 3}} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} className='projectHeader changesButton'>
+          <motion.div  whileTap={{y: 6}} whileHover={{y: 3}} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} className='projectHeader toTheEnd'>
+            {project.state === -1 && <h1>{generateRandomText(12)}</h1>}
+            {project.projectName !== "" && <h1>{getState()}</h1>}
+
+          </motion.div>
+
+          <motion.div onClick={() => {openModal()}} whileTap={{y: 6}} whileHover={{y: 3}} transition={{ type: "spring", duration: 0.6 }} className='projectHeader changesButton'>
             <h1>Details</h1>
           </motion.div>
 
-          <motion.div onClick={() => navigate(`/project/${projectName}/development`)} whileTap={{scale: 0.9}} whileHover={{scale: 1.03}} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} className='projectHeader toTheEnd changesButton'>
+          <motion.div onClick={() => navigate(`/project/${projectName}/development`)} whileTap={{y: 6}} whileHover={{y: 3}} transition={{ type: "spring", duration: 0.6 }} className='projectHeader toTheEnd changesButton'>
             <h1>Development</h1>
           </motion.div>
+
+          <motion.div onClick={() => navigate(`/${account}`)} whileTap={{y: 6}} whileHover={{y: 3}} transition={{ type: "spring", duration: 0.6 }} className='projectHeader accountButton toTheEnd'>
+            <div className='accountLogo'><MetaMaskAvatar className='accountLogo' address={account} size={40} /></div>
+          </motion.div>
+
         </div>
 
-        <div className={project.files.length > 0 ? "projectListProposals" : 'projectListProposals ListOfPatchesNo'}> 
-        {fileContent === false ? <>
+        <div className={getClassFoldersOrText()}> 
+        {!loading ?
+        <>
+        {fileContent.content === false ? <>
+        <div className='folderList'>
         {project.path.length > 1 ? 
         <div onClick={() => {setProject({...project, path: goBackOneLevel(project.path)})}} className='FileLine'>
           <span className='FileText'>..</span>
           <span className='FileText'>Go Back</span>
         </div> : null}
         {getFilesHtml()}
-        </> : <>
-        {typeof fileContent !== "object" ? CodeEditor(fileContent) : <img src={`https://ipfs.infura.io/ipfs/${fileContent[0]}/`} alt=""/>}
-        <div onClick={() => {setFileContent(false)}}>Go back</div>
-        </>}
+        </div>
+        </> : 
+        <div className='divText'>
+          {typeof fileContent.content !== "object" ? CodeEditor(fileContent.content, "javaScript") : <img src={`https://ipfs.infura.io/ipfs/${fileContent.content}/`} alt=""/>}
+          <div className="goBackFromTextButton">
+            <span className='cursor' onClick={() => {setFileContent({content: false, file_name: ""})}}> Go back </span> <span> | {fileContent.fileName} </span>
+          </div>
+        </div>
+        }</>
+        : <div id="loader"></div>} </div>
         </div>
         </div>
 

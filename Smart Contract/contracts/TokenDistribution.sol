@@ -12,6 +12,7 @@ contract TokenDistribution is Projects, Ownable {
 			_sum += _tokens[i];
 	}
 
+
     function getDistributionBalanceOf(
         address usr, 
         string calldata projectName
@@ -25,10 +26,12 @@ contract TokenDistribution is Projects, Ownable {
         if (tokens == 0) {
             return 0;
         }
+
         tokens = (publicProjects[projectIDX].newTokens * tokens) / 100;
         tokens -= publicProjects[projectIDX].TokensSpent[usr][endDistributionTime];
         return tokens;
     }
+
 
     function distribute(
         address[] memory recipients,
@@ -51,13 +54,13 @@ contract TokenDistribution is Projects, Ownable {
         publicProjects[projectIDX].TokensSpent[msg.sender][endDistributionTime] += tokensToSpend;
     }
 
+
     function startDistribution(
         string calldata projectName
     ) external ProjectExist(projectName) {
         uint projectIDX = NameToID[projectName];
-        if (block.timestamp < publicProjects[projectIDX].DistributionTime) {
-            revert("not starting distribution time");
-        }
+        require(block.timestamp < publicProjects[projectIDX].DistributionTime + ClaimingInterval, "not starting distribution time");
+
         publicProjects[projectIDX].newTokens = 100;
         publicProjects[projectIDX].DistributionTime = block.timestamp + TimeLockInterval;
     }

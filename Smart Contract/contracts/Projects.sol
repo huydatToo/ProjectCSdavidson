@@ -9,6 +9,7 @@ import "./ProjectsToken.sol";
 contract Projects {
     // initiate all the data structures and constants saved on the smart contract
     uint public constant TimeLockInterval = 10 minutes;
+    uint public constant ClaimingInterval = 2 minutes;
 
     using Counters for Counters.Counter;
     using ChangesLibrary for ChangesLibrary.ChangesStorage;
@@ -88,6 +89,7 @@ contract Projects {
         emit NewProjectCreated("New project created with ID:", projectName, newProjectID);
     }
 
+
     // the functions create a change proposal
     function MakeChangeProposal(
         string memory _changeCID, 
@@ -99,6 +101,7 @@ contract Projects {
         emit NewChangeProposalCreated("New change proposal to the Project with the name and following ID and CID:", _projectName, _changeCID, projectIDX);
     }
 
+
     // the functions make a go back proposal
     function MakeGoBackProposal(
         string memory _changeCID, 
@@ -107,6 +110,7 @@ contract Projects {
         uint projectID = NameToID[_projectName];
         publicProjects[projectID].goBackProposals.push(goBack(_changeCID, msg.sender, token.balanceOf(msg.sender, NameToID[_projectName])));
     }
+
 
     // the function make a go Back 
     function acceptGoBack(
@@ -119,6 +123,7 @@ contract Projects {
         emit ProjectWentBack("Project changed to change: ", _changeCID, _projectName);
     }
 
+
     // the functions accept a change proposal and add it to the list
     function acceptChangeProposal(
         string memory _proposedChangeCID, 
@@ -128,6 +133,7 @@ contract Projects {
         publicProjects[projectID].changes.acceptChangeProposal(_proposedChangeCID);
         emit NewChangeIsMadeToProject("A new change has been made to the project: ", _projectName, _proposedChangeCID);
     }
+
 
     // the function allow user to vote in favor of a change proposal
     function voteForChangeProposal(
@@ -156,12 +162,14 @@ contract Projects {
         );
     }
 
+
     function getBalance(
         address _UserAddress,
         string calldata _projectName
     ) ProjectExist(_projectName) external view returns (uint) {
         return token.balanceOf(_UserAddress, NameToID[_projectName]);
     }
+
 
     // the functions returns the changes/change proposals
     function getChangesOrProposals(
@@ -172,12 +180,23 @@ contract Projects {
         return publicProjects[projectID].changes.getChangesOrChangeProposals(changesOrChangeProposals); // true for changes and false for change proposals
     }
 
+
     function getAddresses(
         string calldata _projectName
     ) ProjectExist(_projectName) external view returns (address[] memory) {
         uint projectID = NameToID[_projectName];
         return publicProjects[projectID].changes.getAddresses(); // true for changes and false for change proposals
     }
+
+
+    function getChangeMaker(
+        string calldata _projectName,
+        string calldata change
+    ) ProjectExist(_projectName) external view returns (address) {
+        uint projectID = NameToID[_projectName];
+        return publicProjects[projectID].changes.getChangeMaker(change);
+    }
+
 
     // TEMP
     function getLastProjects() external view returns (string[] memory) {
@@ -195,10 +214,12 @@ contract Projects {
         return lastProjects;
     }
 
+
     function getLastDistriubtionTime(string calldata projectName) external view ProjectExist(projectName) returns (uint)  {
         uint projectID = NameToID[projectName];
         return publicProjects[projectID].DistributionTime;
     }
+
 
     function getPendingTokens(address usr, string calldata projectName) ProjectExist(projectName) external view returns (uint) {
         uint projectID = NameToID[projectName];

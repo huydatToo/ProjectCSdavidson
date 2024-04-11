@@ -14,8 +14,13 @@
   --load: #161413;
   --border-pixel: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M16 0H8v4H4v4H0v8h4v4h4v4h8v-4h4v-4h4V8h-4V4h-4V0zm0 4v4h4v8h-4v4H8v-4H4V8h4V4h8z' fill='%23000000'/%3E%3C/svg%3E")
   8 stretch;
+
+  --fixed-border-pixel: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M16 0H8v4H4v4H0v8h4v4h4v4h8v-4h4v-4h5V6h-4V4h-4V0zm0 4v4h5v8h-0v4H8v-4H4V8h4V4h8z' fill='%23000000'/%3E%3C/svg%3E")
+  8 stretch;
+
   --border-pixel-brown: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M16 0H8v4H4v4H0v8h4v4h4v4h8v-4h4v-4h4V8h-4V4h-4V0zm0 4v4h4v8h-4v4H8v-4H4V8h4V4h8z' fill='%23161413'/%3E%3C/svg%3E")
   8 stretch;
+  
   --border-pixel-bright: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M16 0H8v4H4v4H0v8h4v4h4v4h8v-4h4v-4h4V8h-4V4h-4V0zm0 4v4h4v8h-4v4H8v-4H4V8h4V4h8z' fill='%23e6e6e6'/%3E%3C/svg%3E")
   8 stretch;
 
@@ -28,35 +33,50 @@
   }
 }
 
+.folderList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: 69.5vh;
+  padding: 12px;
+  overflow-y: scroll;
+}
+
 :root {
   *::-webkit-scrollbar {
     height: 10px;
-    width: 6px;
+    width: 0px;
   }
   *::-webkit-scrollbar-track {
     border-radius: 0px;
     background-color: #252627;
+    width: 10px;
   }
   
   *::-webkit-scrollbar-track:hover {
     background-color: #494B4D;
+    width: 10px;
   }
   
   *::-webkit-scrollbar-track:active {
     background-color: #56595A;
+    width: 10px;
   }
   
   *::-webkit-scrollbar-thumb {
     border-radius: 0px;
     background-color: #5a5a5a;
+    width: 10px;
   }
   
   *::-webkit-scrollbar-thumb:hover {
     background-color: #5a5a5a;
+    width: 10px;
   }
   
   *::-webkit-scrollbar-thumb:active {
     background-color: #5a5a5a;
+    width: 10px;
   }
   }
 
@@ -73,10 +93,10 @@
   width: 100%;
   height: 100%;
   background-size: cover;
-  background-color: rgb(255, 255, 255);
+  background-color: rgb(240, 240, 240);
   background-image:
-  linear-gradient(-45deg, transparent 20%, rgb(0, 0, 0, 0.3) 25%, transparent 25%), 
-  linear-gradient(-45deg, transparent 75%, rgba(0, 0, 0, 0.432) 80%, transparent 0);  
+  linear-gradient(-45deg, transparent 20%, rgba(0, 0, 0, 0.126) 25%, transparent 25%), 
+  linear-gradient(-45deg, transparent 75%, rgba(0, 0, 0, 0.153) 80%, transparent 0);  
   background-size: 30px 30px, 30px 30px;
   
   z-index: -2;
@@ -93,6 +113,17 @@
   background-image: radial-gradient(circle, rgb(23, 23, 23) 1px, hsl(0, 0%, 5%) 1px);
 
   z-index: -2;
+}
+
+.smallHeader {
+  text-wrap: wrap;
+  width: 60px;
+  font-size: 23px;
+}
+
+.headerModalChanges {
+  display: flex;
+  justify-content: space-between;
 }
 
 .box {
@@ -133,7 +164,10 @@
 .square {
   width: fit-content;
   height: fit-content;
+}
 
+.accountLogo {
+  margin: auto;
 }
 
 .BoxProject-box-load {
@@ -260,12 +294,18 @@
 
 .lineProjectPage {
   display: flex;
-  flex-direction: column;
   justify-content: center;
+  height: 100vh;
+  margin: auto;
+}
+
+.onSideProjectPage {
+  display: flex;
+  margin-block: auto;
   gap: 15px;
   height: 90%;
-  width: 123.6vh;
-  margin: auto;
+  width: 123.7vh;
+  flex-direction: column;
 }
 
 .lineShorter {
@@ -278,10 +318,27 @@
   
 }
 
+.skeletonNavBarButtons {
+  background-color: #afafaf; /* Adjust background color */
+  margin: 5px;
+  width: 100%;
+  height: 100%;
+  animation: loading 1.5s infinite ease-in-out; /* Adjust animation duration and timing */
+
+} 
+
+@keyframes loading {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 0.5; }
+}
+
+
+
 .DistributionAndDev {
   display: flex;
   justify-content: center;
-  height: 100%;
+  height: 100vh;
 }
 
 .onSide {
@@ -290,6 +347,14 @@
   gap: 15px;
   height: 90%;
 }
+
+.CenterDiv {
+  display: flex;
+  margin: auto;
+  gap: 15px;
+  height: 80%;
+}
+
 
 .lineGapHome {
   margin: 2rem auto;
@@ -736,6 +801,31 @@ input[type=number]::-webkit-outer-spin-button {
 
 }
 
+.projectHeaderOpacity {
+  border: 9px solid var(--color-four);
+  padding: 1ch;
+  border-image: var(--border-pixel);
+  width: fit-content;
+  height: fit-content;
+  backdrop-filter: blur(2px);
+  background-color: #000000c9;
+  border-radius: 22.5px;
+  color: #e6e6e6a0;
+  box-shadow: #000000 4px 4px 0px 3px;
+
+}
+
+.editor {
+  width: 100%;
+  height: 96%;
+  border: 9px solid var(--color-four);
+  border-image: var(--border-pixel);
+  border-style: solid;
+  border-radius: 22.5px;
+  background-color: var(--color-four);
+}
+
+
 .projectListFiles {
   display: flex;
   flex-direction: column;
@@ -784,6 +874,169 @@ input[type=number]::-webkit-outer-spin-button {
 
   gap: 20px;
   
+}
+
+.accountBox {
+  display: flex;
+  flex-direction: column;
+  border: 9px solid var(--color-four);
+  border-radius: 20.5px;
+  border-image: var(--border-pixel);
+  backdrop-filter: blur(2px);
+  background-color: #000000d8;
+  border-radius: 20.5px;
+  justify-content: center;
+  color: var(--color-text-bright);
+  box-shadow: #000000 4px 4px 0px 3px;
+  padding: 20px;
+  height: 20vh;
+}
+
+.leftSideAccount {
+  height: auto;
+}
+
+.accountRecentActivityBox {
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  width: 40vh;
+  border: 9px solid var(--color-four);
+  border-radius: 20.5px;
+  border-image: var(--border-pixel);
+  backdrop-filter: blur(2px);
+  background-color: #000000b6;
+  border-radius: 20.5px;
+  color: var(--color-text-bright);
+  box-shadow: #000000 4px 4px 0px 3px;
+  padding: 20px;
+}
+
+.projectHeaderAccount {
+  border: 9px solid var(--color-four);
+  padding: 1ch;
+  border-image: var(--border-pixel);
+  margin-top: 15px;
+  width: auto;
+  height: fit-content;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  backdrop-filter: blur(2px);
+  background-color: #000000c9;
+  border-radius: 22.5px;
+  color: var(--color-text-bright);
+  box-shadow: #000000 4px 4px 0px 3px;
+}
+
+.projectBoxAccount {
+  cursor: pointer;
+  background-color: #000000b6;
+  padding: 10px;
+  border: 9px solid var(--color-four);
+  border-radius: 20.5px;
+  border-image: var(--border-pixel);
+  backdrop-filter: blur(2px);
+  background-color: #000000b6;
+  display: flex;
+  justify-content: space-between;
+}
+
+.svgParticipants {
+  fill: var(--color-text-bright);
+}
+
+.spanProjectName {
+  margin-block: auto;
+  font-size: 20px;
+}
+
+.participantsDiv {
+  display: flex;
+  gap: 10px;
+}
+
+.projectsBoxesAccount {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.accountDiv {
+  margin: auto;
+  height: auto;
+  display: flex;
+  gap: 15px;
+}
+
+.projectListProposalsCode {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  height: 100%;
+  border: 9px solid var(--color-four);
+  border-radius: 20.5px;
+  border-image: var(--border-pixel);
+  backdrop-filter: blur(2px);
+  background-color: #000000d8;
+  border-radius: 20.5px;
+  color: var(--color-text-bright);
+  box-shadow: #000000 4px 4px 0px 3px;
+
+  gap: 20px;
+  
+}
+
+.cursor {
+  cursor: pointer;
+}
+
+.cursor:hover {
+  color: #c8c8c8;
+  transition-duration: 300ms;
+}
+
+.goBackFromTextButton {
+  padding: 10px;
+  background-color: #000000;
+  font-size: 20px;
+  border: 9px solid var(--color-four);
+  border-radius: 20.5px;
+  border-image: var(--border-pixel);
+  backdrop-filter: blur(2px);
+  background-color: #000000e4;
+  
+}
+
+.divText {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  justify-content: space-between;
+  height: 69.5vh;
+}
+
+.codeEditor {
+  border: 9px solid var(--color-four);
+  border-radius: 20.5px;
+  border-image: var(--border-pixel);
+  background-color: #00000010;
+}
+
+.centerFileLine {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.fileSvgFileLine {
+  margin: auto;
+  fill: #dedede;
+}
+
+.fileSvgFolderLine {
+  margin: auto;
+  fill: #383838;
 }
 
 .FileLine {
@@ -887,6 +1140,13 @@ input[type=number]::-webkit-outer-spin-button {
 
 .changesButton {
   cursor: pointer;
+}
+
+.accountButton {
+  cursor: pointer;
+  height: auto;
+  display: flex;
+  justify-content: center;
 }
 
 .cursorPointer {

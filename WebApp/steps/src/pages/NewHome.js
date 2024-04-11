@@ -49,7 +49,7 @@ const NewHome = () => {
         const end = address.substring(address.length - endLength);
       
         return `${start}...${end}`;
-      }
+    }
     
     return (
         <div className='backgroundNew center'>
