@@ -1,0 +1,18 @@
+{
+  "changed_folders": [
+    {
+      "sign": "?",
+      "path": ""
+    }
+  ],
+  "changed_files": {
+    "": [
+      {
+        "sign": "+",
+        "new_name": "dorability.txt",
+        "old_name": null,
+        "hash": "82203e09071da84dfe5cf5b05146f451f8b272a6c45e996d46cff0b6cccdad09"
+      }
+    ]
+  }
+}

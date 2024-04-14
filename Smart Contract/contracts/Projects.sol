@@ -8,7 +8,7 @@ import "./ProjectsToken.sol";
 
 contract Projects {
     // initiate all the data structures and constants saved on the smart contract
-    uint public constant TimeLockInterval = 10 minutes;
+    uint public constant TimeLockInterval = 4 minutes;
     uint public constant ClaimingInterval = 2 minutes;
 
     using Counters for Counters.Counter;

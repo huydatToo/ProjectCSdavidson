@@ -6,7 +6,7 @@ from .text_patch import create_patch
 import json
 from .compare_projects import compare_remote_project
 from .get_from_ipfs import get_single_text_file_ipfs
-import ipfshttpclient2
+from .wrappers import save_path
 
 
 def initialize_new_path(patch_name: str) -> None:
@@ -90,7 +90,7 @@ def create_project_patch_json(
 def create_project_patch_from_remote_project(
         client, patches: list[str], 
         new_project_path: str, 
-        patch_name: str
+        patch_name: str,
     ) -> None:
     patch_name = "patch-{}".format(patch_name)
     initialize_new_path(patch_name)

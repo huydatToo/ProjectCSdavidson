@@ -150,7 +150,6 @@ def get_ipfs_file_hash(
     ) -> str:
     
     file_content = get_single_text_file_ipfs(client, file_name, changes_cids)
-
     if not is_text_file(file_name):
         file_content = base64.b64encode(file_content).decode('utf-8')
 
@@ -178,7 +177,6 @@ def is_remote_folder_content_same(
         local_folder_path: str, 
         patch_cids: list[str]
     ) -> bool:
-    
     local_dir_files = list(filter(lambda x: is_file(x), os.listdir(local_folder_path)))
     if len(file_names) != len(local_dir_files):
         return False
@@ -186,6 +184,7 @@ def is_remote_folder_content_same(
     for file_name in file_names:
         local_file_path = os.path.join(local_folder_path, file_name)
         ipfs_file_path = os.path.join(folder_path, file_name)
+        
         if file_name not in local_dir_files or not compare_files_ipfs(client, patch_cids, ipfs_file_path, local_file_path):
             return False
     

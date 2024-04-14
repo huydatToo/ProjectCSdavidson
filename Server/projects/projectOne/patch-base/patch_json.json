@@ -9,9 +9,21 @@
     "": [
       {
         "sign": "+",
+        "new_name": "elegant.txt",
+        "old_name": null,
+        "hash": "eab8d76b0501da6ee836f97b98cd5bee558a79f2e2d82f1b6cdccb8d2917aae2"
+      },
+      {
+        "sign": "+",
+        "new_name": "morechange.txt",
+        "old_name": null,
+        "hash": "4a85244c24c3216ae94cb39b7db3c43b0a4e506f25bad24d457c883b67ae58bf"
+      },
+      {
+        "sign": "+",
         "new_name": "one.txt",
         "old_name": null,
-        "hash": "064f80ccb2dd0e689e9651eb75d0002b69fca39f40f05fa2ae3c8c011a03847e"
+        "hash": "d67e2e944994496c8d8ec76eed0cf9f09679448d584b532bebf941852a37f5ed"
       }
     ]
   }

@@ -18,7 +18,8 @@ function ProjectDevelopment() {
   const { contract, account, isConnected, checkWalletConnection } = useWallet();
   const [ChangeProposals, setChangeProposals] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [projectState, setProjectState] = useState(null);
+  const [projectState, setProjectState] = useState({});
+  
   
   const [time, setTime] = useState(null);
   const [localProject, setLocalProject] = useState({unSavedChanges: false, myChanges: [], changesCIDs: []})
@@ -36,7 +37,6 @@ function ProjectDevelopment() {
   async function getChangeProposals() {
     const changeProposalsTemp = await contract.getChangesOrProposals(projectName, false);
     setChangeProposals(changeProposalsTemp);
-    setLoading(false)
   }
 
   function getTimeInSeconds() {
@@ -55,7 +55,7 @@ function ProjectDevelopment() {
   // Functions to open/close the modal update
   async function openModalUpdate() {
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/check-project', {
+      const response = await fetch('http://127.0.0.1:8000/api/search_conflicts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -63,7 +63,9 @@ function ProjectDevelopment() {
         body: JSON.stringify({ name: projectName, changes: localProject.changesCIDs }),
       });
       const data = await response.json();
-      setProjectState(data["message"])
+      console.log(data["message"])
+      console.log(data["conflicts"])
+      setProjectState({state: data["message"], conflicts: data["conflicts"]});
 
     } catch (error) {
       console.error('Error:', error);
@@ -78,7 +80,7 @@ function ProjectDevelopment() {
 
   // Function to get user's changes
   async function getMyChanges() {
-    const changesCIDsTemp = await contract.getChangesOrProposals(projectName, true);
+    let changesCIDsTemp = await contract.getChangesOrProposals(projectName, true);
 
     try {
       const response = await fetch('http://127.0.0.1:8000/api/get_my_changes', {
@@ -98,14 +100,29 @@ function ProjectDevelopment() {
 
 
   async function acceptChange() {
-    await contract.acceptChangeProposal(clickedChangeProposal, projectName);
+    const transaction = await contract.acceptChangeProposal(clickedChangeProposal, projectName);
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/accept_change', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: projectName, patch: clickedChangeProposal }),
+      });
+      await response.json();
+
+    } catch (error) {
+      console.error('Error:', error);
+    }
+
+    await transaction.wait();
     navigate(`/project/${projectName}`);
   }
 
 
   // Function to vote in favor of a change
   async function voteForChange() {
-    await contract.vote(clickedChangeProposal, projectName);
+    await contract.voteForChangeProposal(clickedChangeProposal, projectName);
   }
 
 
@@ -125,10 +142,11 @@ function ProjectDevelopment() {
       });
 
       const data = await response.json();
-      await contract.MakeChangeProposal(data['ipfsCID'], projectName);
+      const transaction = await contract.MakeChangeProposal(data['ipfsCID'], projectName);
+      await transaction.wait();
+      closeModal();
       await getChangeProposals();
       await getMyChanges();
-      closeModal();
 
     } catch (error) {
       console.error('Error:', error);
@@ -161,14 +179,13 @@ function ProjectDevelopment() {
 
   // Function to save user's local changes
   async function saveChanges() {
-    let reversedChangesCIDs = [...localProject.changesCIDs].reverse()
     try {
       await fetch('http://127.0.0.1:8000/api/save_changes', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name: projectName, changes: reversedChangesCIDs }),
+        body: JSON.stringify({ name: projectName, changes: localProject.changesCIDs }),
       });
 
       getMyChanges();
@@ -266,6 +283,7 @@ function ProjectDevelopment() {
       await getDistributionState();
       await getChangeProposals();
       await getMyChanges();
+      setLoading(false)
     }}
 
     getTimeInSeconds()
@@ -346,9 +364,45 @@ function ProjectDevelopment() {
         </ModalChanges>
 
         <ModalUpdate isOpen={isModalUpdateOpen} closeModal={closeModalUpdate}>
-        <div className='modalFlex'>
-          {projectState === 351 ? "Need Update" : "Not Need Update"}
-        </div>
+          <div className='modalFlex width60'>
+            {projectState.state === 351 ? 
+            <>
+            <h1>Need Update</h1>
+            <div className='gap10'>
+            {Object.entries(projectState.conflicts.files).map((item, index) => (
+              <div className='folderFilesDiv' key={index}>
+                <h2>{item[0]}/</h2>
+                
+                <div className='filesListFolderFiles'>
+                {item[1].map((file_name, index_file) => (
+                  <div className='fileLineFolderFiles'>
+                    <span className='' key={index_file}>{file_name}</span>
+                    <div className='buttonsFoldersFiles'>
+                      <span>1</span>
+                      <span>2</span>
+                      <span>3</span>
+                    </div>
+                  </div>
+                ))}
+                </div>
+              </div>
+            ))}
+
+            {projectState.conflicts.folders.map((item, index) => (
+              <div className='folderLineFolder'>
+                <span className='' key={index}>{item}</span>
+                <div className='buttonsFoldersFiles'>
+                  <span>1</span>
+                  <span>2</span>
+                  <span>3</span>
+                </div>
+              </div>
+            ))}
+            </div>
+
+            </>
+            : <h1 className='titleCenter'>Latest Version</h1>}
+          </div>
         </ModalUpdate>
         
         <div className='DistributionAndDev'>
@@ -395,7 +449,8 @@ function ProjectDevelopment() {
 
             <div className='distributionData'>
                 {timeForDistribution()}
-                <h2>Distribution Balance: {distribution.myBalance}</h2>
+                <span className='distributionBalance'>Distribution Balance</span>
+                <span className='distributionBalanceBalance'>{distribution.myBalance}</span>
             </div>
 
             <div className='distribution'> 
@@ -406,7 +461,9 @@ function ProjectDevelopment() {
                   {distribution.addresses.map((item, index) => (
                   <div key={index} className='payTokensDiv'>
                     <div className='payTokensDetails'>
+                    <div className='cursor center' onClick={() => {navigate("/" + item.address)}}>
                     <MetaMaskAvatar className='' address={item.address} size={40} />
+                    </div>
                     <div className='justDetails'>
                     <span className=''>{getFormatAddress(item.address, 5, 3)}</span>
                     <span className=''>Changes: {item.changesOrProposalsCount}</span>

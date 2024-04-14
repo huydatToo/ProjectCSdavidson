@@ -1,7 +1,12 @@
 {
     "project-name": "projectTwo",
-    "project-path": "C:\\Users\\User\\Documents\\tries\\src",
+    "project-path": "C:\\Users\\User\\Documents\\tries\\moreProject",
     "project-changes": [
-        "QmUEWpzmTbXccaphgQ6d4rmzXC5cDw43dvZ7QJMdQ9x7X5"
+        "QmS3k8vEHHugJU5vcrJ6NFKrFNoJFdoAjxDjgRsnConH3E",
+        "QmZkmdshApuMTv1psD6es7xAwgvj47wwz7adzsTfcHFvCn"
+        ],
+    "hidden_local_changes": [
+        "patch-1713113708",
+        "patch-1713118578"
     ]
 }

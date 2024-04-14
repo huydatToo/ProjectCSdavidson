@@ -1099,10 +1099,89 @@ input[type=number]::-webkit-outer-spin-button {
   justify-content: space-between;
 }
 
+.width60 {
+  width: 70vh;
+  display: flex;
+  justify-content: start;
+}
+
+.folderFilesDiv {
+  background-color: #000000ce;
+  color: var(--color-text-bright);
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  border-radius: 20.5px;
+  border: 9px solid var(--color-four);
+  border-image: var(--border-pixel);
+
+  & h2 {
+    display: flex;
+    justify-content: start;
+    margin-inline: auto;
+    font-size: 20px;
+    color: var(--color-text-bright);
+  }
+}
+
+.filesListFolderFiles {
+  gap: 5px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.fileLineFolderFiles {
+  background-color: #0000008f;
+  color: var(--color-text-bright);
+  padding: 3px;
+  padding-inline: 10px;
+  border-radius: 20.5px;
+  border: 9px solid var(--color-four);
+  border-image: var(--border-pixel);  
+  display: flex;
+  justify-content: space-between;
+  font-size: 20px;
+}
+
+.gap10 {
+  gap: 5px;
+  display: flex;
+  flex-direction: column;
+}
+
+.folderLineFolder {
+  background-color: #000000c9;
+  color: var(--color-text-bright);
+  padding: 3px;
+  padding-inline: 10px;
+  border-radius: 20.5px;
+  border: 9px solid var(--color-four);
+  border-image: var(--border-pixel);  
+  display: flex;
+  justify-content: space-between;
+  font-size: 20px;
+}
+
 .boxesDownload {
   display: flex;
   gap: 20px;
   justify-content: space-between;
+}
+
+.buttonsFoldersFiles {
+  display: flex;
+  gap: 20px;
+
+  & span {
+    cursor: pointer;
+  }
+}
+
+.titleCenter {
+  margin: auto;
+  font-size: 60px;
+  color: var(--color-text-bright);
 }
 
 .CIDtext {
@@ -1149,6 +1228,14 @@ input[type=number]::-webkit-outer-spin-button {
   justify-content: center;
 }
 
+.distributionBalance {
+  font-size: 25px;
+}
+
+.distributionBalanceBalance {
+  font-size: 28px;
+}
+
 .cursorPointer {
   cursor: pointer;
 }
@@ -1157,6 +1244,11 @@ input[type=number]::-webkit-outer-spin-button {
   display: flex;
   justify-content: center;  
   text-align: center;
+  
+}
+
+.marginAuto {
+  margin: auto;
 }
 
 .ListOfPatchesNoText {

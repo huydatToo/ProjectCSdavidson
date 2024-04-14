@@ -91,14 +91,14 @@ const ProjectPage = () => {
         )
     ))}
     else {
-      return <div className='ListOfPatchesNo'><h1 className='ListOfPatchesNoText'>[ Empty ]</h1></div>
+      return <div className='ListOfPatchesNo marginAuto'><h1 className='ListOfPatchesNoText'>[ Empty ]</h1></div>
     }}
 
     // the functions get the project data like changes, name, etc...
     const getProjectDetails = async () => {
       setLoading(true)
       let changes = await contract.getChangesOrProposals(projectName, true);
-      changes = [...changes].reverse();
+      console.log(changes)
       let changesWithProposal
       if (changeProposalOrGoBack === "changeProposal") {
         changesWithProposal = [...changes]

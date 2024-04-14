@@ -2,6 +2,14 @@
     "project-name": "projectOne",
     "project-path": "C:\\Users\\User\\Documents\\tries\\test",
     "project-changes": [
-        "Qmdpj8hHnorL3EyPf86UiZrx2Uacu2XyHtf7zrVoe3o5PB"
+        "QmRCGZUpjhc1MP4vxNsGSU41WdhhUXsPo5Eqr4EnkiWaTG",
+        "QmW2HrAnkLEQtbEUbVjGRKWXjAv3sJvLT5C9obQpkKE1mZ",
+        "QmetustACdrHViDLrHU7cUwQx6Um6XffpFCGMea8BuGUrW",
+        "QmXmMK9x7DEZUyWYmzSq9ccG2znoWwDFdeU2yGTNGvNfxg"
+    ],
+    "hidden_local_changes": [
+        "patch-1713108592",
+        "patch-1713108698",
+        "patch-1713109880"
     ]
 }

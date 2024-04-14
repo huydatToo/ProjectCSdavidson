@@ -86,7 +86,7 @@ library ChangesLibrary {
         string memory current = ChangesOrChangeProposals ? self.headChanges : self.headChangeProposals;
 
         for (uint i = 0; i < proposalCount; i++) {
-            returnedList[i] = current;
+            returnedList[proposalCount - i - 1] = current;
             current = self.changes[current].before;
         }
         
