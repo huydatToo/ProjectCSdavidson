@@ -171,6 +171,13 @@ contract Projects {
     }
 
 
+    function getTotalTokens(
+        string calldata _projectName
+    ) ProjectExist(_projectName) external view returns (uint) {
+        return token.totalSupply(NameToID[_projectName]);
+    }
+
+
     // the functions returns the changes/change proposals
     function getChangesOrProposals(
         string calldata _projectName, 

@@ -135,7 +135,7 @@ def save_changes() -> flask.Response:
             project_details = json.load(json_file)
             
         os.chdir("changes")
-        if (unsaved_changes_internal(change_cids=changes_cids, project_path=project_details["project-path"], client=client, project_name=project_name)):
+        if (unsaved_changes_internal(change_cids=changes_cids.copy(), project_path=project_details["project-path"], client=client, project_name=project_name)):
             create_project_patch_from_remote_project(client, changes_cids, project_details["project-path"], str(round(time.time())))
             message = jsonify({'message': 355}), 200
         else:
@@ -158,16 +158,19 @@ def get_my_changes() -> flask.Response:
         data = request.get_json()
         project_name = data["name"]
         project_patches = data["patches"]
-        os.chdir(project_name)
+        if project_name in os.listdir():
+            os.chdir(project_name)
 
-        with open("project_details.json", 'r') as json_file:
-            project_details = json.load(json_file)
+            with open("project_details.json", 'r') as json_file:
+                project_details = json.load(json_file)
 
-        my_changes = os.listdir("changes")
-        un_saved_changes = unsaved_changes_internal(change_cids=project_patches, project_path=project_details["project-path"], client=client, project_name=project_name)
-        hidden_local_changes = project_details["hidden_local_changes"]
-        my_changes = list(filter(lambda x: x not in hidden_local_changes, my_changes))
-        message = jsonify({'my_changes': my_changes, "unSavedChanges": un_saved_changes}), 200
+            my_changes = os.listdir("changes")
+            un_saved_changes = unsaved_changes_internal(change_cids=project_patches, project_path=project_details["project-path"], client=client, project_name=project_name)
+            hidden_local_changes = project_details["hidden_local_changes"]
+            my_changes = list(filter(lambda x: x not in hidden_local_changes, my_changes))
+            message = jsonify({'my_changes': my_changes, "unSavedChanges": un_saved_changes}), 200
+        else:
+            message = jsonify({'message': 353}), 200
             
     except Exception as e:
         message = jsonify({'error': str(e)}), 500
@@ -253,6 +256,7 @@ def upload_changes() -> flask.Response:
             message = jsonify({'unsaved changes': 357}), 500
             
     except Exception as e:
+        print(e)
         message = jsonify({'error': str(e)}), 500
     
     finally:
@@ -268,30 +272,32 @@ def search_conflicts() -> flask.Response:
         data = request.get_json()
         changes_cids = data["changes"]
         project_name = data["name"]
-        os.chdir(project_name)
+        if project_name in os.listdir():
+            os.chdir(project_name)
 
-        
-        with open("project_details.json", 'r') as json_file:
-            project_details = json.load(json_file)
-        
-        if (project_details["project-changes"] != changes_cids):
-            local_project_changes = project_details["project-changes"]
-            new_changes = changes_cids[-(len(changes_cids) - len(local_project_changes)):]
+            with open("project_details.json", 'r') as json_file:
+                project_details = json.load(json_file)
+            
+            if (project_details["project-changes"] != changes_cids):
+                local_project_changes = project_details["project-changes"]
+                new_changes = changes_cids[-(len(changes_cids) - len(local_project_changes)):]
 
-            os.chdir("changes")
-            my_changes = os.listdir()
-            if (len(my_changes) != 0):
-                last_change = max(my_changes, key=lambda x: int(x.split("-")[1]))
-                result = client.add(last_change, recursive=True)
-                last_change_cid = result[-1]["Hash"]
-                conflicts = get_conflicts(client, project_name, last_change_cid, new_changes)
+                os.chdir("changes")
+                my_changes = os.listdir()
+                if (len(my_changes) != 0):
+                    last_change = max(my_changes, key=lambda x: int(x.split("-")[1]))
+                    result = client.add(last_change, recursive=True)
+                    last_change_cid = result[-1]["Hash"]
+                    conflicts = get_conflicts(client, project_name, last_change_cid, new_changes)
 
-                if not conflicts:
-                    message = jsonify({'conflicts': None, 'message': 351}), 200
-                else:
-                    message = jsonify({'conflicts': conflicts, 'message': 351}), 200
+                    if not conflicts:
+                        message = jsonify({'conflicts': None, 'message': 351}), 200
+                    else:
+                        message = jsonify({'conflicts': conflicts, 'message': 351}), 200
+            else:
+                message = jsonify({'message': 354}), 200
         else:
-            message = jsonify({'message': 354}), 200
+            message = jsonify({'message': 353}), 200
 
     except Exception as e:
         message = jsonify({'error': str(e)}), 500
@@ -391,7 +397,6 @@ def get_project_files() -> flask.Response:
         data = request.get_json()
         changes_cids = data["changes"]
         project_name = data["name"]
-        os.chdir(project_name)
         all_files = get_project_files_internal(changes_cids, client)
         message = jsonify({"files": all_files}), 200
     except Exception as e:
@@ -441,10 +446,10 @@ def delete_change() -> flask.Response:
         
         os.chdir(project_name)
         os.chdir("changes")
-
         shutil.rmtree(change_name)
-        message = jsonify({'my_changes': os.listdir()}), 200
+        message = jsonify({'message': "success"}), 200
     except Exception as e:
+        print(e)
         message = jsonify({'error': str(e)}), 500
     finally:
         client.close()

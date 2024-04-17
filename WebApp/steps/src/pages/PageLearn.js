@@ -37,27 +37,27 @@ const PageLearn = ({scroll}) => {
       <div className="gridExplains">
 
       <motion.div initial={{opacity: 0}} className="explainBox1">
-        <span>1. Initiate A New Project</span>
+        <span>1. rewgbrgbwegbbrg</span>
       </motion.div>
 
       <motion.div initial={{opacity: 0}} className="explainBox2">
-        <span>2. Share To Others</span>
+        <span>2. wbergbregwgb</span>
       </motion.div>
 
       <motion.div initial={{opacity: 0}} className="explainBox">
-        <span>3. Upload A Change Proposal</span>
+        <span>3. wbergbrwgbrgbwe</span>
       </motion.div>
 
       <motion.div initial={{opacity: 0}} className="explainBox1">
-        <span>4. Vote For Change Proposals</span>
+        <span>4. wberggbwegbwbge</span>
       </motion.div>
 
       <motion.div initial={{opacity: 0}} className="explainBox2">
-        <span>1. Initiate A New Project</span>
+        <span>1. webrgwgbergbwebg</span>
       </motion.div>
 
       <motion.div initial={{opacity: 0}} className="explainBox">
-        <span>1. Initiate A New Project</span>
+        <span>1. wbergbwegbgwebrb</span>
       </motion.div>
 
       </div>

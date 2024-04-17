@@ -74,8 +74,8 @@ const ProjectPage = () => {
         fileName.includes(".") ? (
             <div onClick={() => {getFileContent(fileName)}} className='FileLine' key={index}>
                 <div className='centerFileLine'>
-                  <DocumentSvg className="fileSvgFileLine" width={25} height={25} />
-                  <span className='FileText'>{getFileNameFromPath(fileName)}</span>
+                  <DocumentSvg className="marginAuto fileSvgFileLine" width={40} height={40} />
+                  <span className='marginAuto FileText'>{getFileNameFromPath(fileName)}</span>
                 </div>
 
                 <span className='FileText'>Date</span>
@@ -83,8 +83,8 @@ const ProjectPage = () => {
         ) : (
             <div onClick={() => setProject({...project, path: fileName + "\\"})} className='DirLine' key={index}>
                 <div className='centerFileLine'>
-                  <FolderSvg className="fileSvgFolderLine" width={25} height={25} />
-                  <span className='FileText'>{getFileNameFromPath(fileName)}</span>
+                  <FolderSvg className="marginAuto fileSvgFolderLine" width={40} height={40} />
+                  <span className='FileText marginAuto'>{getFileNameFromPath(fileName)}</span>
                 </div>
                 <span className='FileText'>Date</span>
             </div>
@@ -239,7 +239,7 @@ const ProjectPage = () => {
             <h1>Changes</h1>
             <div className='modalFlex gap'>
             {project.changes.map((changeCID, index) => (
-              <div onClick={() => navigate(`/project/${projectName}/goBack/${index}`)} className='FileLine centerText' key={index}>
+              <div onClick={() => navigate(`/project/${projectName}/goBack/${index}`)} className='FileLine' key={index}>
                 <label className='CIDtext FileText'>{changeCID.slice(0, 42)}</label>
               </div>
             ))}
@@ -247,12 +247,12 @@ const ProjectPage = () => {
           </div>
 
           <div className='boxesDownload'>
-            <motion.div whileTap={{scale: 0.9}} whileHover={{scale: 1.03}} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} onClick={() => {!path.openPathInput ? closeModal() : downloadProject()}} className='projectHeader HomeButtonDiv'>
+            <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} onClick={() => {!path.openPathInput ? closeModal() : downloadProject()}} className='projectHeader HomeButtonDiv'>
             <img className="HomeButton" src={!(path.path.length > 3) ? LeftArrowSvg : CompleteSvg} alt="" />
             </motion.div>
 
             {!path.openPathInput ?
-            <motion.div onClick={() => setPath({...path, openPathInput: !path.openPathInput})} whileTap={{scale: 0.9}} whileHover={{scale: 1.03}} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} className='projectHeader cursorPointer'>
+            <motion.div onClick={() => setPath({...path, openPathInput: !path.openPathInput})} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} className='projectHeader cursorPointer'>
               <DownloadSvg height={77} width={77} style={{  "fill": "#dedede" }}/>
             </motion.div> :
             <motion.div onClick={e => {e.stopPropagation()}} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} className='projectHeader'>
@@ -289,7 +289,9 @@ const ProjectPage = () => {
           </motion.div>
 
           <motion.div onClick={() => navigate(`/${account}`)} whileTap={{y: 6}} whileHover={{y: 3}} transition={{ type: "spring", duration: 0.6 }} className='projectHeader accountButton toTheEnd'>
-            <div className='accountLogo'><MetaMaskAvatar className='accountLogo' address={account} size={40} /></div>
+            <div className='accountLogo'>
+              <img className='squareGray' src={`https://effigy.im/a/${account}.png`} alt=""/>
+            </div>
           </motion.div>
 
         </div>

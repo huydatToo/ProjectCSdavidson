@@ -1,4 +1,4 @@
-export const CONTRACT_ADDRESS = "0x244AdDC4E149f4aD4E48478199B1c5eF176a38F8"
+export const CONTRACT_ADDRESS = "0xFD700DA577d3969777019F959B24523f03C62b4d"
 export const CONTRACT_ABI =  [
   {
     "inputs": [
@@ -464,6 +464,25 @@ export const CONTRACT_ABI =  [
       }
     ],
     "name": "getPendingTokens",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_projectName",
+        "type": "string"
+      }
+    ],
+    "name": "getTotalTokens",
     "outputs": [
       {
         "internalType": "uint256",

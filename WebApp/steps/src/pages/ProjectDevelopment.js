@@ -4,12 +4,14 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import LeftArrowSvg from '../assets/leftArrow.svg';
 import {ReactComponent as FlagUnSavedChanges} from '../assets/flag-svgrepo-com.svg';
-
+import {ReactComponent as Show} from '../assets/show.svg';
 import { useWallet } from '../utils/WalletContext';
 import HomeSvg from '../assets/home.svg';
 import ModalChanges from '../components/ModalChanges';
 import ModalUpdate from '../components/ModalUpdate';
 import { MetaMaskAvatar } from 'react-metamask-avatar';
+
+
 
 // Project development page component
 function ProjectDevelopment() {
@@ -19,14 +21,13 @@ function ProjectDevelopment() {
   const [ChangeProposals, setChangeProposals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [projectState, setProjectState] = useState({});
-  
-  
   const [time, setTime] = useState(null);
   const [localProject, setLocalProject] = useState({unSavedChanges: false, myChanges: [], changesCIDs: []})
   const [distribution, setDistribution] = useState({
     open: null,
     addresses: [],
     myBalance: null,
+    projectBalance: null,
   });
   const [isModalOpen, setModalOpen] = useState(false);
   const [isModalUpdateOpen, setModalUpdateOpen] = useState(false);
@@ -35,8 +36,13 @@ function ProjectDevelopment() {
 
   // Function to get change proposals for the project
   async function getChangeProposals() {
-    const changeProposalsTemp = await contract.getChangesOrProposals(projectName, false);
-    setChangeProposals(changeProposalsTemp);
+    let changeProposalsTemp = await contract.getChangesOrProposals(projectName, false);
+    let t = [];
+    changeProposalsTemp.map(async(changeProposal, index) => {
+      const changeMaker = await contract.getChangeMaker(projectName, changeProposal)
+      t.push({cid: changeProposal, changeMaker: changeMaker});
+    })
+    setChangeProposals(t);
   }
 
   function getTimeInSeconds() {
@@ -63,8 +69,6 @@ function ProjectDevelopment() {
         body: JSON.stringify({ name: projectName, changes: localProject.changesCIDs }),
       });
       const data = await response.json();
-      console.log(data["message"])
-      console.log(data["conflicts"])
       setProjectState({state: data["message"], conflicts: data["conflicts"]});
 
     } catch (error) {
@@ -91,7 +95,9 @@ function ProjectDevelopment() {
         body: JSON.stringify({ name: projectName, patches: changesCIDsTemp }),
       });
       const data = await response.json();
-      setLocalProject({...localProject, myChanges: data['my_changes'], unSavedChanges: data["unSavedChanges"], changesCIDs: changesCIDsTemp});
+      if (data.message !== 353) {
+        setLocalProject({...localProject, myChanges: data['my_changes'], unSavedChanges: data["unSavedChanges"], changesCIDs: changesCIDsTemp});
+      }
 
     } catch (error) {
       console.error('Error:', error);
@@ -168,13 +174,12 @@ function ProjectDevelopment() {
         body: JSON.stringify({ name: projectName, change_name: clickedLocalChange }),
       });
 
-      const data = await response.json();
-      setLocalProject({...localProject, myChanges: data['my_changes']});
+      await response.json();
     } catch (error) {
       console.error('Error:', error);
     }
-
-    getMyChanges()
+    
+    await getMyChanges()
   }
 
   // Function to save user's local changes
@@ -197,14 +202,18 @@ function ProjectDevelopment() {
   // Function to get the distribution state
   async function getDistributionState() {
     var lastDistributionTime = await contract.getLastDistriubtionTime(projectName);
-    var timeInterval = await contract.TimeLockInterval();
     var myBalance = await contract.getDistributionBalanceOf(account, projectName);
+    var projectBalance = await contract.getBalance(account, projectName)
     var myPendingTokens = await contract.getPendingTokens(account, projectName)
+    var totalTokensInProject = await contract.getTotalTokens(projectName)
+    var TimeLockInterval = await contract.ClaimingInterval();
     
+    TimeLockInterval = TimeLockInterval.toNumber()
     myPendingTokens = myPendingTokens.toNumber()
-    timeInterval = timeInterval.toNumber()
     lastDistributionTime = lastDistributionTime.toNumber()
     myBalance = myBalance.toNumber()
+    projectBalance = projectBalance.toNumber()
+    totalTokensInProject = totalTokensInProject.toNumber()
     
     let contributors = [];
     if (lastDistributionTime > time) {
@@ -225,8 +234,10 @@ function ProjectDevelopment() {
       myBalance: myBalance,
       lastDistributionTime: lastDistributionTime,
       addresses: contributors,
-      timeInterval: timeInterval,
-      myPendingTokens: myPendingTokens
+      myPendingTokens: myPendingTokens,
+      projectBalance: projectBalance,
+      totalTokens: totalTokensInProject,
+      timeLockInterval: TimeLockInterval
     });
   }
 
@@ -236,15 +247,33 @@ function ProjectDevelopment() {
     if (distribution.lastDistributionTime > time) {
       const timeUntilNextDistribution = distribution.lastDistributionTime - timeNow;
       if (timeUntilNextDistribution > 60 * 60 * 24) {
-        return <h2>{`${Math.floor(timeUntilNextDistribution / (60 * 60 * 24))} days until distribution ends`}</h2>
+        return `${Math.floor(timeUntilNextDistribution / (60 * 60 * 24))} days until distribution ends`
       } else if (timeUntilNextDistribution < 60 * 60 * 24 && timeUntilNextDistribution > 60 * 60) {
-        return <h2>{`${Math.floor(timeUntilNextDistribution / (60 * 60))} hours until distribution ends`}</h2>
+        return `${Math.floor(timeUntilNextDistribution / (60 * 60))} hours until distribution ends`
       } else if (timeUntilNextDistribution < 60 * 60 && timeUntilNextDistribution > 60) {
-        return <h2>{`${Math.floor(timeUntilNextDistribution / (60))} minutes until distribution ends`}</h2>
+        return `${Math.floor(timeUntilNextDistribution / (60))} minutes until distribution ends`
       } else {
-        return <h2>{`${Math.floor(timeUntilNextDistribution)} seconds until distribution ends`}</h2>
+        return `${Math.floor(timeUntilNextDistribution)} seconds until distribution ends`
       }
+    } else {
+      return false;
+    }
+  }
+
+  function timeForClaiming() {
+    const timeNow = time;
+    if (distribution.lastDistributionTime + distribution.timeLockInterval > timeNow) {
+      const timeUntilNextClaimingEnds = (distribution.lastDistributionTime + distribution.timeLockInterval) - timeNow;
+      if (timeUntilNextClaimingEnds > 60 * 60 * 24) {
+        return `${Math.floor(timeUntilNextClaimingEnds / (60 * 60 * 24))} days until claiming ends`
+      } else if (timeUntilNextClaimingEnds < 60 * 60 * 24 && timeUntilNextClaimingEnds > 60 * 60) {
+        return `${Math.floor(timeUntilNextClaimingEnds / (60 * 60))} hours until claiming ends`
+      } else if (timeUntilNextClaimingEnds < 60 * 60 && timeUntilNextClaimingEnds > 60) {
+        return `${Math.floor(timeUntilNextClaimingEnds / (60))} minutes until claiming ends`
       } else {
+        return `${Math.floor(timeUntilNextClaimingEnds)} seconds until claiming ends`
+      }
+    } else {
       return false;
     }
   }
@@ -258,7 +287,9 @@ function ProjectDevelopment() {
     amounts = amounts.filter((element) => element !== 0);
 
     if (amounts.length + addresses.length > 0) {
-      await contract.distribute(addresses, amounts, projectName);
+      const transaction = await contract.distribute(addresses, amounts, projectName);
+      await transaction.wait()
+      await getDistributionState()
     }
   }
 
@@ -313,15 +344,28 @@ function ProjectDevelopment() {
 
   // Function to claim tokens
   const claimTokens = async() => {
-    await contract.claimPendingTokens(projectName);
+    const transaction = await contract.claimPendingTokens(projectName);
+    await transaction.wait()
     await getDistributionState();
   }
 
   // Function to start distribution
   const startDistribution = async() => {
-    await contract.startDistribution(projectName);
+    const transaction = await contract.startDistribution(projectName);
+    await transaction.wait()
     await getDistributionState();
   }
+
+
+  function formatNumber(number) {
+    if (Number.isInteger(number)) {
+      return number.toString(); 
+    } else {
+      let roundedNumber = number.toFixed(2);
+      return parseFloat(roundedNumber).toString(); 
+    }
+  }
+  
 
     // returns the page's react component
     return (
@@ -330,8 +374,8 @@ function ProjectDevelopment() {
         <div className='modalFlex'>
           <div className=''>
             <div className='headerModalChanges'>
-            <h1>Local Patches</h1>
-            {localProject.unSavedChanges ? <><h1>|</h1> <h1>Un Saved Changes Found</h1></> : null}
+            <span className='HeaderModal'>[ Local Patches ]</span>
+            {localProject.unSavedChanges ? <span className='unSavedChangesHeader'>Un Saved Changes Found</span> : null}
             </div>
             <div className='modalFlex gap'>
             {localProject.myChanges.map((myChange, index) => (
@@ -343,19 +387,19 @@ function ProjectDevelopment() {
           </div>
 
           <div className='boxesDownload'>
-            <motion.div whileTap={{scale: 0.9}} whileHover={{scale: 1.03}} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}  transition={{ type: "spring", duration: 0.6 }} onClick={() => {closeModal()}} className='projectHeader HomeButtonDiv'>
+            <motion.div onClick={() => {closeModal()}} className='projectHeader HomeButtonDiv'>
             <img className="HomeButton" src={LeftArrowSvg } alt="" />
             </motion.div>
 
-            <motion.div whileTap={{scale: 0.9}} whileHover={{scale: 1.03}} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}  transition={{ type: "spring", duration: 0.6 }} onClick={() => {uploadChange()}} className='projectHeader HomeButtonDiv'>
+            <motion.div onClick={() => {uploadChange()}} className='projectHeader HomeButtonDiv'>
             <h1>Upload</h1>
             </motion.div>
 
-            <motion.div whileTap={{scale: 0.9}} whileHover={{scale: 1.03}} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}  transition={{ type: "spring", duration: 0.6 }} onClick={() => {deleteChange()}} className='projectHeader HomeButtonDiv'>
+            <motion.div onClick={() => {deleteChange()}} className='projectHeader HomeButtonDiv'>
             <h1>Delete</h1>
             </motion.div>
 
-            <motion.div whileTap={{scale: 0.9}} whileHover={{scale: 1.03}} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}  transition={{ type: "spring", duration: 0.6 }} onClick={() => {saveChanges()}} className={localProject.unSavedChanges ? 'projectHeader HomeButtonDiv' : "HomeButtonDiv projectHeaderOpacity"}>
+            <motion.div onClick={() => {localProject.unSavedChanges && saveChanges()}} className={localProject.unSavedChanges ? 'projectHeader HomeButtonDiv' : "projectHeaderOpacity"}>
             <h1>Save Changes</h1>
             </motion.div>
 
@@ -367,7 +411,8 @@ function ProjectDevelopment() {
           <div className='modalFlex width60'>
             {projectState.state === 351 ? 
             <>
-            <h1>Need Update</h1>
+            <div>
+            <h1 className='headerUpdate'>Need Update</h1>
             <div className='gap10'>
             {Object.entries(projectState.conflicts.files).map((item, index) => (
               <div className='folderFilesDiv' key={index}>
@@ -389,8 +434,8 @@ function ProjectDevelopment() {
             ))}
 
             {projectState.conflicts.folders.map((item, index) => (
-              <div className='folderLineFolder'>
-                <span className='' key={index}>{item}</span>
+              <div key={index} className='folderLineFolder'>
+                <span className='' >{item}</span>
                 <div className='buttonsFoldersFiles'>
                   <span>1</span>
                   <span>2</span>
@@ -399,7 +444,9 @@ function ProjectDevelopment() {
               </div>
             ))}
             </div>
+            </div>
 
+            <h1 className='updateButton'>Update</h1>
             </>
             : <h1 className='titleCenter'>Latest Version</h1>}
           </div>
@@ -409,7 +456,7 @@ function ProjectDevelopment() {
           <div className='onSide'>
           <div className='lineShort'>
             <div className='projectHeaderLineProposals'>
-                <motion.div whileTap={{y: 6}} whileHover={{y: 3}}  transition={{ type: "spring", duration: 0.6 }} onClick={() => {navigate('/')}} className='projectHeader HomeButtonDiv'>
+                <motion.div whileTap={{y: 6}} whileHover={{y: 3}}  transition={{ type: "spring", duration: 0.6 }} onClick={() => {navigate('/')}} className='BackgroundHome projectHeader HomeButtonDiv'>
                     <img className="HomeButton" src={HomeSvg} alt="" />
                 </motion.div>
 
@@ -417,28 +464,48 @@ function ProjectDevelopment() {
                     <img className="HomeButton" src={LeftArrowSvg} alt="" />
                 </motion.div>
 
+
+                {projectState.state !== 353 ?
+                <>
                 <motion.div onClick={() => {!localProject.unSavedChanges ? openModalUpdate() : openModal()}} whileTap={{y: 6}} whileHover={{y: 3}}   transition={{ type: "spring", duration: 0.6 }} className='projectHeader toTheEnd changesButton'>
-                    {localProject.unSavedChanges ? <FlagUnSavedChanges style={{"fill": "#dedede"}} width={60} height={80} /> : <h1>Update</h1>}
+                    {localProject.unSavedChanges ? <FlagUnSavedChanges style={{"fill": "#dedede"}} width={60} height={80} /> 
+                    : <h1>Update</h1>}
                 </motion.div>
 
                 <motion.div onClick={() => {openModal()}} whileTap={{y: 6}} whileHover={{y: 3}}   transition={{ type: "spring", duration: 0.6 }} className='projectHeader toTheEnd changesButton'>
                     <h1>My changes</h1>
                 </motion.div>
+                </>
+                : 
+                <motion.div className='projectHeader toTheEnd changesButton'>
+                  <h1>not downloaded</h1>
+                </motion.div>}
             </div>
 
             <div className={ChangeProposals.length > 0 ? "projectListProposals" : "projectListProposals ListOfPatchesNo"}> 
             {!loading ? <>
             {ChangeProposals.length > 0 ? ChangeProposals.map((item, index) => (
-                (item !== clickedChangeProposal ?
-                <div onClick={() => {setClickedChangeProposal(item)}} className='FileLine gapLine'>
-                <span className='FileText'>{getFormatAddress(item)}</span>
-                <span className='FileText'>|</span>
+              
+                (item.cid !== clickedChangeProposal ?
+                <div key={index} onClick={() => {setClickedChangeProposal(item.cid)}} className='FileLine gapLine'>
+                <span className='FileText'>{getFormatAddress(item.cid)}</span>
+                <span className='FileTextVL'>|</span>
                 <span className='FileText'>Change Proposal</span>
                 </div> : 
                 <div onClick={() => {setClickedChangeProposal(false)}} className='clickChangeProposal'>
-                  <span onClick={(e) => {e.stopPropagation(); voteForChange()}} className='FileText buttonFileLine'>Vote</span>
-                  <span onClick={(e) => {e.stopPropagation(); navigate(`/project/${projectName}/changeProposal/${item}`)}} className='FileText buttonFileLine'>Watch</span>
-                  <span onClick={(e) => {e.stopPropagation(); acceptChange()}} className='FileText buttonFileLine'>Accept</span>
+                  <span className='spanClickedAddr'>{getFormatAddress(item.cid, 10, 3)}</span>
+                  <div className='centerClickedButtons'>
+                    <span onClick={(e) => {e.stopPropagation(); voteForChange()}} className='FileText buttonFileLineChangeProposal'>Vote</span>
+                    <div className='vl'/>
+                    <Show width={40} height={40} onClick={(e) => {e.stopPropagation(); navigate(`/project/${projectName}/changeProposal/${item.cid}`)}} className='FileText buttonFileLineChangeProposal'/>
+                    <div className='vl'/>
+                    <div className='marginAuto' onClick={() => {navigate(`/${item.changeMaker}`)}}>
+                      <img className='squareGraySmall' src={`https://effigy.im/a/${item.changeMaker}.png`} alt=""/>
+
+                      </div>
+                    <div className='vl'/>
+                    <span onClick={(e) => {e.stopPropagation(); acceptChange()}} className='FileText buttonFileLineChangeProposal'>Accept</span>
+                  </div>
                 </div>
                 ))) : <h1 className='ListOfPatchesNoText'>[ Change Proposals ]</h1>}
             </> : <div id="loader"></div>}
@@ -446,11 +513,35 @@ function ProjectDevelopment() {
           </div>
           
           <div className='lineShorter'>
+              
+            {timeForDistribution() !== false && 
+            <div className='distributionData'>
+            <span className='spanTimeToDistribution'>{timeForDistribution()}</span>
+            </div>}
 
             <div className='distributionData'>
-                {timeForDistribution()}
-                <span className='distributionBalance'>Distribution Balance</span>
-                <span className='distributionBalanceBalance'>{distribution.myBalance}</span>
+                {timeForDistribution() !== false && <>
+                <div className='divLinesDistributionData'>
+                  <span className='distributionBalance'>Distribution Balance</span>
+                  <span className='distributionBalanceBalance'>{distribution.myBalance}</span>
+                </div>
+                <hr className='hrLineDistribution' />
+                </>}
+
+                <div className='divLinesDistributionData'>
+                  <span className='distributionBalance'>Project Balance</span>
+                  <div className='gapDistributionBalance'>
+                    <span className='distributionBalanceBalance'>{distribution.projectBalance}</span>
+                    <div className='vl'/>
+                    <span className='distributionBalanceBalance'>{formatNumber(100*(distribution.projectBalance/distribution.totalTokens))}%</span>
+                  </div>
+                </div>
+
+                <hr className='hrLineDistribution' />
+                <div className='divLinesDistributionData'>
+                  <span className='distributionBalance'>Total Tokens</span>
+                  <span className='distributionBalanceBalance'>{distribution.totalTokens}</span>
+                </div>
             </div>
 
             <div className='distribution'> 
@@ -486,10 +577,15 @@ function ProjectDevelopment() {
               ) : (
               <>
               <div className='center'>
-                {distribution.myPendingTokens !== 0 ?
-                <h1 onClick={() => {claimTokens()}} className='StartDistributeButtonOrClaim'>Claim {distribution.myPendingTokens} Tokens</h1>
-                : null}
-                <h1 onClick={() => {startDistribution()}} className={distribution.lastDistributionTime > time ? 'StartDistributeButtonOrClaim' : 'StartDistributeButtonOrClaim'}>Start Distribution</h1>
+                {timeForClaiming() !== false  ?
+                <>
+                  <h1>{timeForClaiming()}</h1>
+                  {distribution.myPendingTokens !== 0 &&
+                  <h1 onClick={() => {claimTokens()}} className='StartDistributeButtonOrClaim'>Claim {distribution.myPendingTokens} Tokens</h1>
+                  }
+                </>
+                : <h1 onClick={() => {startDistribution()}} className="StartDistributeButtonOrClaim">Start Distribution</h1>
+                }
               </div>
               </>
               )}

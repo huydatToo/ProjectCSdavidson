@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { useWallet } from '../utils/WalletContext';
 import PageLearn from './PageLearn'
 import { Link } from 'react-scroll';
+import {ReactComponent as ParticipantsSvg} from '../assets/person-group-svgrepo-com.svg'
+import Patch from '../assets/patch_gray.png'
 
 
 // the home page
@@ -44,25 +46,45 @@ function Home() {
     }
   }
 
-  // TEMP
   const getLastProjects = async () => {
-    let lastProjectsNow = await contract.getLastProjects();
-    lastProjectsNow = lastProjectsNow.filter(str => str !== "");
     try {
+      const lastProjectsNow = await contract.getLastProjects();
       const response = await fetch('http://127.0.0.1:8000/api/getLocalProjects', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         }
       });
-
-      const data = await response.json(); 
-      setLastProjects({lastProjects: lastProjectsNow, localProjects: data.projects})
+      const { projects: localProjects } = await response.json();
+  
+      const processProject = async (projectName, projectsArray) => {
+        const changes = await contract.getChangesOrProposals(projectName, true);
+        const participants = await contract.getAddresses(projectName);
+        const uniqueAddresses = new Set(participants);
+        projectsArray.push({ name: projectName, participants: uniqueAddresses.size, changes: changes.length });
+      };
+  
+      const lastProjectsNowToSet = [];
+      const popularProjects = [];
+  
+      await Promise.all(localProjects.map(async (projectName) => {
+        await processProject(projectName, lastProjectsNowToSet);
+      }));
+  
+      await Promise.all(lastProjectsNow.map(async (projectName) => {
+        if (!localProjects.includes(projectName)) {
+          await processProject(projectName, popularProjects);
+        }
+      }));
+  
+      setLastProjects({ lastProjects: popularProjects, localProjects: lastProjectsNowToSet });
     } catch (error) {
       console.error('Error:', error);
-      setLastProjects({lastProjects: lastProjectsNow, localProjects: []})
+      setLastProjects({ lastProjects: [], localProjects: [] });
     }
-  }
+  };
+    
+
 
   // the function initiate the page
   useEffect(() => {
@@ -87,10 +109,22 @@ function Home() {
         <div className='line lineGapHome'>
           <div className='box-projects'>
             <h1 className='Title'>Popular Projects</h1>
-            {lastProjects.lastProjects.map((item, index) => (
-            <motion.div onClick={() => {navigate(`project/${item}`)}} key={index} whileHover={{scale: 1.05}} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", duration: 0.7 }} className='project-box-load'>
-              <span className='project-box-header'>{item}</span>
-              <span>----------- | -----------</span>
+            {lastProjects.lastProjects.map((project, index) => (
+            <motion.div onClick={() => {navigate(`project/${project.name}`)}} key={index} whileHover={{scale: 1.05}} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", duration: 0.7 }} className='project-box-load'>
+              <span className='project-box-header'>{project.name}</span>
+              <div className='divProjectsHome'>
+                <span className='brackets'>[</span>
+                <div className='centerProjectBox'>
+                  <ParticipantsSvg className="svgParticipants" width={30} height={30}/> 
+                  <span className='spanProjectName'>{project.participants}</span>
+                </div>
+                <div className='vl'/>
+                <div className='centerProjectBox'>
+                  <img className='patchPngGray' src={Patch} alt="Patches" />
+                  <span className='spanProjectName'>{project.changes}</span>
+                </div>
+                <span className='brackets'>]</span>
+              </div>
             </motion.div>
             ))}
           </div>
@@ -99,7 +133,7 @@ function Home() {
             <div onClick={() => {checkConnectedOnButtonPress("createNewProject")}}>
             <AnimatePresence initial={false} mode='wait'>
             {isButtons.new_project === 0 ?
-            <motion.div key={"createNewProjectButton"} whileTap={{scale: 0.9}} whileHover={{scale: 1.03}} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.1 }} className='box-create-project border-step4'>
+            <motion.div key={"createNewProjectButton"} whileTap={{scale: 0.9}} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.1 }} className='box-create-project border-step4'>
               <motion.h1 initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{scale: 0.9, opacity: 0.2 }} transition={{ type: "spring", duration: 0.1 }}  key={"createNewProjectButtonH1"} className='Title TitleCreatePorject'>Create <br /> New Project</motion.h1>
             </motion.div>
             : 
@@ -109,9 +143,10 @@ function Home() {
             }
             </AnimatePresence>
             </div>
+            
 
             <Link to="pageTwo" smooth={true} duration={500}>
-            <motion.div onMouseEnter={() => setHoverDown(true)} onMouseLeave={() => setHoverDown(false)}  whileHover={{scale: 1.03}} transition={{ type: "spring", duration: 0.7 }} className='box-arrow-down'>
+            <motion.div onMouseEnter={() => setHoverDown(true)} onMouseLeave={() => setHoverDown(false)} transition={{ type: "spring", duration: 0.7 }} className='box-arrow-down'>
               <motion.img animate={{ y: hoverDown ? 40 : 0 }} transition={{ type: "spring", duration: 0.7 }} className='arrowDown' src={downArrow} alt="" />
             </motion.div>
             </Link>
@@ -119,10 +154,22 @@ function Home() {
 
           <div className='box-projects'>
             <h1 className='Title'>Recent activity</h1>
-            {lastProjects.localProjects.map((item, index) => (
-            <motion.div onClick={() => {navigate(`project/${item}`)}} key={index} whileHover={{scale: 1.05}} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", duration: 0.7 }} className='project-box-load'>
-              <span className='project-box-header'>{item}</span>
-              <span>----------- | -----------</span>
+            {lastProjects.localProjects.map((project, index) => (
+            <motion.div onClick={() => {navigate(`project/${project.name}`)}} key={index} whileHover={{scale: 1.05}} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", duration: 0.7 }} className='project-box-load'>
+              <span className='project-box-header'>{project.name}</span>
+              <div className='divProjectsHome'>
+                <span className='brackets'>[</span>
+                <div className='centerProjectBox'>
+                  <ParticipantsSvg className="svgParticipants" width={30} height={30}/> 
+                  <span className='spanProjectName'>{project.participants}</span>
+                </div>
+                <div className='vl'/>
+                <div className='centerProjectBox'>
+                  <img className='patchPngGray' src={Patch} alt="Patches" />
+                  <span className='spanProjectName'>{project.changes}</span>
+                </div>
+                <span className='brackets'>]</span>
+              </div>
             </motion.div>
             ))}
 

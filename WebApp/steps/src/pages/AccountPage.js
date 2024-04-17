@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { MetaMaskAvatar } from 'react-metamask-avatar';
 import { useParams } from 'react-router-dom';
 import { useWallet } from '../utils/WalletContext';
 import {ReactComponent as ParticipantsSvg} from '../assets/person-group-svgrepo-com.svg'
-import {ReactComponent as Patch} from '../assets/patch.svg'
+import Patch from '../assets/patch_gray.png'
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {ReactComponent as HomeSvg} from '../assets/home.svg';
@@ -66,8 +65,13 @@ const AccountPage = () => {
             <div className='accountDiv'>
                 <div className='leftSideAccount'>
                 <div className='accountBox'>
-                    <div className='centerSquare'><MetaMaskAvatar className='square' address={accountAddress} size={40} /></div>
-                    <h1>{getFormatAddress(accountAddress)}</h1>
+                    <div className='centerSquare'>
+                        <img className='square' src={`https://effigy.im/a/${accountAddress}.png`} alt=""/>
+                    </div>
+                    <div className='addressBox'>
+                        <span className='Address'>{getFormatAddress(accountAddress)}</span>
+                        <span className='addressSpan'>Address</span>
+                    </div>
                 </div>
 
                 <motion.div whileTap={{y: 6}} whileHover={{y: 3}} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} onClick={() => {navigate('/')}} className='projectHeaderAccount'>
@@ -78,12 +82,15 @@ const AccountPage = () => {
                 <div className='accountRecentActivityBox'>
                     <h2>Recent Activity</h2>
                     <div className='projectsBoxesAccount'>
-                    {projects.map((projectName, index) => (
-                        <div onClick={() => {navigate(`/project/${projectName.name}`)}} key={index} className='projectBoxAccount'>
-                            <span className='spanProjectName'>{projectName.name}</span> 
+                    {projects.map((project, index) => (
+                        <div onClick={() => {navigate(`/project/${project.name}`)}} key={index} className='projectBoxAccount'>
+                            <span className='spanProjectName'>{project.name}</span> 
                             <div className="participantsDiv">
                             <ParticipantsSvg className="svgParticipants" width={30} height={30}/> 
-                            <span className='spanProjectName'>{projectName.participants}</span>
+                            <span className='spanProjectName'>{project.participants}</span>
+
+                            <img className='patchPngGray' src={Patch} alt="Patches" />
+                            <span className='spanProjectName'>{project.changes}</span>
                             </div>
                         </div>
                     ))}

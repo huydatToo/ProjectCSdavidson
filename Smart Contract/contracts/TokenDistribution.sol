@@ -7,6 +7,7 @@ contract TokenDistribution is Projects, Ownable {
 
     constructor(address _tokenAddress) Projects(_tokenAddress) {} 
 
+
     function sum(uint[] memory _tokens) internal pure returns(uint _sum) {
 		for (uint i = 0; i < _tokens.length; i++)
 			_sum += _tokens[i];
@@ -35,7 +36,7 @@ contract TokenDistribution is Projects, Ownable {
 
     function distribute(
         address[] memory recipients,
-        uint[] memory amounts,  
+        uint[] memory amounts,
         string calldata projectName
     ) external ProjectExist(projectName) {
         uint projectIDX = NameToID[projectName];
@@ -59,7 +60,7 @@ contract TokenDistribution is Projects, Ownable {
         string calldata projectName
     ) external ProjectExist(projectName) {
         uint projectIDX = NameToID[projectName];
-        require(block.timestamp < publicProjects[projectIDX].DistributionTime + ClaimingInterval, "not starting distribution time");
+        require(block.timestamp >= publicProjects[projectIDX].DistributionTime + ClaimingInterval, "not starting distribution time");
 
         publicProjects[projectIDX].newTokens = 100;
         publicProjects[projectIDX].DistributionTime = block.timestamp + TimeLockInterval;
