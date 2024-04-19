@@ -80,7 +80,7 @@ const AccountPage = () => {
                 </div>
 
                 <div className='accountRecentActivityBox'>
-                    <h2>Recent Activity</h2>
+                    <span className='recentActivityHeader'>Recent Activity</span>
                     <div className='projectsBoxesAccount'>
                     {projects.map((project, index) => (
                         <div onClick={() => {navigate(`/project/${project.name}`)}} key={index} className='projectBoxAccount'>

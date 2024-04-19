@@ -1,5 +1,5 @@
-export const CONTRACT_ADDRESS = "0xFD700DA577d3969777019F959B24523f03C62b4d"
-export const CONTRACT_ABI =  [
+export const CONTRACT_ADDRESS = "0x0690e8de6857A84410542CC3D4A700C256F50d72"
+export const CONTRACT_ABI = [
   {
     "inputs": [
       {
@@ -118,12 +118,6 @@ export const CONTRACT_ABI =  [
         "internalType": "address",
         "name": "voter",
         "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "votes",
-        "type": "uint256"
       }
     ],
     "name": "NewVoteForChangeProposal",
@@ -214,29 +208,11 @@ export const CONTRACT_ABI =  [
       },
       {
         "internalType": "string",
-        "name": "_projectName",
+        "name": "projectName",
         "type": "string"
       }
     ],
     "name": "MakeChangeProposal",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "_changeCID",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "_projectName",
-        "type": "string"
-      }
-    ],
-    "name": "MakeGoBackProposal",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -282,7 +258,7 @@ export const CONTRACT_ABI =  [
       },
       {
         "internalType": "string",
-        "name": "_projectName",
+        "name": "projectName",
         "type": "string"
       }
     ],
@@ -295,16 +271,16 @@ export const CONTRACT_ABI =  [
     "inputs": [
       {
         "internalType": "string",
-        "name": "_projectName",
+        "name": "projectName",
         "type": "string"
       },
       {
         "internalType": "string",
-        "name": "_changeCID",
+        "name": "changeCID",
         "type": "string"
       }
     ],
-    "name": "acceptGoBack",
+    "name": "acceptRemoval",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -331,7 +307,7 @@ export const CONTRACT_ABI =  [
     "inputs": [
       {
         "internalType": "string",
-        "name": "_projectName",
+        "name": "projectName",
         "type": "string"
       }
     ],
@@ -350,12 +326,12 @@ export const CONTRACT_ABI =  [
     "inputs": [
       {
         "internalType": "address",
-        "name": "_UserAddress",
+        "name": "UserAddress",
         "type": "address"
       },
       {
         "internalType": "string",
-        "name": "_projectName",
+        "name": "projectName",
         "type": "string"
       }
     ],
@@ -374,7 +350,7 @@ export const CONTRACT_ABI =  [
     "inputs": [
       {
         "internalType": "string",
-        "name": "_projectName",
+        "name": "projectName",
         "type": "string"
       },
       {
@@ -398,7 +374,55 @@ export const CONTRACT_ABI =  [
     "inputs": [
       {
         "internalType": "string",
-        "name": "_projectName",
+        "name": "changeCID",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "projectName",
+        "type": "string"
+      }
+    ],
+    "name": "getChangeRemovalVotes",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "changeCID",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "projectName",
+        "type": "string"
+      }
+    ],
+    "name": "getChangeVotes",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "projectName",
         "type": "string"
       },
       {
@@ -413,25 +437,6 @@ export const CONTRACT_ABI =  [
         "internalType": "string[]",
         "name": "",
         "type": "string[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "projectName",
-        "type": "string"
-      }
-    ],
-    "name": "getLastDistriubtionTime",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -453,17 +458,12 @@ export const CONTRACT_ABI =  [
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "usr",
-        "type": "address"
-      },
-      {
         "internalType": "string",
         "name": "projectName",
         "type": "string"
       }
     ],
-    "name": "getPendingTokens",
+    "name": "getTotalTokens",
     "outputs": [
       {
         "internalType": "uint256",
@@ -477,17 +477,27 @@ export const CONTRACT_ABI =  [
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "addr",
+        "type": "address"
+      },
+      {
         "internalType": "string",
-        "name": "_projectName",
+        "name": "changeProposalCID",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "projectName",
         "type": "string"
       }
     ],
-    "name": "getTotalTokens",
+    "name": "isVoted",
     "outputs": [
       {
-        "internalType": "uint256",
+        "internalType": "bool",
         "name": "",
-        "type": "uint256"
+        "type": "bool"
       }
     ],
     "stateMutability": "view",
@@ -548,7 +558,7 @@ export const CONTRACT_ABI =  [
       },
       {
         "internalType": "string",
-        "name": "_projectName",
+        "name": "projectName",
         "type": "string"
       }
     ],
@@ -628,6 +638,49 @@ export const CONTRACT_ABI =  [
     "name": "claimPendingTokens",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "projectName",
+        "type": "string"
+      }
+    ],
+    "name": "getLastDistriubtionTime",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "usr",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "projectName",
+        "type": "string"
+      }
+    ],
+    "name": "getPendingTokens",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   }
 ]

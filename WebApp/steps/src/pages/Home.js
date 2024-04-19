@@ -3,8 +3,6 @@ import downArrow from '../assets/down-arrow-svgrepo-com.svg';
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWallet } from '../utils/WalletContext';
-import PageLearn from './PageLearn'
-import { Link } from 'react-scroll';
 import {ReactComponent as ParticipantsSvg} from '../assets/person-group-svgrepo-com.svg'
 import Patch from '../assets/patch_gray.png'
 
@@ -17,7 +15,7 @@ function Home() {
   const [isButtons, setIsButtons] = useState({new_project: 0, my: 0})
   const [lastProjects, setLastProjects]  = useState({lastProjects: [], localProjects: []})
   const [hoverDown, setHoverDown]  = useState(false)
-  const { isConnected, checkWalletConnection, setIsConnected, setAccount } = useWallet();
+  const { isConnected, checkWalletConnection, setIsConnected, setAccount, account } = useWallet();
 
   // connect smart wallet function
   const connectWallet = async () => {
@@ -32,6 +30,15 @@ function Home() {
       }
     }
   };
+
+  function getFormatAddress(address, startLength = 6, endLength = 4) {
+      if (!address) return '';
+    
+      const start = address.substring(0, startLength);
+      const end = address.substring(address.length - endLength);
+    
+      return `${start}...${end}`;
+  }
 
   // the function check whether a user is connected or not
   const checkConnectedOnButtonPress = (buttonPressed) => {
@@ -118,7 +125,6 @@ function Home() {
                   <ParticipantsSvg className="svgParticipants" width={30} height={30}/> 
                   <span className='spanProjectName'>{project.participants}</span>
                 </div>
-                <div className='vl'/>
                 <div className='centerProjectBox'>
                   <img className='patchPngGray' src={Patch} alt="Patches" />
                   <span className='spanProjectName'>{project.changes}</span>
@@ -133,7 +139,7 @@ function Home() {
             <div onClick={() => {checkConnectedOnButtonPress("createNewProject")}}>
             <AnimatePresence initial={false} mode='wait'>
             {isButtons.new_project === 0 ?
-            <motion.div key={"createNewProjectButton"} whileTap={{scale: 0.9}} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.1 }} className='box-create-project border-step4'>
+            <motion.div key={"createNewProjectButton"} whileTap={{scale: 0.9}} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.1 }} className='box-create-project'>
               <motion.h1 initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{scale: 0.9, opacity: 0.2 }} transition={{ type: "spring", duration: 0.1 }}  key={"createNewProjectButtonH1"} className='Title TitleCreatePorject'>Create <br /> New Project</motion.h1>
             </motion.div>
             : 
@@ -145,11 +151,15 @@ function Home() {
             </div>
             
 
-            <Link to="pageTwo" smooth={true} duration={500}>
-            <motion.div onMouseEnter={() => setHoverDown(true)} onMouseLeave={() => setHoverDown(false)} transition={{ type: "spring", duration: 0.7 }} className='box-arrow-down'>
-              <motion.img animate={{ y: hoverDown ? 40 : 0 }} transition={{ type: "spring", duration: 0.7 }} className='arrowDown' src={downArrow} alt="" />
+            <motion.div onMouseEnter={() => setHoverDown(true)} onMouseLeave={() => setHoverDown(false)} transition={{ type: "spring", duration: 0.7 }} className='box-account'>
+              <div className='centerSquare'>
+                  <img className='squareWhite' src={`https://effigy.im/a/${account}.png`} alt=""/>
+              </div>
+              <div className='addressBox'>
+                  <span className='Address'>{getFormatAddress(account)}</span>
+                  <span className='addressSpan'>Address</span>
+              </div>
             </motion.div>
-            </Link>
           </div>
 
           <div className='box-projects'>
@@ -163,7 +173,6 @@ function Home() {
                   <ParticipantsSvg className="svgParticipants" width={30} height={30}/> 
                   <span className='spanProjectName'>{project.participants}</span>
                 </div>
-                <div className='vl'/>
                 <div className='centerProjectBox'>
                   <img className='patchPngGray' src={Patch} alt="Patches" />
                   <span className='spanProjectName'>{project.changes}</span>
@@ -176,10 +185,6 @@ function Home() {
           </div>
         </div>
       </div>
-      </div>
-
-      <div name="pageTwo" className='pageTwo background2 centerLearn'>
-        <PageLearn scroll={scrollRef}/>
       </div>
     </div>
   );

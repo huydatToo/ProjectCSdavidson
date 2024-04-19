@@ -255,9 +255,11 @@ const ProjectPage = () => {
             <motion.div onClick={() => setPath({...path, openPathInput: !path.openPathInput})} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} className='projectHeader cursorPointer'>
               <DownloadSvg height={77} width={77} style={{  "fill": "#dedede" }}/>
             </motion.div> :
+            
             <motion.div onClick={e => {e.stopPropagation()}} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} className='projectHeader'>
             <input onChange={(e) => {setPath({...path, path: e.target.value})}} type="text" placeholder='Project Path' className="DownloadInput" />
             </motion.div>}
+            
           </div>
         </div>
         </ModalDetails>
@@ -269,12 +271,12 @@ const ProjectPage = () => {
               <img className="HomeButton" src={HomeSvg} alt="" />
           </motion.div>
 
-          <motion.div  whileTap={{y: 6}} whileHover={{y: 3}} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} className='projectHeader'>
+          <motion.div whileHover={{y: 3}} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} className='projectHeader'>
             {project.projectName !== "" && <h1>{project.projectName}</h1>}
             {project.projectName === "" && <h1>{generateRandomText(6)}</h1>}
           </motion.div>
 
-          <motion.div  whileTap={{y: 6}} whileHover={{y: 3}} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} className='projectHeader toTheEnd'>
+          <motion.div whileHover={{y: 3}} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} className='projectHeader toTheEnd'>
             {project.state === -1 && <h1>{generateRandomText(12)}</h1>}
             {project.projectName !== "" && <h1>{getState()}</h1>}
 

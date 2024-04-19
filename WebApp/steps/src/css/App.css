@@ -38,7 +38,7 @@
   flex-direction: column;
   gap: 20px;
   height: 69.5vh;
-  padding: 12px;
+  padding: 8px;
   overflow-y: scroll;
 }
 
@@ -100,6 +100,49 @@
   background-size: 30px 30px, 30px 30px;
   z-index: -2;
 }
+
+.backgroundGradient {
+	background: linear-gradient(0deg, rgb(13, 30, 44) 0%, rgba(0,0,0,1) 100%);
+	position: fixed;
+	top: 0%;
+	bottom: 0;
+	right: 0;
+	left: 0;	
+}
+
+
+.backgroundStars:before, .backgroundStars:after {
+	width: auto;
+	content: "";
+	position: fixed;
+
+	z-index: 0;
+	top: 0%;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	background-color: #081b13;
+	background-image: url(./background/stars.png);
+	background-size: 7%;
+	opacity: 0.3;
+  
+  }
+
+
+.noise::before{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    content: "";
+    opacity: .02;  
+    z-index: 2;
+    pointer-events: none;
+    background: url(./background/noise.gif);
+	animation: anim-ss steps(10) 1000s infinite;
+}
+
 
 .Address {
   color: var(--color-text-bright);
@@ -189,6 +232,16 @@
   margin: 6px auto;
 }
 
+.squareWhite {
+  width: fit-content;
+  height: fit-content;
+  width: 60px;
+  height: 60px;
+  box-shadow: 6px 0 #6565656e, -6px 0 #656565ee, 0 -6px #656565ee, 0 6px #6565656e;
+  filter: grayscale(30%);
+  margin: 6px auto;
+}
+
 .squareGray {
   width: fit-content;
   height: fit-content;
@@ -212,6 +265,16 @@
   transition: 0.1s;
  &:hover {
   opacity: 0.6;
+ }
+}
+
+.squareGraySmallBright {
+  width: 33px;
+  height: 33px;
+  filter: grayscale(30%);
+  transition: all 0.1s;
+ &:hover {
+  filter: brightness(1.05)
  }
 }
 
@@ -482,6 +545,15 @@
   width: 100%;
 }
 
+.recentActivityHeader {
+  color: var(--color-text-bright);
+  font-size: 25px;
+  margin-block: 10px;
+  font-weight: 100;
+  text-shadow: 0px 2px 0px rgb(24, 24, 24);
+
+}
+
 .payTokens {
   display: flex;
   flex-direction: column;
@@ -692,9 +764,9 @@ input[type=number]::-webkit-outer-spin-button {
 /* box create project ------------------------------------------------------- */
 
 /* box arrow down ------------------------------------------------------- */
-.box-arrow-down {
+.box-account {
   backdrop-filter: blur(2px);
-  background-color: #0000003b;
+  background-color: #000000ee;
   border-radius: 20.5px;
   flex: 1;
   display: flex;
@@ -704,21 +776,13 @@ input[type=number]::-webkit-outer-spin-button {
   padding: 8ch;
   border-image: var(--border-pixel);
   width: auto;
+  gap: 18px;
   height: auto;
   cursor: pointer;
   box-shadow: #000000 4px 4px 0px 3px;
   transition: all 0.5s;
 }
 
-.box-arrow-down:hover {
-  background-color: #e9e9e979;
-}
-
-.arrowDown {
-  height: 100px;
-  width: 100px;
-  pointer-events: none;
-}
 /* box arrow down ------------------------------------------------------- */
 
 /* project box */
@@ -1027,6 +1091,11 @@ input[type=number]::-webkit-outer-spin-button {
   border-radius: 22.5px;
   color: var(--color-text-bright);
   box-shadow: #000000 4px 4px 0px 3px;
+  transition: 0.1s;
+
+  &:hover {
+    background-color: #000000c1;
+  }
 }
 
 .projectBoxAccount {
@@ -1369,6 +1438,7 @@ input[type=number]::-webkit-outer-spin-button {
 .FileTextVL {
   font-size: 30px;
   color: #868686;
+  margin-block: auto;
 }
 
 .changesButton {
@@ -1502,11 +1572,17 @@ input[type=number]::-webkit-outer-spin-button {
 
 .buttonFileLineChangeProposal {
   margin-block: auto;
-  fill: #e6e6e6;
+  color: #949494;
+  fill: #949494;
   &:hover {
     color: #bfbfbf;
     fill: #bfbfbf;
   }
+}
+
+.buttonFileLineChangeProposalVoted {
+  margin-block: auto;
+  color: #949494;
 }
 
 .hoverDownClass {
@@ -1524,56 +1600,13 @@ input[type=number]::-webkit-outer-spin-button {
 
 .titleLearn {
   font-size: 60px;
-  color: #f4f4f4;
-}
-
-.explainBox {
-  border: 8px solid var(--color-text-bright);
-  border-radius: 20.5px;
-  padding: 2ch;
-  font-size: 30px;
-  border-image: var(--border-pixel-bright);
-  display: flex;
-  justify-content: center;
-  text-align: center;
-  flex-direction: column;
-  backdrop-filter: blur(2px);
-  background-color: var(--color-text-bright);
-
-}
-.explainBox1 {
-  border: 8px solid var(--color-text-bright);
-  border-radius: 20.5px;
-  padding: 2ch;
-  font-size: 30px;
-  border-image: var(--border-pixel-bright);
-  display: flex;
-  justify-content: center;
-  text-align: center;
-  flex-direction: column;
-  backdrop-filter: blur(2px);
-  background-color: var(--color-text-bright);
-
-}
-
-.explainBox2 {
-  border: 8px solid var(--color-text-bright);
-  border-radius: 20.5px;
-  padding: 2ch;
-  font-size: 30px;
-  border-image: var(--border-pixel-bright);
-  display: flex;
-  justify-content: center;
-  text-align: center;
-  flex-direction: column;
-  backdrop-filter: blur(2px);
-  background-color: var(--color-text-bright);
-
+  color: #ffe6cd;
+  text-shadow: 0px 5px #5f370f;
 }
 
 .gridExplains {
   display: grid;
-  grid-template-columns: repeat(3, 40vh);
-  grid-gap: 20px;
+  grid-template-columns: repeat(3, 35vh);
+  grid-gap: 50px;
 }
 /* learn */

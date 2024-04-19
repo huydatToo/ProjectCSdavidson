@@ -1,0 +1,122 @@
+.headerLandingPage {
+    color: #e4c0a0;
+    text-align: center;
+    font-size: 60px;
+    text-shadow: 0px 5px 0px #d1383a;
+    line-height: 70px
+}
+
+@font-face {
+    font-family: "Kemco"; 
+    src: url('./fonts/Kemco.ttf') 
+}
+
+.fontKemco {
+    font-family: "Kemco", sans-serif; 
+}
+
+.centerLandingPage {    
+    display: flex;
+}
+
+.divHeaderLandingPage {
+    width: 80vh;
+    z-index: 1;
+}
+
+.borderPixelLandingPage {
+    box-shadow: 3px 0 #366255, -3px 0 #366255, 0 -3px #366255, 0 3px #366255, 6px 0 #366255, -6px 0 #366255, 0 -6px #366255, 0 6px #366255, 0 0 0 3px #366255, 9px 0 #223f36, -9px 0 #427868, 0 9px #223f36, 0 -9px #427868, 0 -3px 0 3px #427868, 0 3px 0 3px #223f36, 3px 0 0 3px #223f36, -3px 0 0 3px #427868;
+    cursor: pointer;
+}
+
+.connectWalletLandingPage {
+    font-size: 25px;
+    padding: 10px;
+    display: flex;
+    color: #e4c0a0;
+    background-color: #366255;
+
+    &:hover {
+        background-color: #47806e;
+        box-shadow: 3px 0 #47806e, -3px 0 #47806e, 0 -3px #47806e, 0 3px #47806e, 6px 0 #47806e, -6px 0 #47806e, 0 -6px #47806e, 0 6px #47806e, 0 0 0 3px #366255, 9px 0 #223f36, -9px 0 #427868, 0 9px #223f36, 0 -9px #427868, 0 -3px 0 3px #427868, 0 3px 0 3px #223f36, 3px 0 0 3px #427868, -3px 0 0 3px #427868;
+    }
+}
+
+.titleLearnButton {
+    box-shadow: 3px 0 #366255, -3px 0 #366255, 0 -3px #366255, 0 3px #366255, 6px 0 #366255, -6px 0 #366255, 0 -6px #366255, 0 6px #366255, 0 0 0 3px #366255, 9px 0 #223f36, -9px 0 #427868, 0 9px #223f36, 0 -9px #427868, 0 -3px 0 3px #427868, 0 3px 0 3px #223f36, 3px 0 0 3px #223f36, -3px 0 0 3px #427868;
+    background-color: #366255;
+    margin-block: auto;
+    cursor: pointer;
+    color: #e4c0a0;
+    height: fit-content;
+
+    &:hover {
+        background-color: #47806e;
+        box-shadow: 3px 0 #47806e, -3px 0 #47806e, 0 -3px #47806e, 0 3px #47806e, 6px 0 #47806e, -6px 0 #47806e, 0 -6px #47806e, 0 6px #47806e, 0 0 0 3px #366255, 9px 0 #223f36, -9px 0 #427868, 0 9px #223f36, 0 -9px #427868, 0 -3px 0 3px #427868, 0 3px 0 3px #223f36, 3px 0 0 3px #427868, -3px 0 0 3px #427868;
+    }
+
+}
+
+.flexButtonLandingPage {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-bottom: 65px;
+}
+
+
+.landingPageBackground {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh; 
+    background-size: cover;
+    background-image:
+    linear-gradient(-45deg, transparent 20%, rgba(0, 0, 0, 0.126) 25%, transparent 25%), 
+    linear-gradient(-45deg, transparent 75%, rgba(0, 0, 0, 0.153) 80%, transparent 0);  
+    background-size: 30px 30px, 30px 30px;
+    z-index: -3;
+    background-color: #1b1e28;
+}
+
+.learnHeaderLine {
+    display: flex;
+    justify-content: space-between;
+}
+
+
+.pageTwoLearn {
+    display: flex;
+    height: 100vh;
+    flex-direction: column;
+    background-size: cover;
+    z-index: -2;
+    background-color: #ff552b;      
+  
+}
+
+.LandingPage {
+    margin: -8px; 
+    overflow-y: scroll;
+    scroll-behavior: smooth;
+}
+
+.pageLearnCenter {
+    margin: auto;
+    margin-bottom:40vh;
+}
+
+.explainBox {
+    padding: 2ch;
+    font-size: 30px;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    flex-direction: column;
+
+    box-shadow: 5px 0 #e4c0a0, -5px 0 #e4c0a0, 0 -5px #e4c0a0, 0 5px #e4c0a0, 10px 0 #e4c0a0, -10px 0 #e4c0a0, 0 -10px #e4c0a0, 0 10px #e4c0a0, 0 0 0 5px #e4c0a0, 15px 0 #e4c0a0, -15px 0 #e4c0a0, 0 15px #e4c0a0, 0 -15px #e4c0a0, 0 -5px 0 5px #e4c0a0, 0 5px 0 5px #e4c0a0, 5px 0 0 5px #e4c0a0, -5px 0 0 5px #e4c0a0, 20px 0 #bd9f84, -20px 0 #ffd6b1, 0 -20px #ffd6b1, 0 20px #bd9f84, 10px 0 0 5px #bd9f84, -10px 0 0 5px #bd9f84, 0 10px 0 5px #bd9f84, 0 -10px 0 5px #bd9f84, 0 0 0 10px #bd9f84;
+      
+  
+    backdrop-filter: blur(2px);
+    background-color: #e4c0a0;
+}

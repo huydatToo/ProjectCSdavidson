@@ -10,6 +10,8 @@ contract("Projects", accounts => {
   it("should create a new project without errors", async () => {
     const Projects = await TokenDistribution.deployed();
     await Projects.createProject("BaseChange", ProjectName, { from: accounts[0] });
+    const resultChanges = await Projects.getChangesOrProposals(ProjectName, true , { from: accounts[0] });
+    console.log(resultChanges)
   });
 
   it("should make a change proposal without errors", async () => {
@@ -33,13 +35,15 @@ contract("Projects", accounts => {
 
   it("should accept the last change proposal with no errors", async () => {
     const Projects = await TokenDistribution.deployed();
-    await Projects.acceptChangeProposal(changeProposalName + "1", ProjectName, { from: accounts[0] });
+    await Projects.acceptChangeProposal(changeProposalName + "1", ProjectName, { from: accounts[1] });
   });
 
   it("should get project changes with no errors", async () => {
     const Projects = await TokenDistribution.deployed();
     const resultChanges = await Projects.getChangesOrProposals(ProjectName, true , { from: accounts[0] });
     const resultChangeProposals = await Projects.getChangesOrProposals(ProjectName, false  , { from: accounts[0] });
+    console.log(resultChanges);
+    console.log(resultChangeProposals);
     assert.lengthOf(resultChanges, 2, "Project changes length should be two (base change) and the one we just accepted");
     assert.lengthOf(resultChangeProposals, 1, "Project change proposals length should be zero");
   });

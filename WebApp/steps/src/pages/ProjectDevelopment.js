@@ -39,8 +39,12 @@ function ProjectDevelopment() {
     let changeProposalsTemp = await contract.getChangesOrProposals(projectName, false);
     let t = [];
     changeProposalsTemp.map(async(changeProposal, index) => {
-      const changeMaker = await contract.getChangeMaker(projectName, changeProposal)
-      t.push({cid: changeProposal, changeMaker: changeMaker});
+      const changeMaker = await contract.getChangeMaker(projectName, changeProposal);
+      const isVoted = await contract.isVoted(changeMaker, changeProposal, projectName);
+      let votes = await contract.getChangeVotes(changeProposal, projectName);
+      votes = votes.toNumber()
+      
+      t.push({cid: changeProposal, changeMaker: changeMaker, voted: isVoted, votes: votes});
     })
     setChangeProposals(t);
   }
@@ -57,6 +61,7 @@ function ProjectDevelopment() {
   function closeModal() {
     setModalOpen(false);
   }
+
 
   // Functions to open/close the modal update
   async function openModalUpdate() {
@@ -493,19 +498,23 @@ function ProjectDevelopment() {
                 <span className='FileText'>Change Proposal</span>
                 </div> : 
                 <div onClick={() => {setClickedChangeProposal(false)}} className='clickChangeProposal'>
-                  <span className='spanClickedAddr'>{getFormatAddress(item.cid, 10, 3)}</span>
+                  <span className='spanClickedAddr'>{getFormatAddress(item.cid, 5, 4)}</span>
                   <div className='centerClickedButtons'>
-                    <span onClick={(e) => {e.stopPropagation(); voteForChange()}} className='FileText buttonFileLineChangeProposal'>Vote</span>
-                    <div className='vl'/>
+                    <span className='buttonFileLineChangeProposalVoted FileText'>{100*(distribution.totalTokens / item.votes)}%</span>
+                    <span className='FileTextVL'>|</span>
+                    <span onClick={(e) => {if (!item.voted) {e.stopPropagation(); voteForChange();}}} className={!item.voted ? 'buttonFileLineChangeProposal FileText' : 'buttonFileLineChangeProposalVoted FileText'}>{item.voted ? "Voted" : "Vote"}</span>
+                    <span className='FileTextVL'>|</span>
                     <Show width={40} height={40} onClick={(e) => {e.stopPropagation(); navigate(`/project/${projectName}/changeProposal/${item.cid}`)}} className='FileText buttonFileLineChangeProposal'/>
-                    <div className='vl'/>
-                    <div className='marginAuto' onClick={() => {navigate(`/${item.changeMaker}`)}}>
-                      <img className='squareGraySmall' src={`https://effigy.im/a/${item.changeMaker}.png`} alt=""/>
+                    <span className='FileTextVL'>|</span>
+                    <div className='center' onClick={() => {navigate(`/${item.changeMaker}`)}}>
+                      <img className='squareGraySmallBright' src={`https://effigy.im/a/${item.changeMaker}.png`} alt=""/>
+                    </div>
 
-                      </div>
-                    <div className='vl'/>
-                    <span onClick={(e) => {e.stopPropagation(); acceptChange()}} className='FileText buttonFileLineChangeProposal'>Accept</span>
-                  </div>
+                    {100*(distribution.totalTokens / item.votes) > 50 && <>
+                    <span className='FileTextVL'>|</span>
+                    <span onClick={(e) => {e.stopPropagation(); acceptChange()}} className='buttonFileLineChangeProposal FileText'>Accept</span>
+                    </>}
+                    </div>
                 </div>
                 ))) : <h1 className='ListOfPatchesNoText'>[ Change Proposals ]</h1>}
             </> : <div id="loader"></div>}
