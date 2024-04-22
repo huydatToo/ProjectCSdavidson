@@ -52,6 +52,7 @@ contract("Projects", accounts => {
 
 contract("Distribution", accounts => {
   const ProjectName = "ProjectOne"
+  const changeProposalName = "changeProposalOne"
 
   it("should start new project", async () => {
     const Projects = await TokenDistribution.deployed();
@@ -66,7 +67,10 @@ contract("Distribution", accounts => {
 
   it("should make distribution to two users with no errors", async () => {
     const Projects = await TokenDistribution.deployed();
-    await Projects.distribute([accounts[2], accounts[1]], [20, 30], ProjectName, { from: accounts[0] });
+    await Projects.MakeChangeProposal(changeProposalName + "1", ProjectName, { from: accounts[1] });
+    await Projects.voteForChangeProposal(changeProposalName + "1", ProjectName, { from: accounts[0] });
+    await Projects.acceptChangeProposal(changeProposalName + "1", ProjectName, { from: accounts[1] });
+    await Projects.distribute([accounts[1], accounts[0]], [30, 10], ProjectName, { from: accounts[0] });
     
   });
 

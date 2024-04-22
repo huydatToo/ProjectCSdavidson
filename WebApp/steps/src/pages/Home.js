@@ -63,12 +63,10 @@ function Home() {
         }
       });
       const { projects: localProjects } = await response.json();
-  
       const processProject = async (projectName, projectsArray) => {
         const changes = await contract.getChangesOrProposals(projectName, true);
-        const participants = await contract.getAddresses(projectName);
-        const uniqueAddresses = new Set(participants);
-        projectsArray.push({ name: projectName, participants: uniqueAddresses.size, changes: changes.length });
+        const participants = await contract.getParticipants(projectName);
+        projectsArray.push({ name: projectName, participants: participants.length, changes: changes.length });
       };
   
       const lastProjectsNowToSet = [];
@@ -120,7 +118,6 @@ function Home() {
             <motion.div onClick={() => {navigate(`project/${project.name}`)}} key={index} whileHover={{scale: 1.05}} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", duration: 0.7 }} className='project-box-load'>
               <span className='project-box-header'>{project.name}</span>
               <div className='divProjectsHome'>
-                <span className='brackets'>[</span>
                 <div className='centerProjectBox'>
                   <ParticipantsSvg className="svgParticipants" width={30} height={30}/> 
                   <span className='spanProjectName'>{project.participants}</span>
@@ -129,7 +126,6 @@ function Home() {
                   <img className='patchPngGray' src={Patch} alt="Patches" />
                   <span className='spanProjectName'>{project.changes}</span>
                 </div>
-                <span className='brackets'>]</span>
               </div>
             </motion.div>
             ))}
@@ -152,7 +148,7 @@ function Home() {
             
 
             <motion.div onMouseEnter={() => setHoverDown(true)} onMouseLeave={() => setHoverDown(false)} transition={{ type: "spring", duration: 0.7 }} className='box-account'>
-              <div className='centerSquare'>
+              <div onClick={() => navigate("/"+account)} className='centerSquare'>
                   <img className='squareWhite' src={`https://effigy.im/a/${account}.png`} alt=""/>
               </div>
               <div className='addressBox'>
@@ -168,7 +164,6 @@ function Home() {
             <motion.div onClick={() => {navigate(`project/${project.name}`)}} key={index} whileHover={{scale: 1.05}} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", duration: 0.7 }} className='project-box-load'>
               <span className='project-box-header'>{project.name}</span>
               <div className='divProjectsHome'>
-                <span className='brackets'>[</span>
                 <div className='centerProjectBox'>
                   <ParticipantsSvg className="svgParticipants" width={30} height={30}/> 
                   <span className='spanProjectName'>{project.participants}</span>
@@ -177,7 +172,6 @@ function Home() {
                   <img className='patchPngGray' src={Patch} alt="Patches" />
                   <span className='spanProjectName'>{project.changes}</span>
                 </div>
-                <span className='brackets'>]</span>
               </div>
             </motion.div>
             ))}

@@ -53,7 +53,7 @@ def apply_project_patch(old: str, patch: str) -> None:
                     shutil.copy2(hash_path, new_file_path)
 
 
-def apply_project_patch_from_remote_project(client: ipfshttpclient2.Client, old: str, patch: str, ignore: dict[str, dict[str, int] | dict[str, list[dict[str, int]]]]=None) -> None:
+def apply_project_patch_from_remote_project(client: ipfshttpclient2.Client, old: str, patch: str, ignore: dict[str, dict[str, int] | dict[str, list[dict[str, str | str, int]]]]=None) -> None:
     patch_cid, changes_folder_cid = get_file_cid_from_patch(client, patch, "patch_json.json", "changes")
 
     json_data = client.cat(patch_cid)
@@ -67,7 +67,7 @@ def apply_project_patch_from_remote_project(client: ipfshttpclient2.Client, old:
 
         elif (new_removed_folder["sign"] == "-"):
             if ignore != None:
-                folder_conflicts = ignore.get("new_removed_folder")
+                folder_conflicts = ignore.get("folders")
                 if (folder_conflicts != None or folder_conflicts != []):
                     continue
                 else:
@@ -131,8 +131,8 @@ def apply_conflicts_configurations(client: ipfshttpclient2.Client, old: str, ori
         conflicted_changed_folder_files = conflicted_changed_folders[conflicted_changed_folder]
         
         for conflicted_file in conflicted_changed_folder_files:
-            file_name = conflicted_file.keys()[0]
-            action = conflicted_file[file_name]
+            file_name = conflicted_file["filename"]
+            action = conflicted_file["action"]
 
             if action == 2:
                 file_path = os.path.join(conflicted_changed_folder, file_name)

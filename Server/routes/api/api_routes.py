@@ -8,14 +8,14 @@ import shutil
 from .Diff.create_patch import create_project_patch_json
 from .Diff.create_patch import create_project_patch_from_remote_project
 from .Diff.compare_projects import compare_remote_project_folder_changes
-from .Diff.get_from_ipfs import get_single_text_file_ipfs
+from .Diff.get_from_ipfs import get_single_text_file_ipfs, get_single_not_text_file_ipfs
 from .Diff.get_from_ipfs import get_remote_project_tree
 from .Diff.apply_patch import apply_project_patch_from_remote_project
 import json
 from .Diff.compare_patches import get_conflicts
 from .Diff.apply_patch import apply_conflicts_configurations
 from .Diff.wrappers import return_to_origin, save_path
-
+from .Diff.others import is_text_file
 
 
 # This page contains all the accessible API routes for users, each function with @api_routes representing an individual route.
@@ -251,12 +251,10 @@ def upload_changes() -> flask.Response:
 
             with open("project_details.json", 'w') as json_file:
                 json.dump(project_details, json_file, indent=4)
-
         else:
             message = jsonify({'unsaved changes': 357}), 500
             
     except Exception as e:
-        print(e)
         message = jsonify({'error': str(e)}), 500
     
     finally:
@@ -414,8 +412,13 @@ def get_single_file() -> flask.Response:
         data = request.get_json()
         changes_cids = data["changes"]
         file_name = data["file_name"]
-        version = get_single_text_file_ipfs(client, file_name, changes_cids)
-        message = jsonify({'file': version}), 200
+        
+        if is_text_file(file_name): 
+            version = get_single_text_file_ipfs(client, file_name, changes_cids)
+            message = jsonify({'file': version}), 200
+        else: 
+            version = get_single_not_text_file_ipfs(client, file_name, changes_cids)
+            message = jsonify({'cid': version}), 200
     except Exception as e:
         message = jsonify({'error': str(e)}), 500
     finally:

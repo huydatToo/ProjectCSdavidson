@@ -8,11 +8,13 @@ import CompleteSvg from '../assets/complete-svgrepo-com.svg';
 import { useNavigate } from 'react-router-dom';
 import CodeEditor from '../components/CodeEditor';
 import ModalDetails from '../components/ModalDetails';
-import { MetaMaskAvatar } from 'react-metamask-avatar';
 import {ReactComponent as DocumentSvg} from '../assets/document-svgrepo-com.svg';
 import {ReactComponent as FolderSvg} from '../assets/folder-svgrepo-com.svg';
 import {ReactComponent as DownloadSvg} from '../assets/download-svgrepo-com.svg';
 import "../css/spinner.css"
+import {ReactComponent as Show} from '../assets/show.svg';
+import {ReactComponent as Accept} from '../assets/complete-svgrepo-com.svg';
+
 
 // the project page
 const ProjectPage = () => {
@@ -25,6 +27,7 @@ const ProjectPage = () => {
     const [isModalOpen, setModalOpen] = useState(false);
     const [loading, setLoading] = useState(true);
     const [path, setPath] = useState({path: "", openPathInput: false})
+    const [pressedChange, setPressedChange] = useState({cid: "", changeMaker: ""})
 
     // modal control functions
     const openModal = () => {
@@ -98,7 +101,6 @@ const ProjectPage = () => {
     const getProjectDetails = async () => {
       setLoading(true)
       let changes = await contract.getChangesOrProposals(projectName, true);
-      console.log(changes)
       let changesWithProposal
       if (changeProposalOrGoBack === "changeProposal") {
         changesWithProposal = [...changes]
@@ -185,8 +187,11 @@ const ProjectPage = () => {
       });
 
       const data = await response.json(); 
-      setFileContent({content: data["file"], fileName: file_name})
-      
+      if (data["cid"] !== undefined) {
+        setFileContent({content: {cid: data["cid"]}, fileName: file_name})
+      } else {
+        setFileContent({content: data["file"], fileName: file_name})
+      }
     } catch (error) {
         console.error('Error uploading file:', error);
     }
@@ -229,6 +234,51 @@ const ProjectPage = () => {
     }
   }
 
+  const goBack = (index) => {
+    navigate(`/project/${projectName}/goBack/${index}`);
+  }
+
+  function getFormatAddress(address, startLength = 10, endLength = 4) {
+    if (!address) return '';
+
+    const start = address.substring(0, startLength);
+    const end = address.substring(address.length - endLength);
+
+    return `${start}...${end}`;
+  }
+
+  const setChangeProcess = async (changeCID) => {
+    const changeMaker = await contract.getChangeMaker(projectName, changeCID);
+    const isVoted = await contract.isVoted(changeMaker, changeCID, false, projectName);
+    let votesToRemove = await contract.getChangeVotes(changeCID, false, projectName);
+    let totalTokens = await contract.getTotalTokens(projectName);
+    votesToRemove = votesToRemove.toNumber();
+    totalTokens = totalTokens.toNumber();
+  
+    const votesToRemovePercentage = parseFloat(100*(votesToRemove/totalTokens)).toString()
+    setPressedChange({cid: changeCID, changeMaker: changeMaker, votesToRemove: votesToRemovePercentage, voted: isVoted})
+  }
+
+  const voteToChangeRemoval = async () => {
+    if (!pressedChange.voted) {
+      const transaction = await contract.voteForChangeProposal(pressedChange.cid, false, projectName);
+      await transaction.wait()
+    } else {
+      const transaction = await contract.removeVote(pressedChange.cid, false, projectName);
+      await transaction.wait()
+    }
+    await setChangeProcess(pressedChange.cid)
+  }
+
+  const acceptChangeRemoval = async () => {
+    const transaction = await contract.acceptRemoval(pressedChange.cid, projectName);
+    await transaction.wait()
+    await setChangeProcess(pressedChange.cid)
+  }
+
+
+  
+
 
   // the pages jsx
     return (
@@ -237,11 +287,30 @@ const ProjectPage = () => {
         <div className='modalFlex'>
           <div className=''>
             <h1>Changes</h1>
-            <div className='modalFlex gap'>
+            <div className='modalFlex gap width10'>
             {project.changes.map((changeCID, index) => (
-              <div onClick={() => navigate(`/project/${projectName}/goBack/${index}`)} className='FileLine' key={index}>
-                <label className='CIDtext FileText'>{changeCID.slice(0, 42)}</label>
-              </div>
+              (pressedChange.cid !== changeCID ?
+              <div onClick={() => setChangeProcess(changeCID)} className='FileLine' key={index}>
+                <label className='CIDtext FileText'>{changeCID.slice(0, 37)}</label>
+              </div> 
+              : 
+              <div onClick={() => {setPressedChange({cid: "", changeMaker: ""})}} className='FileLinePressed'>
+              <span className='spanClickedAddr'>{getFormatAddress(changeCID, 5, 4)}</span>
+                <div className='centerClickedButtons'>
+                  <span className='buttonFileLineChangeProposalVoted FileText'>{pressedChange.votesToRemove}%</span>
+                  <span className='FileTextVL'>|</span>
+                  <span onClick={(e) => {e.stopPropagation(); voteToChangeRemoval()}} className='FileTextVL FileTextVLVoteToRemove'>{pressedChange.voted ? "Remove Vote" : "Vote For Removal"}</span>
+                  <span className='FileTextVL'>|</span>
+                  <Show onClick={() => goBack(index)} width={40} height={40} className='FileText buttonFileLineChangeProposal'/>
+                  <span className='FileTextVL'>|</span>
+                  {pressedChange.votesToRemove > 50 &&
+                  <><Accept onClick={(e) => {e.stopPropagation(); acceptChangeRemoval()}} width={40} height={40} className='FileText buttonFileLineChangeProposal'/>
+                  <span className='FileTextVL'>|</span></>}
+                  <div className='center'>
+                    <img onClick={() => navigate("/"+pressedChange.changeMaker)} className='squareDev' src={`https://effigy.im/a/${pressedChange.changeMaker}.png`} alt=""/>
+                  </div>
+                </div>
+              </div>)
             ))}
             </div>
           </div>
@@ -272,13 +341,13 @@ const ProjectPage = () => {
           </motion.div>
 
           <motion.div whileHover={{y: 3}} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} className='projectHeader'>
-            {project.projectName !== "" && <h1>{project.projectName}</h1>}
+            {project.projectName !== "" && <h1 className='CIDtextHeader'>{project.projectName.slice(0,11)}</h1>}
             {project.projectName === "" && <h1>{generateRandomText(6)}</h1>}
           </motion.div>
 
           <motion.div whileHover={{y: 3}} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} className='projectHeader toTheEnd'>
             {project.state === -1 && <h1>{generateRandomText(12)}</h1>}
-            {project.projectName !== "" && <h1>{getState()}</h1>}
+            {project.projectName !== "" && <h1 className='nowrap'>{getState()}</h1>}
 
           </motion.div>
 
@@ -312,7 +381,11 @@ const ProjectPage = () => {
         </div>
         </> : 
         <div className='divText'>
-          {typeof fileContent.content !== "object" ? CodeEditor(fileContent.content, "javaScript") : <img src={`https://ipfs.infura.io/ipfs/${fileContent.content}/`} alt=""/>}
+          {console.log(fileContent.content)}
+          {typeof fileContent.content !== "object" ? 
+            CodeEditor(fileContent.content, "javaScript") 
+            : <div className='sizePhotoFromIPFS'><img className='showPhoto' src={`https://ipfs.io/ipfs/${fileContent.content.cid}/`} alt=""/></div>
+          }
           <div className="goBackFromTextButton">
             <span className='cursor' onClick={() => {setFileContent({content: false, file_name: ""})}}> Go back </span> <span> | {fileContent.fileName} </span>
           </div>

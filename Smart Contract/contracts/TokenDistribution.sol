@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 import "./Projects.sol";
-import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
+import "../node_modules/@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
 
-contract TokenDistribution is Projects, Ownable {
+contract TokenDistribution is Projects {
+    using EnumerableSet for EnumerableSet.AddressSet;
 
     constructor(address _tokenAddress) Projects(_tokenAddress) {} 
 
@@ -30,7 +31,7 @@ contract TokenDistribution is Projects, Ownable {
         }
 
         tokens = (publicProjects[projectID].newTokens * tokens) / 100;
-        tokens -= publicProjects[projectID].TokensSpent[usr][endDistributionTime];
+        tokens -= publicProjects[projectID].participant[usr].TokensSpent[endDistributionTime];
         return tokens;
     }
 
@@ -47,13 +48,19 @@ contract TokenDistribution is Projects, Ownable {
         require(publicProjects[projectID].DistributionTime > block.timestamp, "not distribution time");
         require(tokensToSpend <= getDistributionBalanceOf(msg.sender, projectName), "Unsufficent amount of tokens");
         
+        for (uint i=0; i<recipients.length; i++) {
+            if (publicProjects[projectID].participants.contains(recipients[i]) == false) {
+                revert("Not a Project Participant");
+            }
+        }
+
         uint endDistributionTime = publicProjects[projectID].DistributionTime;
 
         for (uint i=0; i<recipients.length; i++) {
-            publicProjects[projectID].pendingTokens[recipients[i]] += amounts[i];
+            publicProjects[projectID].participant[recipients[i]].pendingTokens += amounts[i];
         }
 
-        publicProjects[projectID].TokensSpent[msg.sender][endDistributionTime] += tokensToSpend;
+        publicProjects[projectID].participant[msg.sender].TokensSpent[endDistributionTime] += tokensToSpend;
     }
 
 
@@ -73,9 +80,8 @@ contract TokenDistribution is Projects, Ownable {
     ) public ProjectExist(projectName) {
         uint projectID = NameToID[projectName];
         require(block.timestamp >= publicProjects[projectID].DistributionTime, "not claiming time");
-        addParticipant(msg.sender, projectName);
-        token.mint(msg.sender, projectID, publicProjects[projectID].pendingTokens[msg.sender]);
-        delete publicProjects[projectID].pendingTokens[msg.sender];
+        token.mint(msg.sender, projectID, publicProjects[projectID].participant[msg.sender].pendingTokens);
+        delete publicProjects[projectID].participant[msg.sender].pendingTokens;
     }
 
 
@@ -87,6 +93,7 @@ contract TokenDistribution is Projects, Ownable {
 
     function getPendingTokens(address usr, string calldata projectName) ProjectExist(projectName) external view returns (uint) {
         uint projectID = NameToID[projectName];
-        return publicProjects[projectID].pendingTokens[usr];
+        return publicProjects[projectID].participant[usr].pendingTokens;
     }
+
 }

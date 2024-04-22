@@ -1,13 +1,25 @@
 import hashlib
 import os
+import base64
 
 # the functions returns the hash of a local file
 def get_local_file_hash(filename: str) -> str:
-    with open(filename, 'rb') as f:
-        file_hash = hashlib.sha256()
-        while chunk := f.read(4096):
-            file_hash.update(chunk)
-    return file_hash.hexdigest()
+    if is_text_file(filename):
+        with open(filename, 'r') as f:
+            file_content = f.read()
+
+        hasher = hashlib.sha256()
+        hasher.update(file_content.encode("utf-8"))
+        return hasher.hexdigest()
+    else:
+        sha256_hash = hashlib.sha256()
+        with open(filename, "rb") as file:
+            data = file.read()
+        sha256_hash.update(base64.b64encode(data))
+        
+        return sha256_hash.hexdigest()
+
+
 
 # the functions checks by exstension whether a file is a text file or not
 def is_text_file(filename: str) -> bool:

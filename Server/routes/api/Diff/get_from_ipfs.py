@@ -99,8 +99,30 @@ def get_single_text_file_ipfs(
         else:
             patch = client.cat(patch_cid).decode('utf-8')
             content = apply_patch(content, patch).replace("\r", "")
-            
     return content
+
+
+def get_single_not_text_file_ipfs(
+        client: ipfshttpclient2.Client, 
+        file_name: str, 
+        changes_cids: list[str]
+    ) -> str:
+    
+    files_creation_patch = -1
+    for idx, change_cid in enumerate(changes_cids[::-1]):
+        try:
+            file_type_in_change = get_files_type_in_patch(client, file_name, change_cid)
+            if file_type_in_change == "+" or file_type_in_change == "?":
+                files_creation_patch = idx
+                break
+        except NotFoundOnIPFS:
+            continue
+    if files_creation_patch == -1:
+        raise NotFoundOnIPFS
+    
+    content_cid = get_changed_file_cid_from_patch(client, file_name, changes_cids[len(changes_cids) - files_creation_patch - 1])            
+    return content_cid
+
 
 
 def get_project_files_patch(
@@ -151,10 +173,10 @@ def get_ipfs_file_hash(
     
     file_content = get_single_text_file_ipfs(client, file_name, changes_cids)
     if not is_text_file(file_name):
-        file_content = base64.b64encode(file_content).decode('utf-8')
-
+        pass
     hasher = hashlib.sha256()
-    hasher.update(file_content.encode('utf-8'))
+    file_content = file_content.replace("\r", "")
+    hasher.update(file_content.encode("utf-8"))
     return hasher.hexdigest()
 
 
@@ -164,9 +186,17 @@ def compare_files_ipfs(
         file_on_ipfs_name: str, 
         local_file_path: str
     ) -> bool:
-    
-    ipfs_hash = get_ipfs_file_hash(client, file_on_ipfs_name, patch_cids)
-    local_hash = get_local_file_hash(local_file_path)
+
+    if is_text_file(file_on_ipfs_name):
+        ipfs_hash = get_ipfs_file_hash(client, file_on_ipfs_name, patch_cids)
+        local_hash = get_local_file_hash(local_file_path)
+    else:
+        ipfs_file_cid = get_single_not_text_file_ipfs(client, file_on_ipfs_name, patch_cids)
+        file_content = base64.b64encode(client.cat(ipfs_file_cid)).decode('utf-8')
+        hasher = hashlib.sha256()
+        hasher.update(file_content.encode('utf-8'))
+        ipfs_hash = hasher.hexdigest()
+        local_hash = get_local_file_hash(local_file_path)
     return ipfs_hash == local_hash
 
 
@@ -178,14 +208,13 @@ def is_remote_folder_content_same(
         patch_cids: list[str]
     ) -> bool:
     local_dir_files = list(filter(lambda x: is_file(x), os.listdir(local_folder_path)))
+
     if len(file_names) != len(local_dir_files):
         return False
     
     for file_name in file_names:
         local_file_path = os.path.join(local_folder_path, file_name)
         ipfs_file_path = os.path.join(folder_path, file_name)
-        
         if file_name not in local_dir_files or not compare_files_ipfs(client, patch_cids, ipfs_file_path, local_file_path):
             return False
-    
     return True

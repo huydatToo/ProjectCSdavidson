@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
-
 import "../node_modules/@openzeppelin/contracts/utils/Counters.sol";
-import "../node_modules/@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import "../node_modules/@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
 import "./Changes.sol";
 import "./ProjectsToken.sol";
 
@@ -21,38 +20,25 @@ contract Projects {
     mapping(string => uint) public NameToID;    
 
     // -------------------------------------------------------- Structs
-
-    struct goBack {
-        string changeCID;
-        address goBackMaker;
-        uint votes;
-    }
-
-
     struct Vote {
-        bool voted;
-        bool removeVoted;
+        bool VotedToChangeProposal;
+        bool VotedToChangeRemoval;
     }
 
+    struct Participant {
+        mapping(string => Vote) voted;
+        mapping(uint => uint) TokensSpent;
+        uint pendingTokens;
+    }
 
     struct Project {
         string name;
         ChangesLibrary.changesMap changes;
-        EnumerableSet.AddressSet participants;
-
-        // time lock
         uint DistributionTime;
-
-        // - ChangeCID => Voter address => Voted?
-        mapping(string => mapping(address => Vote)) Voted;
-
-        // distribution
         uint newTokens;
-        mapping(address => uint) pendingTokens;
-        mapping(address => mapping(uint => uint)) TokensSpent; // user => time => tokens spent
-
+        EnumerableSet.AddressSet participants;
+        mapping(address => Participant) participant;
     }
-
 
     // -------------------------------------------------------- Lists
     Project[] publicProjects;
@@ -75,7 +61,6 @@ contract Projects {
         _;
     }
 
-
     // -------------------------------------------------------- Constructor
     constructor(address tokenAddress) {
         token = ProjectsToken(tokenAddress);
@@ -84,14 +69,17 @@ contract Projects {
     // -------------------------------------------------------- Functions
 
     // the function create a new project with an inital change
-    function createProject(string memory _CID, string memory projectName) public {
+    function createProject(
+        string memory changeCID, 
+        string memory projectName
+    ) public {
         uint newProjectID = publicProjects.length;
         NameToID[projectName] = newProjectID;
         token.mint(msg.sender, newProjectID, 100);
         
         Project storage newProject = publicProjects.push();
         newProject.name = projectName;
-        newProject.changes.initialize(_CID);
+        newProject.changes.initialize(changeCID);
         newProject.newTokens = 100;
         newProject.DistributionTime = block.timestamp + TimeLockInterval; 
         newProject.participants.add(msg.sender);
@@ -101,127 +89,126 @@ contract Projects {
 
 
     // the functions create a change proposal
-    function MakeChangeProposal(
-        string memory _changeCID, 
+    function uploadChangeProposal(
+        string memory changeCID, 
         string calldata projectName
     ) ProjectExist(projectName) external {
         uint projectID = NameToID[projectName];
-        publicProjects[projectID].changes.createChangeProposal(_changeCID);
-        publicProjects[projectID].Voted[_changeCID][msg.sender].voted = true;
-        emit NewChangeProposalCreated("New change proposal to the Project with the name and following ID and CID:", projectName, _changeCID, projectID);
+        publicProjects[projectID].changes.createChangeProposal(changeCID);
+        publicProjects[projectID].participant[msg.sender].voted[changeCID].VotedToChangeProposal = true;
+        emit NewChangeProposalCreated("New change proposal to the Project with the name and following ID and CID:", projectName, changeCID, projectID);
     }
 
     
     function isVoted(
         address addr,
         string calldata changeProposalCID,
+        bool isChange,
         string calldata projectName
     ) ProjectExist(projectName) view external returns (bool) {
         uint projectID = NameToID[projectName];
-        return publicProjects[projectID].Voted[changeProposalCID][addr].voted;
+        return isChange ? publicProjects[projectID].participant[addr].voted[changeProposalCID].VotedToChangeProposal
+                        : publicProjects[projectID].participant[addr].voted[changeProposalCID].VotedToChangeRemoval;
     }
 
 
     // the function make a go Back 
     function acceptRemoval(
-        string calldata projectName, 
-        string memory changeCID
+        string calldata changeCID,
+        string calldata projectName 
     ) ProjectExist(projectName) external {
         uint projectID = NameToID[projectName];
-        publicProjects[projectID].changes.removeChange(changeCID);
+        require(getChangeVotes(changeCID, false, projectName)*2 > token.totalSupply(projectID));
 
         address participant;
         for (uint index = 0; index < publicProjects[projectID].participants.length(); index++) {
             participant = publicProjects[projectID].participants.at(index);
-            delete publicProjects[projectID].Voted[changeCID][participant];
+            delete publicProjects[projectID].participant[participant].voted[changeCID];
         }
         
+        publicProjects[projectID].changes.removeChange(changeCID);
         emit ProjectWentBack("Project changed to change: ", changeCID, projectName);
     }
 
 
     // the functions accept a change proposal and add it to the list
     function acceptChangeProposal(
-        string calldata _proposedChangeCID,
+        string calldata changeProposalCID,
         string calldata projectName
     ) ProjectExist(projectName) external {
         uint projectID = NameToID[projectName];
-        require(publicProjects[projectID].changes.getChangeMaker(_proposedChangeCID) == msg.sender, "only the change proposal creator can accept");
-        require(getChangeVotes(_proposedChangeCID, projectName)*2 > token.totalSupply(projectID));
+        require(publicProjects[projectID].changes.getChangeMaker(changeProposalCID) == msg.sender, "only the change proposal creator can accept");
+        require(getChangeVotes(changeProposalCID, true, projectName)*2 > token.totalSupply(projectID));
+        publicProjects[projectID].participants.add(msg.sender);
+        publicProjects[projectID].changes.acceptChangeProposal(changeProposalCID);
 
-        publicProjects[projectID].changes.acceptChangeProposal(_proposedChangeCID);
-
-        emit NewChangeIsMadeToProject("A new change has been made to the project: ", projectName, _proposedChangeCID);
+        emit NewChangeIsMadeToProject("A new change has been made to the project: ", projectName, changeProposalCID);
     }
 
 
     // the function allow user to vote in favor of a change proposal
     function voteForChangeProposal(
-        string memory _changeProposalCID, 
+        string memory changeProposalCID, 
+        bool isChange,
         string calldata projectName
     ) ProjectExist(projectName) external {
         uint projectID = NameToID[projectName];
-
-        require(publicProjects[projectID].Voted[_changeProposalCID][msg.sender].voted == false, "Already voted");
+        if (isChange) {
+            require(publicProjects[projectID].participant[msg.sender].voted[changeProposalCID].VotedToChangeProposal == false, "Already voted");
+        } else {
+            require(publicProjects[projectID].participant[msg.sender].voted[changeProposalCID].VotedToChangeRemoval == false, "Already voted");
+        }
 
         uint votingPower = token.balanceOf(msg.sender, projectID);
         if (votingPower <= 0) {
             revert("Voting power is insufficient");
         }
 
-        publicProjects[projectID].Voted[_changeProposalCID][msg.sender].voted = true;
-        
+        if (isChange) {
+            publicProjects[projectID].participant[msg.sender].voted[changeProposalCID].VotedToChangeProposal = true;
+        } else {
+            publicProjects[projectID].participant[msg.sender].voted[changeProposalCID].VotedToChangeRemoval = true;
+        }
         emit NewVoteForChangeProposal(
             "New vote for change proposal:",
             projectName,
-            _changeProposalCID,
+            changeProposalCID,
             msg.sender
         );
     }
 
- 
-    function addParticipant(
-        address addr,
-        string calldata projectName
-    ) ProjectExist(projectName) internal returns (bool) {
-        uint projectID = NameToID[projectName];
-        return publicProjects[projectID].participants.add(addr);
-    }
-
-
     function getChangeVotes(
-        string calldata changeCID,
-        string calldata projectName
+    string calldata changeCID,
+    bool isChange,
+    string calldata projectName
     ) ProjectExist(projectName) public view returns (uint) {
         uint projectID = NameToID[projectName];
         uint votes = 0;
         address participant;
         for (uint index = 0; index < publicProjects[projectID].participants.length(); index++) {
             participant = publicProjects[projectID].participants.at(index);
-            if (publicProjects[projectID].Voted[changeCID][participant].voted) {
+            if (isChange ? publicProjects[projectID].participant[participant].voted[changeCID].VotedToChangeProposal 
+                         : publicProjects[projectID].participant[participant].voted[changeCID].VotedToChangeRemoval) {
                 votes += token.balanceOf(participant, projectID);
             }
         }
-
         return votes;
     }
 
 
-    function getChangeRemovalVotes(
+    function removeVote(
         string calldata changeCID,
-        string calldata projectName
-    ) ProjectExist(projectName) public view returns (uint) {
+        bool isChange,
+        string memory projectName
+    ) ProjectExist(projectName) external {
         uint projectID = NameToID[projectName];
-        uint votes = 0;
-        address participant;
-        for (uint index = 0; index < publicProjects[projectID].participants.length(); index++) {
-            participant = publicProjects[projectID].participants.at(index);
-            if (publicProjects[projectID].Voted[changeCID][participant].removeVoted) {
-                votes += token.balanceOf(participant, projectID);
-            }
+        if (isChange) {
+            require(publicProjects[projectID].participant[msg.sender].voted[changeCID].VotedToChangeProposal, "To remove your vote you must vote first");
+            publicProjects[projectID].participant[msg.sender].voted[changeCID].VotedToChangeProposal = false;
+        } else {
+            require(publicProjects[projectID].participant[msg.sender].voted[changeCID].VotedToChangeRemoval, "To remove your vote you must vote first");
+            publicProjects[projectID].participant[msg.sender].voted[changeCID].VotedToChangeRemoval = false;
         }
-
-        return votes;
     }
 
 
@@ -250,7 +237,7 @@ contract Projects {
     }
 
 
-    function getAddresses(
+    function getParticipants(
         string calldata projectName
     ) ProjectExist(projectName) external view returns (address[] memory) {
         uint projectID = NameToID[projectName];
@@ -260,26 +247,19 @@ contract Projects {
 
     function getChangeMaker(
         string calldata projectName,
-        string calldata change
+        string calldata changeCID
     ) ProjectExist(projectName) external view returns (address) {
         uint projectID = NameToID[projectName];
-        return publicProjects[projectID].changes.getChangeMaker(change);
+        return publicProjects[projectID].changes.getChangeMaker(changeCID);
     }
-
 
     // TEMP
     function getLastProjects() external view returns (string[] memory) {
         uint arr_length = publicProjects.length;
-        uint arr_index = publicProjects.length;
-        if (arr_length > 10) {
-            arr_length = 10;
+        string[] memory projects = new string[](arr_length);
+        for (uint i = 0; i < arr_length; i++) {
+            projects[i] = publicProjects[i].name; 
         }
-
-        string[] memory lastProjects = new string[](arr_length);
-        if (publicProjects.length > 0) {
-        for (uint256 i = arr_index - arr_length; i < arr_index; i++) {
-            lastProjects[arr_index - 1 - i] = publicProjects[i].name; 
-        }}
-        return lastProjects;
+        return projects;
     }
 }

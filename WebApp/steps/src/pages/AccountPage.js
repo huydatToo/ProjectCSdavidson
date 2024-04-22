@@ -35,11 +35,8 @@ const AccountPage = () => {
             const participate = await isUserParticipateInProject(projectName, accountAddress, changes);
 
             if (participate) {
-                const participants = await contract.getAddresses(projectName);
-                let uniqueAddresses = participants.filter((addr, index) => {
-                    return participants.indexOf(addr) === index;
-                });
-                projectsParticipatedIn.push({name: projectName, participants: uniqueAddresses.length, changes: changes.length });
+                const participants = await contract.getParticipants(projectName);
+                projectsParticipatedIn.push({name: projectName, participants: participants.length, changes: changes.length });
             }
         }
         setProjects(projectsParticipatedIn);

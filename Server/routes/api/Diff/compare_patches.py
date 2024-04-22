@@ -30,7 +30,7 @@ def compare_patches(client: ipfshttpclient2.Client, project_name: str, patch: st
     removed_folders.extend(get_removed_folders_in_json(data_other_patch))
     patch_files = set()
     other_patch_files = set()
-    conflicts = set()
+    conflicts = set([i for i in removed_folders if removed_folders.count(i) == 2])
     
     changed_files = data_patch["changed_files"]
     for changed_folder in changed_files.keys():
@@ -54,6 +54,7 @@ def compare_patches(client: ipfshttpclient2.Client, project_name: str, patch: st
             else:
                 other_patch_files.add(os.path.join(changed_folder, changed_file["old_name"]))
     merged_conflicts = conflicts.union(patch_files & other_patch_files)
+
     return merged_conflicts
 
 
@@ -79,5 +80,4 @@ def get_conflicts(client: ipfshttpclient2.Client, project_name, patch: str, othe
     conflicts = set()
     for other_patch in other_patches:
         conflicts = conflicts.union(compare_patches(client, project_name, patch, other_patch))
-
     return paths_list_to_dict(list(conflicts))

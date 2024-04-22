@@ -9,7 +9,6 @@ import { useWallet } from '../utils/WalletContext';
 import HomeSvg from '../assets/home.svg';
 import ModalChanges from '../components/ModalChanges';
 import ModalUpdate from '../components/ModalUpdate';
-import { MetaMaskAvatar } from 'react-metamask-avatar';
 
 
 
@@ -22,6 +21,7 @@ function ProjectDevelopment() {
   const [loading, setLoading] = useState(true);
   const [projectState, setProjectState] = useState({});
   const [time, setTime] = useState(null);
+  const [changes, setChanges] = useState([]);
   const [localProject, setLocalProject] = useState({unSavedChanges: false, myChanges: [], changesCIDs: []})
   const [distribution, setDistribution] = useState({
     open: null,
@@ -40,13 +40,27 @@ function ProjectDevelopment() {
     let t = [];
     changeProposalsTemp.map(async(changeProposal, index) => {
       const changeMaker = await contract.getChangeMaker(projectName, changeProposal);
-      const isVoted = await contract.isVoted(changeMaker, changeProposal, projectName);
-      let votes = await contract.getChangeVotes(changeProposal, projectName);
+      const isVoted = await contract.isVoted(changeMaker, changeProposal, true, projectName);
+      let votes = await contract.getChangeVotes(changeProposal, true, projectName);
       votes = votes.toNumber()
       
       t.push({cid: changeProposal, changeMaker: changeMaker, voted: isVoted, votes: votes});
     })
     setChangeProposals(t);
+  }
+
+  async function getChanges() {
+    let changeProposalsTemp = await contract.getChangesOrProposals(projectName, true);
+    let t = [];
+    changeProposalsTemp.map(async(changeProposal, index) => {
+      const changeMaker = await contract.getChangeMaker(projectName, changeProposal);
+      const isVoted = await contract.isVoted(changeMaker, changeProposal, true, projectName);
+      let votes = await contract.getChangeVotes(changeProposal, true, projectName);
+      votes = votes.toNumber()
+      
+      t.push({cid: changeProposal, changeMaker: changeMaker, voted: isVoted, votes: votes});
+    })
+    setChanges(t);
   }
 
   function getTimeInSeconds() {
@@ -73,7 +87,15 @@ function ProjectDevelopment() {
         },
         body: JSON.stringify({ name: projectName, changes: localProject.changesCIDs }),
       });
-      const data = await response.json();
+      let filename;
+      let data = await response.json();
+      for (let folder in data["conflicts"].files) {
+        for (let i=0; i<data["conflicts"].files[folder].length; i++) {
+          filename = data["conflicts"].files[folder][i];
+          data["conflicts"].files[folder][i] = {filename: filename, action: -1};
+        }
+      }
+      console.log(data)
       setProjectState({state: data["message"], conflicts: data["conflicts"]});
 
     } catch (error) {
@@ -81,6 +103,17 @@ function ProjectDevelopment() {
     }
 
     setModalUpdateOpen(true);
+  }
+
+  function changeAction(Folder, fileIndex, newAction) {
+    let newConflicts = {...projectState};
+    if (newConflicts.conflicts.files[Folder][fileIndex].action == -1 || newConflicts.conflicts.files[Folder][fileIndex].action != newAction) {
+      newConflicts.conflicts.files[Folder][fileIndex].action = newAction;
+    } else {
+      newConflicts.conflicts.files[Folder][fileIndex].action = -1;
+    }
+
+    return newConflicts;
   }
 
   function closeModalUpdate() {
@@ -133,7 +166,7 @@ function ProjectDevelopment() {
 
   // Function to vote in favor of a change
   async function voteForChange() {
-    await contract.voteForChangeProposal(clickedChangeProposal, projectName);
+    await contract.voteForChangeProposal(clickedChangeProposal, true, projectName);
   }
 
 
@@ -153,7 +186,7 @@ function ProjectDevelopment() {
       });
 
       const data = await response.json();
-      const transaction = await contract.MakeChangeProposal(data['ipfsCID'], projectName);
+      const transaction = await contract.uploadChangeProposal(data['ipfsCID'], projectName);
       await transaction.wait();
       closeModal();
       await getChangeProposals();
@@ -222,14 +255,12 @@ function ProjectDevelopment() {
     
     let contributors = [];
     if (lastDistributionTime > time) {
-      const projectAddresses = await contract.getAddresses(projectName);
-      const projectAddressesFiltered = [...new Set(projectAddresses)];
-
-      for (let i = 0; i < projectAddressesFiltered.length; i++) {
+      const projectAddresses = await contract.getParticipants(projectName);
+      for (let i = 0; i < projectAddresses.length; i++) {
         contributors.push({
-          address: projectAddressesFiltered[i],
+          address: projectAddresses[i],
           sendTo: 0,
-          changesOrProposalsCount: projectAddresses.filter((element) => element === projectAddresses[i]).length,
+          changesOrProposalsCount: changes.filter((element) => element.changeMaker === projectAddresses[i]).length,
         });
       }
     }
@@ -316,8 +347,9 @@ function ProjectDevelopment() {
   useEffect(() => {
     async function fetchData() {
       if (isConnected) {
-      await getDistributionState();
-      await getChangeProposals();
+        await getChanges();
+        await getChangeProposals();
+        await getDistributionState();
       await getMyChanges();
       setLoading(false)
     }}
@@ -424,13 +456,13 @@ function ProjectDevelopment() {
                 <h2>{item[0]}/</h2>
                 
                 <div className='filesListFolderFiles'>
-                {item[1].map((file_name, index_file) => (
-                  <div className='fileLineFolderFiles'>
-                    <span className='' key={index_file}>{file_name}</span>
+                {item[1].map((conflictedFile, indexFile) => (
+                  <div key={indexFile} className='fileLineFolderFiles'>
+                    <span className=''>{conflictedFile.filename}</span>
                     <div className='buttonsFoldersFiles'>
-                      <span>1</span>
-                      <span>2</span>
-                      <span>3</span>
+                      <div onClick={() => setProjectState(changeAction(item[0], indexFile, 1))} className={conflictedFile.action == 1 ? "buttonConflictGreen" : 'buttonConflict'}></div>
+                      <div onClick={() => setProjectState(changeAction(item[0], indexFile, 2))} className={conflictedFile.action == 2 ? "buttonConflictGreen" : 'buttonConflict'}></div>
+                      <div onClick={() => setProjectState(changeAction(item[0], indexFile, 3))} className={conflictedFile.action == 3 ? "buttonConflictGreen" : 'buttonConflict'}></div>
                     </div>
                   </div>
                 ))}
@@ -562,7 +594,10 @@ function ProjectDevelopment() {
                   <div key={index} className='payTokensDiv'>
                     <div className='payTokensDetails'>
                     <div className='cursor center' onClick={() => {navigate("/" + item.address)}}>
-                    <MetaMaskAvatar className='' address={item.address} size={40} />
+                    <div onClick={() => navigate("/"+account)} className='centerSquare'>
+                        <img className='squareDev' src={`https://effigy.im/a/${account}.png`} alt=""/>
+                    </div>
+
                     </div>
                     <div className='justDetails'>
                     <span className=''>{getFormatAddress(item.address, 5, 3)}</span>
