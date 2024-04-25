@@ -6,7 +6,6 @@ from .text_patch import create_patch
 import json
 from .compare_projects import compare_remote_project
 from .get_from_ipfs import get_single_text_file_ipfs
-from .wrappers import save_path
 
 
 def initialize_new_path(patch_name: str) -> None:
@@ -157,6 +156,3 @@ def create_project_patch_from_remote_project(
     with open(json_path, "w") as json_file:
         json.dump(json_patch, json_file, indent=2)
 
-
-if __name__ == "__main__":
-    create_project_patch_json()

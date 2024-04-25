@@ -95,7 +95,6 @@ function ProjectDevelopment() {
           data["conflicts"].files[folder][i] = {filename: filename, action: -1};
         }
       }
-      console.log(data)
       setProjectState({state: data["message"], conflicts: data["conflicts"]});
 
     } catch (error) {
@@ -166,7 +165,15 @@ function ProjectDevelopment() {
 
   // Function to vote in favor of a change
   async function voteForChange() {
-    await contract.voteForChangeProposal(clickedChangeProposal, true, projectName);
+    const transaction = await contract.voteForChangeProposal(clickedChangeProposal, true, projectName);
+    await transaction.wait();
+    await getChangeProposals();
+  }
+
+  async function RemoveVote() {
+    const transaction = await contract.removeVote(clickedChangeProposal, true, projectName);
+    await transaction.wait();
+    await getChangeProposals();
   }
 
 
@@ -530,11 +537,11 @@ function ProjectDevelopment() {
                 <span className='FileText'>Change Proposal</span>
                 </div> : 
                 <div onClick={() => {setClickedChangeProposal(false)}} className='clickChangeProposal'>
-                  <span className='spanClickedAddr'>{getFormatAddress(item.cid, 5, 4)}</span>
+                  <span className='spanClickedAddr'>{!item.voted ? getFormatAddress(item.cid, 5, 4) : getFormatAddress(item.cid, 3, 2)}</span>
                   <div className='centerClickedButtons'>
-                    <span className='buttonFileLineChangeProposalVoted FileText'>{100*(distribution.totalTokens / item.votes)}%</span>
+                    <span className='buttonFileLineChangeProposalVoted FileText'>{100*(item.votes / distribution.totalTokens)}%</span>
                     <span className='FileTextVL'>|</span>
-                    <span onClick={(e) => {if (!item.voted) {e.stopPropagation(); voteForChange();}}} className={!item.voted ? 'buttonFileLineChangeProposal FileText' : 'buttonFileLineChangeProposalVoted FileText'}>{item.voted ? "Voted" : "Vote"}</span>
+                    <span onClick={(e) => {if (!item.voted) {e.stopPropagation(); voteForChange();} else {e.stopPropagation(); RemoveVote();}}} className='nowrap buttonFileLineChangeProposal FileText'>{item.voted ? "Remove Vote" : "Vote"}</span>
                     <span className='FileTextVL'>|</span>
                     <Show width={40} height={40} onClick={(e) => {e.stopPropagation(); navigate(`/project/${projectName}/changeProposal/${item.cid}`)}} className='FileText buttonFileLineChangeProposal'/>
                     <span className='FileTextVL'>|</span>
@@ -542,7 +549,7 @@ function ProjectDevelopment() {
                       <img className='squareGraySmallBright' src={`https://effigy.im/a/${item.changeMaker}.png`} alt=""/>
                     </div>
 
-                    {100*(distribution.totalTokens / item.votes) > 50 && <>
+                    {100*(item.votes / distribution.totalTokens) > 50 && <>
                     <span className='FileTextVL'>|</span>
                     <span onClick={(e) => {e.stopPropagation(); acceptChange()}} className='buttonFileLineChangeProposal FileText'>Accept</span>
                     </>}

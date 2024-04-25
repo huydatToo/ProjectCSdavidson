@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom'
 import { useWallet } from '../utils/WalletContext';
 import { motion } from 'framer-motion';
@@ -216,6 +216,7 @@ const ProjectPage = () => {
       }
   }, [changeProposalOrGoBack]);
 
+
   const generateRandomText = (size) => {
     // Function to generate random text
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -227,7 +228,7 @@ const ProjectPage = () => {
   };
 
   const getClassFoldersOrText = () => {
-    if (fileContent.content == false) {
+    if (fileContent.content === false) {
       return project.files.length > 0 ? "projectListProposals" : 'projectListProposals ListOfPatchesNo'
     } else {
       return "projectListProposalsCode"
@@ -272,7 +273,21 @@ const ProjectPage = () => {
 
   const acceptChangeRemoval = async () => {
     const transaction = await contract.acceptRemoval(pressedChange.cid, projectName);
-    await transaction.wait()
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/accept_remove', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: projectName, patch: pressedChange.cid }),
+      });
+      await response.json();
+
+    } catch (error) {
+      console.error('Error:', error);
+    }
+    await transaction.wait();
+    await getProjectDetails();
     await setChangeProcess(pressedChange.cid)
   }
 
@@ -381,7 +396,6 @@ const ProjectPage = () => {
         </div>
         </> : 
         <div className='divText'>
-          {console.log(fileContent.content)}
           {typeof fileContent.content !== "object" ? 
             CodeEditor(fileContent.content, "javaScript") 
             : <div className='sizePhotoFromIPFS'><img className='showPhoto' src={`https://ipfs.io/ipfs/${fileContent.content.cid}/`} alt=""/></div>

@@ -25,7 +25,7 @@ api_routes = Blueprint('api_routes', __name__, url_prefix="/api")
 # the function initiate necessary data on the project
 class API_Context:
     def __init__(self):
-        self.base_path = "C:\\Users\\User\\Desktop\\תכנות\\davidson\\project\\DavidsonProject\\Server\\projects"
+        self.base_path = os.path.join(os.getcwd(), "projects")
         self.client_addr = '/ip4/127.0.0.1/tcp/5001'
     
     def get_client(self) -> ipfshttpclient2.Client:
@@ -36,7 +36,7 @@ api_context = API_Context()
 
 # the functions upload a new project to the IPFS and returns it's CID
 @api_routes.route('/upload', methods=['POST'])
-@return_to_origin
+@return_to_origin(api_context.base_path)
 def upload() -> flask.Response:
     client = api_context.get_client()
     try:
@@ -80,7 +80,8 @@ def upload() -> flask.Response:
 
 # the functions downloads a remote project
 @api_routes.route('/download_project', methods=['POST'])
-@return_to_origin
+@return_to_origin(api_context.base_path)
+
 def download_project() -> flask.Response:
     client = api_context.get_client()
     try:
@@ -88,6 +89,21 @@ def download_project() -> flask.Response:
         patches_cids = data["changes"]
         project_path = data["path"]
         project_name = data["file_name"]
+
+        if (project_name not in os.listdir()):
+            os.mkdir(project_name)
+            os.chdir(project_name)
+            project_details = {
+            "project-name": data["name"],
+            "project-path": project_path,
+            "project-changes": patches_cids,
+            "hidden_local_changes": []
+            }
+
+            with open("project_details.json", 'w') as json_file:
+                json.dump(project_details, json_file, indent=4)
+            os.mkdir("changes")
+
         os.chdir(project_path)
         if (project_name not in os.listdir()):
             os.mkdir(project_name)
@@ -122,7 +138,8 @@ def download_project() -> flask.Response:
 
 # the functions create a changes patch from updated version of a project and a local project
 @api_routes.route('/save_changes', methods=['POST'])
-@return_to_origin
+@return_to_origin(api_context.base_path)
+
 def save_changes() -> flask.Response:
     try:
         client = api_context.get_client()
@@ -151,7 +168,8 @@ def save_changes() -> flask.Response:
 
 # the functions returns the local changes
 @api_routes.route('/get_my_changes', methods=['POST'])
-@return_to_origin
+@return_to_origin(api_context.base_path)
+
 def get_my_changes() -> flask.Response:
     client = api_context.get_client()
     try:
@@ -181,7 +199,8 @@ def get_my_changes() -> flask.Response:
 
 # the functions returns the local changes
 @api_routes.route('/accept_change', methods=['POST'])
-@return_to_origin
+@return_to_origin(api_context.base_path)
+
 def accept_change() -> flask.Response:
     try:
         data = request.get_json()
@@ -207,7 +226,7 @@ def accept_change() -> flask.Response:
     
 
 # the functions checks if unsaved changes exist
-@save_path
+@save_path(api_context.base_path)
 def unsaved_changes_internal(change_cids, project_path, client, project_name) -> flask.Response:
     os.chdir(project_name)
     os.chdir("changes")
@@ -230,7 +249,8 @@ def unsaved_changes_internal(change_cids, project_path, client, project_name) ->
 
 # the function upload changes patch to IPFS
 @api_routes.route('/upload_changes', methods=['POST'])
-@return_to_origin
+@return_to_origin(api_context.base_path)
+
 def upload_changes() -> flask.Response:
     try:
         client = api_context.get_client()
@@ -263,7 +283,8 @@ def upload_changes() -> flask.Response:
     
     
 @api_routes.route('/search_conflicts', methods=['POST'])
-@return_to_origin
+@return_to_origin(api_context.base_path)
+
 def search_conflicts() -> flask.Response:
     client = api_context.get_client()
     try:
@@ -307,7 +328,8 @@ def search_conflicts() -> flask.Response:
 
 # the function update local project
 @api_routes.route('/update_project', methods=['POST'])
-@return_to_origin
+@return_to_origin(api_context.base_path)
+
 def update_project() -> flask.Response:
     client = api_context.get_client()
     try:
@@ -348,7 +370,8 @@ def update_project() -> flask.Response:
 
 # the functions returns the status of local project
 @api_routes.route('/check-project', methods=['POST'])
-@return_to_origin
+@return_to_origin(api_context.base_path)
+
 def check_project() -> flask.Response:
     api_context.get_client()
     try:
@@ -388,7 +411,8 @@ def get_project_files_internal(changes_cids, client) -> list:
 
 # the function returns the tree of files in a remote project
 @api_routes.route('/get_project_files', methods=['POST'])
-@return_to_origin
+@return_to_origin(api_context.base_path)
+
 def get_project_files() -> flask.Response:
     client = api_context.get_client()
     try:
@@ -427,7 +451,8 @@ def get_single_file() -> flask.Response:
     
 
 @api_routes.route('/getLocalProjects', methods=['GET'])
-@return_to_origin
+@return_to_origin(api_context.base_path)
+
 def getLocalProjects() -> flask.Response:
     api_context.get_client()
     try:
@@ -439,7 +464,8 @@ def getLocalProjects() -> flask.Response:
 
 
 @api_routes.route('/delete_change', methods=['POST'])
-@return_to_origin
+@return_to_origin(api_context.base_path)
+
 def delete_change() -> flask.Response:
     client = api_context.get_client()
     try:
@@ -457,3 +483,31 @@ def delete_change() -> flask.Response:
     finally:
         client.close()
         return message
+    
+
+@api_routes.route('/accept_remove', methods=['POST'])
+@return_to_origin(api_context.base_path)
+
+def accept_remove() -> flask.Response:
+    try:
+        data = request.get_json()
+        project_name = data["name"]
+        new_patch = data["patch"]
+        os.chdir(project_name)
+
+        with open("project_details.json", 'r') as json_file:
+            project_details = json.load(json_file)
+
+        project_details["project-changes"].remove(new_patch)
+
+        with open("project_details.json", 'w') as json_file:
+            json.dump(project_details, json_file, indent=4)
+        
+        message = jsonify({'message': "success"}), 200
+
+    except Exception as e:
+        message = jsonify({'error': str(e)}), 500
+
+    finally:
+        return message
+

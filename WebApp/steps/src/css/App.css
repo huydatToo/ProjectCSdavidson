@@ -1391,7 +1391,7 @@ input[type=number]::-webkit-outer-spin-button {
 
   & h2 {
     display: flex;
-    justify-content: start;
+    justify-content: flex-start;
     margin-inline: auto;
     font-size: 20px;
     color: var(--color-text-bright);
@@ -1659,6 +1659,10 @@ input[type=number]::-webkit-outer-spin-button {
   &:hover {
     background-color: #46464667;
   }
+}
+
+.nowrap {
+  text-wrap: nowrap;
 }
 
 .buttonFileLineChangeProposal {

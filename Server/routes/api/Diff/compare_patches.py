@@ -13,9 +13,10 @@ def get_removed_folders_in_json(data_json: dict[str, str]) -> list[str]:
             removed_folders.append(folder_path)
     return removed_folders
 
-@save_path
 def compare_patches(client: ipfshttpclient2.Client, project_name: str, patch: str, other_patch: str) -> set:
-    os.chdir(project_name)
+    current_path = os.getcwd() 
+    while (os.path.basename(os.getcwd()) != "projects"):
+        os.chdir("..")
     
     patch_cid = get_file_cid_from_patch(client, patch, "patch_json.json")
     other_patch_cid = get_file_cid_from_patch(client, other_patch, "patch_json.json")
@@ -54,7 +55,8 @@ def compare_patches(client: ipfshttpclient2.Client, project_name: str, patch: st
             else:
                 other_patch_files.add(os.path.join(changed_folder, changed_file["old_name"]))
     merged_conflicts = conflicts.union(patch_files & other_patch_files)
-
+    
+    os.chdir(current_path)
     return merged_conflicts
 
 

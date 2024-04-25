@@ -1,0 +1,42 @@
+{
+  "changed_folders": [
+    {
+      "sign": "?",
+      "path": ""
+    }
+  ],
+  "changed_files": {
+    "": [
+      {
+        "sign": "+",
+        "new_name": "theory.txt",
+        "old_name": null,
+        "hash": "52152baa91732e8863727c6f1c96d590dd714d727255aa78e915e9cc6fa18752"
+      },
+      {
+        "sign": "+",
+        "new_name": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045.png",
+        "old_name": null,
+        "hash": "4c1644bdfa35eefd4f8e952f34d93cc2c7f9cee79d6f9d61ef188864a8254e29"
+      },
+      {
+        "sign": "+",
+        "new_name": "filetwo.txt",
+        "old_name": null,
+        "hash": "8f434346648f6b96df89dda901c5176b10a6d83961dd3c1ac88b59b2dc327aa4"
+      },
+      {
+        "sign": "+",
+        "new_name": "cooking-recipes-geek-8bit-06-650x874-620x833-4275256685.jpg",
+        "old_name": null,
+        "hash": "dd0a6bb4da687ee1889c57563ba1c18d18775315bc06001dd7e45e3636a595cc"
+      },
+      {
+        "sign": "+",
+        "new_name": "waefwefwef.txt",
+        "old_name": null,
+        "hash": "80d03a72a448be1c6bad54d3cae4801ac6e02fb5659a778f1b31365db8a59921"
+      }
+    ]
+  }
+}

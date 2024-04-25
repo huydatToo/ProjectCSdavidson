@@ -8,7 +8,6 @@ const PageLearn = ({scroll}) => {
     if (!animControls.current) return;
     animControls.current.time = yProgress * animControls.current.duration;
     
-    console.log(animControls.current.time, yProgress, animControls.current.duration)
   });
 
   useEffect(() => {
