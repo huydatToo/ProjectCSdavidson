@@ -40,7 +40,7 @@ function ProjectDevelopment() {
     let t = [];
     changeProposalsTemp.map(async(changeProposal, index) => {
       const changeMaker = await contract.getChangeMaker(projectName, changeProposal);
-      const isVoted = await contract.isVoted(changeMaker, changeProposal, true, projectName);
+      const isVoted = await contract.isVoted(account, changeProposal, true, projectName);
       let votes = await contract.getChangeVotes(changeProposal, true, projectName);
       votes = votes.toNumber()
       
@@ -106,7 +106,7 @@ function ProjectDevelopment() {
 
   function changeAction(Folder, fileIndex, newAction) {
     let newConflicts = {...projectState};
-    if (newConflicts.conflicts.files[Folder][fileIndex].action == -1 || newConflicts.conflicts.files[Folder][fileIndex].action != newAction) {
+    if (newConflicts.conflicts.files[Folder][fileIndex].action === -1 || newConflicts.conflicts.files[Folder][fileIndex].action !== newAction) {
       newConflicts.conflicts.files[Folder][fileIndex].action = newAction;
     } else {
       newConflicts.conflicts.files[Folder][fileIndex].action = -1;
@@ -467,9 +467,9 @@ function ProjectDevelopment() {
                   <div key={indexFile} className='fileLineFolderFiles'>
                     <span className=''>{conflictedFile.filename}</span>
                     <div className='buttonsFoldersFiles'>
-                      <div onClick={() => setProjectState(changeAction(item[0], indexFile, 1))} className={conflictedFile.action == 1 ? "buttonConflictGreen" : 'buttonConflict'}></div>
-                      <div onClick={() => setProjectState(changeAction(item[0], indexFile, 2))} className={conflictedFile.action == 2 ? "buttonConflictGreen" : 'buttonConflict'}></div>
-                      <div onClick={() => setProjectState(changeAction(item[0], indexFile, 3))} className={conflictedFile.action == 3 ? "buttonConflictGreen" : 'buttonConflict'}></div>
+                      <div onClick={() => setProjectState(changeAction(item[0], indexFile, 1))} className={conflictedFile.action === 1 ? "buttonConflictGreen" : 'buttonConflict'}></div>
+                      <div onClick={() => setProjectState(changeAction(item[0], indexFile, 2))} className={conflictedFile.action === 2 ? "buttonConflictGreen" : 'buttonConflict'}></div>
+                      <div onClick={() => setProjectState(changeAction(item[0], indexFile, 3))} className={conflictedFile.action === 3 ? "buttonConflictGreen" : 'buttonConflict'}></div>
                     </div>
                   </div>
                 ))}
@@ -539,7 +539,7 @@ function ProjectDevelopment() {
                 <div onClick={() => {setClickedChangeProposal(false)}} className='clickChangeProposal'>
                   <span className='spanClickedAddr'>{!item.voted ? getFormatAddress(item.cid, 5, 4) : getFormatAddress(item.cid, 3, 2)}</span>
                   <div className='centerClickedButtons'>
-                    <span className='buttonFileLineChangeProposalVoted FileText'>{100*(item.votes / distribution.totalTokens)}%</span>
+                    <span className='buttonFileLineChangeProposalVoted FileText'>{(100*(item.votes / distribution.totalTokens)).toFixed(2)}%</span>
                     <span className='FileTextVL'>|</span>
                     <span onClick={(e) => {if (!item.voted) {e.stopPropagation(); voteForChange();} else {e.stopPropagation(); RemoveVote();}}} className='nowrap buttonFileLineChangeProposal FileText'>{item.voted ? "Remove Vote" : "Vote"}</span>
                     <span className='FileTextVL'>|</span>
@@ -601,18 +601,18 @@ function ProjectDevelopment() {
                   <div key={index} className='payTokensDiv'>
                     <div className='payTokensDetails'>
                     <div className='cursor center' onClick={() => {navigate("/" + item.address)}}>
-                    <div onClick={() => navigate("/"+account)} className='centerSquare'>
-                        <img className='squareDev' src={`https://effigy.im/a/${account}.png`} alt=""/>
+                    <div onClick={() => navigate("/"+item.address)} className='centerSquare'>
+                        <img className='squareDev' src={`https://effigy.im/a/${item.address}.png`} alt=""/>
                     </div>
 
                     </div>
                     <div className='justDetails'>
-                    <span className=''>{getFormatAddress(item.address, 5, 3)}</span>
-                    <span className=''>Changes: {item.changesOrProposalsCount}</span>
+                      <span className=''>{getFormatAddress(item.address, 5, 3)}</span>
+                      <span className=''>Changes: {item.changesOrProposalsCount}</span>
                     </div>
                     </div>
 
-
+                      
                     <div class="payTokensIncrementor">
                       <h3 className='incDec' onClick={() => {updatePayTo(index, distribution.addresses[index].sendTo - 1)}}>-</h3>
                       <input onChange={(e) => updatePayTo(index, e.target.value)} type="number" value={item.sendTo}/>

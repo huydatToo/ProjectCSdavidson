@@ -171,9 +171,15 @@ def get_ipfs_file_hash(
         changes_cids: list
     ) -> str:
     
-    file_content = get_single_text_file_ipfs(client, file_name, changes_cids)
     if not is_text_file(file_name):
-        pass
+        ipfs_file_cid = get_single_not_text_file_ipfs(client, file_name, changes_cids)
+        file_content = base64.b64encode(client.cat(ipfs_file_cid)).decode('utf-8')
+        hasher = hashlib.sha256()
+        hasher.update(file_content.encode('utf-8'))
+        ipfs_hash = hasher.hexdigest()
+        return ipfs_hash
+    
+    file_content = get_single_text_file_ipfs(client, file_name, changes_cids)
     hasher = hashlib.sha256()
     file_content = file_content.replace("\r", "")
     hasher.update(file_content.encode("utf-8"))
@@ -187,17 +193,22 @@ def compare_files_ipfs(
         local_file_path: str
     ) -> bool:
 
-    if is_text_file(file_on_ipfs_name):
-        ipfs_hash = get_ipfs_file_hash(client, file_on_ipfs_name, patch_cids)
-        local_hash = get_local_file_hash(local_file_path)
-    else:
-        ipfs_file_cid = get_single_not_text_file_ipfs(client, file_on_ipfs_name, patch_cids)
-        file_content = base64.b64encode(client.cat(ipfs_file_cid)).decode('utf-8')
-        hasher = hashlib.sha256()
-        hasher.update(file_content.encode('utf-8'))
-        ipfs_hash = hasher.hexdigest()
-        local_hash = get_local_file_hash(local_file_path)
+    ipfs_hash = get_ipfs_file_hash(client, file_on_ipfs_name, patch_cids)
+    local_hash = get_local_file_hash(local_file_path)
     return ipfs_hash == local_hash
+
+
+def compare_ipfs_files(
+        client: ipfshttpclient2.Client, 
+        updated_patches_cids: list[str], 
+        local_patches_cids: list[str], 
+        file_name: str
+    ) -> bool:
+    updated_hash = get_ipfs_file_hash(client, file_name, updated_patches_cids)
+    local_hash = get_ipfs_file_hash(client, file_name, local_patches_cids)
+
+    return updated_hash == local_hash
+
 
 
 def is_remote_folder_content_same(
@@ -216,5 +227,23 @@ def is_remote_folder_content_same(
         local_file_path = os.path.join(local_folder_path, file_name)
         ipfs_file_path = os.path.join(folder_path, file_name)
         if file_name not in local_dir_files or not compare_files_ipfs(client, patch_cids, ipfs_file_path, local_file_path):
+            return False
+    return True
+
+
+def is_remote_folder_projects_content_same(
+        client: ipfshttpclient2.Client, 
+        folder_path: str, 
+        file_names_local: list[str], 
+        file_names_cids: list[str], 
+        local_patch_cides: list[str],
+        updated_patch_cids: list[str]
+    ) -> bool:
+    if len(file_names_local) != len(file_names_cids):
+        return False
+    
+    for file_name in file_names_local:
+        file_path = os.path.join(folder_path, file_name)
+        if file_name not in file_names_local or not compare_ipfs_files(client, updated_patch_cids, local_patch_cides, file_path):
             return False
     return True

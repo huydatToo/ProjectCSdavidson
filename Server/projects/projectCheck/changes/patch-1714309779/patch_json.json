@@ -1,0 +1,18 @@
+{
+  "changed_folders": [
+    {
+      "sign": "?",
+      "path": ""
+    }
+  ],
+  "changed_files": {
+    "": [
+      {
+        "sign": "?",
+        "new_name": "me.txt",
+        "old_name": "me.txt",
+        "hash": "fda332a769725f704562669b8ad9fbea2b0046f733b298b3913e6673981d7147"
+      }
+    ]
+  }
+}

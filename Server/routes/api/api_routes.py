@@ -7,6 +7,9 @@ from flask import Blueprint
 import shutil
 from .Diff.create_patch import create_project_patch_json
 from .Diff.create_patch import create_project_patch_from_remote_project
+import multiaddr.codecs.uint16be
+import multiaddr.codecs.ip4
+import multiaddr.codecs.idna
 from .Diff.compare_projects import compare_remote_project_folder_changes
 from .Diff.get_from_ipfs import get_single_text_file_ipfs, get_single_not_text_file_ipfs
 from .Diff.get_from_ipfs import get_remote_project_tree
@@ -16,7 +19,7 @@ from .Diff.compare_patches import get_conflicts
 from .Diff.apply_patch import apply_conflicts_configurations
 from .Diff.wrappers import return_to_origin, save_path
 from .Diff.others import is_text_file
-
+from .Diff.compare_projects import is_same_project
 
 # This page contains all the accessible API routes for users, each function with @api_routes representing an individual route.
 api_routes = Blueprint('api_routes', __name__, url_prefix="/api")
@@ -81,21 +84,21 @@ def upload() -> flask.Response:
 # the functions downloads a remote project
 @api_routes.route('/download_project', methods=['POST'])
 @return_to_origin(api_context.base_path)
-
 def download_project() -> flask.Response:
     client = api_context.get_client()
     try:
         data = request.get_json()
         patches_cids = data["changes"]
-        project_path = data["path"]
         project_name = data["file_name"]
+        project_path = data["path"]
+        
 
         if (project_name not in os.listdir()):
             os.mkdir(project_name)
             os.chdir(project_name)
             project_details = {
-            "project-name": data["name"],
-            "project-path": project_path,
+            "project-name": project_name,
+            "project-path": os.path.join(data["path"], data["file_name"]),
             "project-changes": patches_cids,
             "hidden_local_changes": []
             }
@@ -120,9 +123,15 @@ def download_project() -> flask.Response:
             for folder in folders:
                 for file_name in project_tree[folder]:
                     file_path = os.path.join(folder, file_name)
-                    file_temp = get_single_text_file_ipfs(client, file_path, patches_cids)
-                    with open(file_path, 'w') as new_file:
-                        new_file.write(file_temp)
+                    if is_text_file(file_path):
+                        file_temp = get_single_text_file_ipfs(client, file_path, patches_cids)
+                        with open(file_path, 'w') as new_file:
+                            new_file.write(file_temp)
+                    else:
+                        file_cid = get_single_not_text_file_ipfs(client, file_name, patches_cids)
+                        content = client.cat(file_cid)
+                        with open(file_path, "wb") as photo_file:
+                            photo_file.write(content)
 
             message = jsonify({'message': 352}), 200
         
@@ -130,8 +139,9 @@ def download_project() -> flask.Response:
             message = jsonify({'message': 354}), 200
     
     except Exception as e:
+        print(e)
         message = jsonify({'error': str(e)}), 500
-    
+
     finally:
         client.close()
         return message
@@ -139,7 +149,6 @@ def download_project() -> flask.Response:
 # the functions create a changes patch from updated version of a project and a local project
 @api_routes.route('/save_changes', methods=['POST'])
 @return_to_origin(api_context.base_path)
-
 def save_changes() -> flask.Response:
     try:
         client = api_context.get_client()
@@ -159,6 +168,7 @@ def save_changes() -> flask.Response:
             message = jsonify({"message": 356}), 200
             
     except Exception as e:
+        print(e)
         message = jsonify({'error': str(e)}), 500
     
     finally:
@@ -169,7 +179,6 @@ def save_changes() -> flask.Response:
 # the functions returns the local changes
 @api_routes.route('/get_my_changes', methods=['POST'])
 @return_to_origin(api_context.base_path)
-
 def get_my_changes() -> flask.Response:
     client = api_context.get_client()
     try:
@@ -200,7 +209,6 @@ def get_my_changes() -> flask.Response:
 # the functions returns the local changes
 @api_routes.route('/accept_change', methods=['POST'])
 @return_to_origin(api_context.base_path)
-
 def accept_change() -> flask.Response:
     try:
         data = request.get_json()
@@ -228,6 +236,7 @@ def accept_change() -> flask.Response:
 # the functions checks if unsaved changes exist
 @save_path(api_context.base_path)
 def unsaved_changes_internal(change_cids, project_path, client, project_name) -> flask.Response:
+    timed = time.time()
     os.chdir(project_name)
     os.chdir("changes")
     
@@ -239,18 +248,13 @@ def unsaved_changes_internal(change_cids, project_path, client, project_name) ->
         if change_hash not in change_cids:
             change_cids.append(change_hash)
 
-    folder_changes = compare_remote_project_folder_changes(client, change_cids, project_path)
-    filtered = list(filter(lambda folder: folder.diff_type != "/", folder_changes))
-    if (len(filtered) != 0):
-        return True
-    else:
-        return False
+    same_project = is_same_project(client, change_cids, project_path)
+    return not same_project
 
 
 # the function upload changes patch to IPFS
 @api_routes.route('/upload_changes', methods=['POST'])
 @return_to_origin(api_context.base_path)
-
 def upload_changes() -> flask.Response:
     try:
         client = api_context.get_client()
@@ -284,52 +288,44 @@ def upload_changes() -> flask.Response:
     
 @api_routes.route('/search_conflicts', methods=['POST'])
 @return_to_origin(api_context.base_path)
-
 def search_conflicts() -> flask.Response:
     client = api_context.get_client()
-    try:
-        data = request.get_json()
-        changes_cids = data["changes"]
-        project_name = data["name"]
-        if project_name in os.listdir():
-            os.chdir(project_name)
+    data = request.get_json()
+    changes_cids = data["changes"]
+    project_name = data["name"]
+    if project_name in os.listdir():
+        os.chdir(project_name)
 
-            with open("project_details.json", 'r') as json_file:
-                project_details = json.load(json_file)
-            
-            if (project_details["project-changes"] != changes_cids):
-                local_project_changes = project_details["project-changes"]
-                new_changes = changes_cids[-(len(changes_cids) - len(local_project_changes)):]
+        with open("project_details.json", 'r') as json_file:
+            project_details = json.load(json_file)
+        
+        if (project_details["project-changes"] != changes_cids):
+            local_project_changes = project_details["project-changes"]
 
-                os.chdir("changes")
-                my_changes = os.listdir()
-                if (len(my_changes) != 0):
-                    last_change = max(my_changes, key=lambda x: int(x.split("-")[1]))
-                    result = client.add(last_change, recursive=True)
-                    last_change_cid = result[-1]["Hash"]
-                    conflicts = get_conflicts(client, project_name, last_change_cid, new_changes)
+            os.chdir("changes")
+            my_changes = os.listdir()
+            if (len(my_changes) != 0):
+                last_change = max(my_changes, key=lambda x: int(x.split("-")[1]))
+                result = client.add(last_change, recursive=True)
+                last_change_cid = result[-1]["Hash"]
+                conflicts = get_conflicts(client, last_change_cid, local_project_changes, changes_cids)
 
-                    if not conflicts:
-                        message = jsonify({'conflicts': None, 'message': 351}), 200
-                    else:
-                        message = jsonify({'conflicts': conflicts, 'message': 351}), 200
-            else:
-                message = jsonify({'message': 354}), 200
+                if not conflicts:
+                    message = jsonify({'conflicts': None, 'message': 351}), 200
+                else:
+                    message = jsonify({'conflicts': conflicts, 'message': 351}), 200
         else:
-            message = jsonify({'message': 353}), 200
-
-    except Exception as e:
-        message = jsonify({'error': str(e)}), 500
-    
-    finally:
-        client.close()
-        return message
+            message = jsonify({'message': 354}), 200
+    else:
+        message = jsonify({'message': 353}), 200    
+    return message
 
 
+
+# TODO get the patch and apply it while taking into account the conflict configuration
 # the function update local project
 @api_routes.route('/update_project', methods=['POST'])
 @return_to_origin(api_context.base_path)
-
 def update_project() -> flask.Response:
     client = api_context.get_client()
     try:
@@ -371,7 +367,6 @@ def update_project() -> flask.Response:
 # the functions returns the status of local project
 @api_routes.route('/check-project', methods=['POST'])
 @return_to_origin(api_context.base_path)
-
 def check_project() -> flask.Response:
     api_context.get_client()
     try:

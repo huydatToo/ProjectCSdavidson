@@ -2,7 +2,7 @@ import filecmp
 import os
 from .diff_objects import FileChange
 import ipfshttpclient2
-from .get_from_ipfs import compare_files_ipfs
+from .get_from_ipfs import compare_files_ipfs, compare_ipfs_files
 from .others import is_file
 
 # Local ------------------------------------------------------------------------------------
@@ -104,6 +104,39 @@ def compare_remote_folder(
                 changes.append(FileChange('*', _file, os.path.basename(new_path)))
         else:
             changes.append(FileChange('?', _file, os.path.basename(new_path)))
+
+    for _file in old_files - new_files:
+        changes.append(FileChange('-', _file))
+
+    for _file in new_files - old_files:
+        changes.append(FileChange(diff_type='+', new_name=_file))
+
+    return changes
+
+
+# REMOTE PROJECTS
+
+
+def compare_remote_projects_folder(
+        client: ipfshttpclient2.Client, 
+        local_patch_cids: list[str], 
+        update_patch_cids: list[str],
+        local_dir_files: list[str], 
+        updated_dir_files: list[str],
+        folder_path: str
+    ) -> list[FileChange]:
+    changes = []
+
+    old_files = set(local_dir_files)
+    new_files = set(updated_dir_files)
+
+    common_files = old_files & new_files
+    for _file in common_files:
+        path = os.path.join(folder_path, _file)
+        if compare_ipfs_files(client, update_patch_cids, local_patch_cids, path):
+            changes.append(FileChange('/', _file))
+        else:
+            changes.append(FileChange('?', _file, _file))
 
     for _file in old_files - new_files:
         changes.append(FileChange('-', _file))
