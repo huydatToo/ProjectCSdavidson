@@ -95,6 +95,9 @@ function ProjectDevelopment() {
           data["conflicts"].files[folder][i] = {filename: filename, action: -1};
         }
       }
+      for (let i=0; i<data["conflicts"].folders; i++) {
+        data["conflicts"].folders[i] = {foldername: data["conflicts"].folders[i], action: -1};
+      }
       setProjectState({state: data["message"], conflicts: data["conflicts"]});
 
     } catch (error) {
@@ -244,6 +247,22 @@ function ProjectDevelopment() {
     }
   }
 
+  async function updateProject() {
+    try {
+      await fetch('http://127.0.0.1:8000/api/update_project', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: projectName, changes: localProject.changesCIDs, conflicts: projectState.conflicts }),
+      });
+
+      fetchData()
+    } catch (error) {
+      console.error('Error saving changes:', error);
+    }
+  }
+
   // Function to get the distribution state
   async function getDistributionState() {
     var lastDistributionTime = await contract.getLastDistriubtionTime(projectName);
@@ -351,15 +370,15 @@ function ProjectDevelopment() {
   }
 
 
+  async function fetchData() {
+    if (isConnected) {
+      await getChanges();
+      await getChangeProposals();
+      await getDistributionState();
+    await getMyChanges();
+    setLoading(false)
+  }}
   useEffect(() => {
-    async function fetchData() {
-      if (isConnected) {
-        await getChanges();
-        await getChangeProposals();
-        await getDistributionState();
-      await getMyChanges();
-      setLoading(false)
-    }}
 
     getTimeInSeconds()
     fetchData()
@@ -467,9 +486,9 @@ function ProjectDevelopment() {
                   <div key={indexFile} className='fileLineFolderFiles'>
                     <span className=''>{conflictedFile.filename}</span>
                     <div className='buttonsFoldersFiles'>
-                      <div onClick={() => setProjectState(changeAction(item[0], indexFile, 1))} className={conflictedFile.action === 1 ? "buttonConflictGreen" : 'buttonConflict'}></div>
-                      <div onClick={() => setProjectState(changeAction(item[0], indexFile, 2))} className={conflictedFile.action === 2 ? "buttonConflictGreen" : 'buttonConflict'}></div>
-                      <div onClick={() => setProjectState(changeAction(item[0], indexFile, 3))} className={conflictedFile.action === 3 ? "buttonConflictGreen" : 'buttonConflict'}></div>
+                      <div className='centerButtonConflict'><span>Before</span><div onClick={() => setProjectState(changeAction(item[0], indexFile, 1))} className={conflictedFile.action === 1 ? "buttonConflictGreen" : 'buttonConflict'}></div></div>
+                      <div className='centerButtonConflict'><span>Delete</span><div onClick={() => setProjectState(changeAction(item[0], indexFile, 2))} className={conflictedFile.action === 2 ? "buttonConflictGreen" : 'buttonConflict'}></div></div>
+                      <div className='centerButtonConflict'><span>Save</span><div onClick={() => setProjectState(changeAction(item[0], indexFile, 3))} className={conflictedFile.action === 3 ? "buttonConflictGreen" : 'buttonConflict'}></div></div>
                     </div>
                   </div>
                 ))}
@@ -490,7 +509,7 @@ function ProjectDevelopment() {
             </div>
             </div>
 
-            <h1 className='updateButton'>Update</h1>
+            <h1 onClick={updateProject} className='updateButton'>Update</h1>
             </>
             : <h1 className='titleCenter'>Latest Version</h1>}
           </div>

@@ -5,16 +5,20 @@ from .others import is_text_file
 from .text_patch import apply_patch
 from .get_from_ipfs import get_file_cid_from_patch
 import ipfshttpclient2
-from .diff_objects import Conflicted_file
 from .get_from_ipfs import get_single_text_file_ipfs
 
 
 
 # the function apply changes patch to a local project
-def apply_project_patch(old: str, patch: str) -> None:
+def apply_project_patch(
+        old: str, 
+        patch: str, 
+        ignore: dict[str, dict[str, int] | dict[str, list[dict[str, str | str, int]]]]=None
+    ) -> None:
+
     with open(os.path.join(patch, "patch_json.json"), 'r') as conf:
         data = json.load(conf)
-
+    
     for new_removed_folder in data["changed_folders"]:
         folder_path = os.path.join(old, new_removed_folder["path"])
 
@@ -22,11 +26,29 @@ def apply_project_patch(old: str, patch: str) -> None:
             os.mkdir(folder_path)
 
         elif (new_removed_folder["sign"] == "-"):
-            os.rmdir(folder_path)
+            if ignore != None:
+                folder_conflicts = ignore.get("folders")
+                if (folder_conflicts != None or folder_conflicts != []):
+                    continue
+                else:
+                    os.rmdir(folder_path)
 
     changed_files = data["changed_files"]
     for changed_folder in changed_files.keys():
         for changed_file in changed_files[changed_folder]:
+
+            skip = False
+            ignored_changed_folders = ignore["files"]
+            for conflicted_file in ignored_changed_folders.get(changed_folder):
+                if conflicted_file["filename"] == changed_file["new_name"] and conflicted_file["action"] != 1:
+                    skip = True
+                    print("skipped")
+                    break
+
+            if skip:
+                continue
+
+
             if (changed_file["sign"] == "+"):
                 new_file_path = os.path.join(old, changed_folder, changed_file["new_name"])
                 shutil.copy(os.path.join(patch, 'changes', changed_file["hash"] + "." + changed_file["new_name"].split(".")[1]), new_file_path)
@@ -38,11 +60,9 @@ def apply_project_patch(old: str, patch: str) -> None:
             elif (changed_file["sign"] == "?"):
                 new_file_path = os.path.join(old, changed_folder, changed_file["new_name"])
                 hash_path = os.path.join(patch, 'changes', changed_file["hash"] + "." + changed_file["new_name"].split(".")[1])
-
                 if is_text_file(new_file_path):
                     with open(new_file_path, 'r') as textfile:
                         old_text = textfile.read()
-                    
                     with open(hash_path, 'r') as textfile:
                         patch_text = textfile.read()
                     
@@ -119,12 +139,16 @@ def apply_project_patch_from_remote_project(client: ipfshttpclient2.Client, old:
                     os.rename(os.path.join(old_file_path, added_file_cid), changed_file["new_name"])
 
 
-def apply_conflicts_configurations(client: ipfshttpclient2.Client, old: str, original_project: list[str], new_patches: list[str], conflicts: dict[str, dict[str, int] | dict[str, list[dict[str, int]]]]) -> None:
+def apply_conflicts_configurations(
+        client: ipfshttpclient2.Client, old: str, 
+        original_project: list[str], new_patches: list[str], 
+        conflicts: dict[str, dict[str, int] | dict[str, list[dict[str, str | str, int]]]]
+    ) -> None:
     conflicted_folders = conflicts["folders"]
-    for conflicted_folder in conflicted_folders.keys():
-        action = conflicted_folders.get(conflicted_folder)
-        if action == 2:
-            os.rmdir(os.path.join(old, conflicted_folder))
+    for conflicted_folder in conflicted_folders:
+        action = conflicted_folder.get("action")
+        if (action == 2):
+            os.rmdir(os.path.join(old, conflicted_folder["foldername"]))
 
     conflicted_changed_folders = conflicts["files"]
     for conflicted_changed_folder in conflicted_changed_folders.keys():

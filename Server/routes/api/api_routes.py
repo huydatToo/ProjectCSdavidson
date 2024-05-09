@@ -20,6 +20,9 @@ from .Diff.apply_patch import apply_conflicts_configurations
 from .Diff.wrappers import return_to_origin, save_path
 from .Diff.others import is_text_file
 from .Diff.compare_projects import is_same_project
+from .Diff.create_patch import create_updates_patch_json
+from .Diff.apply_patch import apply_project_patch
+
 
 # This page contains all the accessible API routes for users, each function with @api_routes representing an individual route.
 api_routes = Blueprint('api_routes', __name__, url_prefix="/api")
@@ -200,6 +203,7 @@ def get_my_changes() -> flask.Response:
             message = jsonify({'message': 353}), 200
             
     except Exception as e:
+        print(e)
         message = jsonify({'error': str(e)}), 500
 
     finally:
@@ -236,7 +240,6 @@ def accept_change() -> flask.Response:
 # the functions checks if unsaved changes exist
 @save_path(api_context.base_path)
 def unsaved_changes_internal(change_cids, project_path, client, project_name) -> flask.Response:
-    timed = time.time()
     os.chdir(project_name)
     os.chdir("changes")
     
@@ -322,7 +325,6 @@ def search_conflicts() -> flask.Response:
 
 
 
-# TODO get the patch and apply it while taking into account the conflict configuration
 # the function update local project
 @api_routes.route('/update_project', methods=['POST'])
 @return_to_origin(api_context.base_path)
@@ -340,23 +342,20 @@ def update_project() -> flask.Response:
             project_details = json.load(json_file)
 
         local_project_changes = project_details["project-changes"]
-        new_changes = changes_cids[-(len(changes_cids) - len(local_project_changes)):]
-        old_changes = changes_cids[:-(len(changes_cids) - len(local_project_changes))]
-
-        if len(conflicts) == 0:
-            for new_change in new_changes:
-                apply_project_patch_from_remote_project(client, project_details["project-path"], new_change)
-        else:
-            my_changes = os.listdir("changes")
-            last_change = max(my_changes, key=lambda x: int(x.split("-")[1]))
-
-            for new_change in new_changes:
-                apply_project_patch_from_remote_project(client, project_details["project-path"], new_change, conflicts)
-            apply_conflicts_configurations(old_changes, new_changes, last_change, conflicts)
-
+        os.mkdir("cache")
+        os.chdir("cache")
+        create_updates_patch_json(client, "update", changes_cids, local_project_changes)
+        apply_project_patch(project_details["project-path"], os.listdir()[0], conflicts)
+        apply_conflicts_configurations(client, project_details["project-path"], local_project_changes, changes_cids, conflicts)
         message = jsonify({'message': 352}), 200
-            
+
+        os.chdir("..")
+        project_details["project-changes"] = changes_cids
+        with open("project_details.json", 'w') as json_file:
+            json.dump(project_details, json_file, indent=4)
+
     except Exception as e:
+        print(e)
         message = jsonify({'error': str(e)}), 500
     
     finally:
@@ -407,7 +406,6 @@ def get_project_files_internal(changes_cids, client) -> list:
 # the function returns the tree of files in a remote project
 @api_routes.route('/get_project_files', methods=['POST'])
 @return_to_origin(api_context.base_path)
-
 def get_project_files() -> flask.Response:
     client = api_context.get_client()
     try:
@@ -447,7 +445,6 @@ def get_single_file() -> flask.Response:
 
 @api_routes.route('/getLocalProjects', methods=['GET'])
 @return_to_origin(api_context.base_path)
-
 def getLocalProjects() -> flask.Response:
     api_context.get_client()
     try:
@@ -460,7 +457,6 @@ def getLocalProjects() -> flask.Response:
 
 @api_routes.route('/delete_change', methods=['POST'])
 @return_to_origin(api_context.base_path)
-
 def delete_change() -> flask.Response:
     client = api_context.get_client()
     try:
@@ -482,7 +478,6 @@ def delete_change() -> flask.Response:
 
 @api_routes.route('/accept_remove', methods=['POST'])
 @return_to_origin(api_context.base_path)
-
 def accept_remove() -> flask.Response:
     try:
         data = request.get_json()

@@ -144,10 +144,11 @@ def is_same_project(
 
     if (new_dirs != old_dirs):
         return False 
+    
 
     for folder in old_dirs:
         new_path = os.path.join(new_project_path, folder)
-
+        
         if not is_remote_folder_content_same(client, folder, ipfs_project_tree[folder], new_path, patches_cids):
             return False
 

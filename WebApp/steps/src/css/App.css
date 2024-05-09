@@ -1711,3 +1711,9 @@ input[type=number]::-webkit-outer-spin-button {
   grid-gap: 50px;
 }
 /* learn */
+
+.centerButtonConflict {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}

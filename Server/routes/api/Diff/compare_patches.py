@@ -78,12 +78,12 @@ def paths_list_to_dict(paths: list[str]) -> dict[str, list[str] | dict[str, list
 
 #                                                             folder/file -> folders | folder -> file
 def get_conflicts(client: ipfshttpclient2.Client, patch: str, patches_local_project: list[str], patches_updated_project: list[str]) -> dict[str, list[str] | dict[str, list[str]]]:
-    json_data = create_updates_patch(client, patches_updated_project, patches_local_project)
+    json_data = create_updates_patch_json(client, patches_updated_project, patches_local_project)
     conflicts = compare_patches(client, patch, json_data)
     return paths_list_to_dict(list(conflicts))
 
 
-def create_updates_patch(
+def create_updates_patch_json(
         client, 
         patches_updated_project: list[str], 
         patches_local_project: list[str], 
@@ -108,21 +108,12 @@ def create_updates_patch(
     for folder_change in list(filter(lambda i: i.diff_type == "?" or i.diff_type == "+", folders_changes)):
         folder_changes = []
         
-        for file_change in folder_change.diff_list:
-            if (file_change.diff_type == "?" or file_change.diff_type == "+"):
-                file_name = file_change.new_name
-            elif file_change.diff_type == "-":
-                file_name = file_change.old_name
-            else:
-                continue
-            
-            hash_file = None
-                
+        for file_change in folder_change.diff_list:    
             folder_changes.append({
                 "sign": file_change.diff_type,
                 "new_name": file_change.new_name,
                 "old_name": file_change.old_name,
-                "hash": hash_file
+                "hash": None
             })
 
         json_patch['changed_files'][folder_change.new_name] = folder_changes
