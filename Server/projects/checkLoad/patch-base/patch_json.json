@@ -1,0 +1,30 @@
+{
+  "changed_folders": [
+    {
+      "sign": "+",
+      "path": "folderOne"
+    },
+    {
+      "sign": "?",
+      "path": ""
+    }
+  ],
+  "changed_files": {
+    "folderOne": [
+      {
+        "sign": "+",
+        "new_name": "sm.txt",
+        "old_name": null,
+        "hash": "8f434346648f6b96df89dda901c5176b10a6d83961dd3c1ac88b59b2dc327aa4"
+      }
+    ],
+    "": [
+      {
+        "sign": "+",
+        "new_name": "checkone.txt",
+        "old_name": null,
+        "hash": "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"
+      }
+    ]
+  }
+}

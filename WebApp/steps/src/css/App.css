@@ -82,6 +82,7 @@
 
 .Title {
   color: #f4f4f4;
+  user-select: none;
   text-shadow: -1px -1px 0 #272727, 1px -1.2px 0 #272727, 1px 2px 0 #272727, 2px 2px 0px #272727;
 }
 
@@ -871,7 +872,28 @@ input[type=number]::-webkit-outer-spin-button {
   text-align: left;
   border: 8px solid var(--color-four);
   border-image: var(--border-pixel);
+}
 
+.arrowDown {
+  fill: black;
+  height: 100%;
+  cursor: pointer;
+  &:hover {
+    transform: translate(0px,2px);
+  };
+  transition: ease-in-out 150ms;
+}
+
+.arrowUp {
+  rotate: 180deg;
+}
+
+.TitleProjects {
+  margin-top: -12px;
+  display: flex;
+  justify-content: center;
+  justify-items: center;
+  flex-direction: row;
 }
 
 /* project box load */
@@ -1104,17 +1126,20 @@ input[type=number]::-webkit-outer-spin-button {
   color: var(--color-text-bright);
   box-shadow: #000000 4px 4px 0px 3px;
   padding: 20px;
-  height: 20vh;
+  flex-grow: 1;
 }
 
 .leftSideAccount {
-  height: auto;
+  height: 43vh;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .accountRecentActivityBox {
   display: flex;
   flex-direction: column;
-  height: auto;
+  height: 37vh;
   width: 40vh;
   border: 9px solid var(--color-four);
   border-radius: 20.5px;
@@ -1131,7 +1156,6 @@ input[type=number]::-webkit-outer-spin-button {
   border: 9px solid var(--color-four);
   padding: 1ch;
   border-image: var(--border-pixel);
-  margin-top: 15px;
   width: auto;
   height: fit-content;
   cursor: pointer;
@@ -1190,6 +1214,8 @@ input[type=number]::-webkit-outer-spin-button {
 .projectsBoxesAccount {
   display: flex;
   flex-direction: column;
+  overflow-y: scroll;
+  height: auto;
   gap: 10px;
 }
 
@@ -1486,6 +1512,12 @@ input[type=number]::-webkit-outer-spin-button {
 
 .HomeButtonDiv {
  cursor: pointer; 
+}
+
+.uploadButton {
+  display: flex;
+  width: 10.5vh;
+  height: 8.3vh;
 }
 
 .CIDheader {

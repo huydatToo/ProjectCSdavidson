@@ -1,25 +1,25 @@
 import React from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { duotoneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'; // Import a base theme
+import { duotoneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'; 
 
 const customStyle = {
-  backgroundColor: '#00000000', // Background color
-  color: '#e6e6e6', // Text color (red)
-  padding: '1em', // Padding around the code block
-  fontSize: '16px', // Font size of the code
-  borderRadius: '4px', // Rounded corners
+  backgroundColor: '#00000000', 
+  color: '#e6e6e6',
+  padding: '1em',
+  fontSize: '16px',
+  borderRadius: '4px',
   height: "56vh",
 };
 
 const customTheme = {
-  ...duotoneDark, // Start with the base theme
+  ...duotoneDark, 
   'code[class*="language-"]': {
-    ...duotoneDark['code[class*="language-"]'], // Start with the base theme for code blocks
-    backgroundColor: '#00000000', // Background color
-    color: '#e6e6e6', // Text color (red)
-    padding: '1em', // Padding around the code block
-    fontSize: '16px', // Font size of the code
-    borderRadius: '4px', // Rounded corners
+    ...duotoneDark['code[class*="language-"]'], 
+    backgroundColor: '#00000000', 
+    color: '#e6e6e6',
+    padding: '1em', 
+    fontSize: '16px', 
+    borderRadius: '4px', 
     height: "56vh",
   },
 };

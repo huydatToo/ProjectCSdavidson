@@ -9,7 +9,7 @@ import { useWallet } from '../utils/WalletContext';
 import HomeSvg from '../assets/home.svg';
 import ModalChanges from '../components/ModalChanges';
 import ModalUpdate from '../components/ModalUpdate';
-
+import "../css/spinnerWhite.css";
 
 
 // Project development page component
@@ -17,6 +17,7 @@ function ProjectDevelopment() {
   const navigate = useNavigate();
   const { projectName } = useParams();
   const { contract, account, isConnected, checkWalletConnection } = useWallet();
+  const [uploadLoad, setUploadLoad] = useState(false);
   const [ChangeProposals, setChangeProposals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [projectState, setProjectState] = useState({});
@@ -182,6 +183,7 @@ function ProjectDevelopment() {
 
   // Function to upload local changes and create a new change proposal
   async function uploadChange() {
+    setUploadLoad(true);
     try {
       if (!clickedLocalChange) {
         return -1;
@@ -197,10 +199,12 @@ function ProjectDevelopment() {
 
       const data = await response.json();
       const transaction = await contract.uploadChangeProposal(data['ipfsCID'], projectName);
+      
       await transaction.wait();
       closeModal();
       await getChangeProposals();
       await getMyChanges();
+      setUploadLoad(false)
 
     } catch (error) {
       console.error('Error:', error);
@@ -454,8 +458,8 @@ function ProjectDevelopment() {
             <img className="HomeButton" src={LeftArrowSvg } alt="" />
             </motion.div>
 
-            <motion.div onClick={() => {uploadChange()}} className='projectHeader HomeButtonDiv'>
-            <h1>Upload</h1>
+            <motion.div onClick={() => {uploadChange()}} className={`${uploadLoad && "uploadButton"} projectHeader HomeButtonDiv`}>
+            {!uploadLoad ? <h1>Upload</h1> : <div className='uploadButton' id='loaderWhite'/>}
             </motion.div>
 
             <motion.div onClick={() => {deleteChange()}} className='projectHeader HomeButtonDiv'>
@@ -465,7 +469,6 @@ function ProjectDevelopment() {
             <motion.div onClick={() => {localProject.unSavedChanges && saveChanges()}} className={localProject.unSavedChanges ? 'projectHeader HomeButtonDiv' : "projectHeaderOpacity"}>
             <h1>Save Changes</h1>
             </motion.div>
-
           </div>
         </div>
         </ModalChanges>
@@ -526,7 +529,6 @@ function ProjectDevelopment() {
                 <motion.div whileTap={{y: 6}} whileHover={{y: 3}}  transition={{ type: "spring", duration: 0.6 }} onClick={() => {navigate(`/project/${projectName}`)}} className='projectHeader HomeButtonDiv'>
                     <img className="HomeButton" src={LeftArrowSvg} alt="" />
                 </motion.div>
-
 
                 {projectState.state !== 353 ?
                 <>

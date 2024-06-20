@@ -1,0 +1,18 @@
+{
+  "changed_folders": [
+    {
+      "sign": "?",
+      "path": ""
+    }
+  ],
+  "changed_files": {
+    "": [
+      {
+        "sign": "?",
+        "new_name": "checkone.txt",
+        "old_name": "checkone.txt",
+        "hash": "25b766ced7ee9cd5a421ba21d5fb4bf850ed57a9fbd75fee2db4087306eb81d1"
+      }
+    ]
+  }
+}

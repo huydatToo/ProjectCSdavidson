@@ -6,7 +6,9 @@ from .wrappers import save_path
 from .compare_projects import compare_remote_projects
 from .others import get_local_file_hash
 
-def get_removed_folders_in_json(data_json: dict[str, str]) -> list[str]:
+def get_removed_folders_in_json(
+        data_json: dict[str, str]
+    ) -> list[str]:
     removed_folders = []
     for removed_folder in data_json["changed_folders"]:
         folder_path = removed_folder["path"]
@@ -15,7 +17,10 @@ def get_removed_folders_in_json(data_json: dict[str, str]) -> list[str]:
     return removed_folders
 
 
-def compare_patches(client: ipfshttpclient2.Client, local_patch: str, updated_patch_data: dict) -> set[str]:
+def compare_patches(
+        client: ipfshttpclient2.Client, 
+        local_patch: str, updated_patch_data: dict
+    ) -> set[str]:
     current_path = os.getcwd() 
     while (os.path.basename(os.getcwd()) != "projects"):
         os.chdir("..")
@@ -59,7 +64,9 @@ def compare_patches(client: ipfshttpclient2.Client, local_patch: str, updated_pa
     return merged_conflicts
 
 
-def paths_list_to_dict(paths: list[str]) -> dict[str, list[str] | dict[str, list[str]]]:
+def paths_list_to_dict(
+        paths: list[str]
+    ) -> dict[str, list[str] | dict[str, list[str]]]:
     folder_dict = []
     file_dict = {}
     
@@ -77,7 +84,11 @@ def paths_list_to_dict(paths: list[str]) -> dict[str, list[str] | dict[str, list
     return {'folders': folder_dict, 'files': file_dict}
 
 #                                                             folder/file -> folders | folder -> file
-def get_conflicts(client: ipfshttpclient2.Client, patch: str, patches_local_project: list[str], patches_updated_project: list[str]) -> dict[str, list[str] | dict[str, list[str]]]:
+def get_conflicts(
+        client: ipfshttpclient2.Client, 
+        patch: str, patches_local_project: list[str], 
+        patches_updated_project: list[str]
+    ) -> dict[str, list[str] | dict[str, list[str]]]:
     json_data = create_updates_patch_json(client, patches_updated_project, patches_local_project)
     conflicts = compare_patches(client, patch, json_data)
     return paths_list_to_dict(list(conflicts))

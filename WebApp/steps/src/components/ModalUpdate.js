@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-const ModalUpdate = ({ isOpen, closeModal, children, closeInput }) => {
+const ModalUpdate = ({ isOpen, closeModal, children }) => {
   if (!isOpen) return null;
 
   return (

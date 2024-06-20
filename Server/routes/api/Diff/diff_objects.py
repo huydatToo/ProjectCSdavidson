@@ -1,5 +1,5 @@
 class Change:
-    def __init__(self, diff_type, old_name=None, new_name=None) -> None:
+    def __init__(self, diff_type: str, old_name: str=None, new_name: str=None) -> None:
         self.diff_type = diff_type
         self.old_name = old_name
         self.new_name = new_name
@@ -10,7 +10,7 @@ class FileChange(Change):
 
 
 class FolderChange(Change):
-    def __init__(self, diff_type, old_name=None, new_name=None) -> None:
+    def __init__(self, diff_type: str, old_name: str=None, new_name: str=None) -> None:
         super().__init__(diff_type, old_name, new_name) 
         self.diff_list = []
 
@@ -19,6 +19,6 @@ class FolderChange(Change):
 
 
 class Conflicted_file(Change):
-    def __init__(self, configuration, diff_type, old_name=None, new_name=None) -> None:
+    def __init__(self, configuration: int, diff_type: str, old_name=None, new_name=None) -> None:
         super().__init__(diff_type, old_name, new_name) 
         self.configuration = configuration

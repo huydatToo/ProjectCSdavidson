@@ -27,7 +27,7 @@ const LandingPage = () => {
 
     <div className='backgroundStars landingPageBackground noise centerLandingPage'>
         <div className='divHeaderLandingPage center'>
-            <h1 className='fontKemco headerLandingPage'>explore web3 open source</h1>
+            <h1 className='fontKemco headerLandingPage'>CS davidson Project</h1>
             
             <div className='flexButtonLandingPage'>
               <div className='connectWalletLandingPage borderPixelLandingPage fontKemco'>

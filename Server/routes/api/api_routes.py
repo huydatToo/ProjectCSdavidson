@@ -22,7 +22,7 @@ from .Diff.others import is_text_file
 from .Diff.compare_projects import is_same_project
 from .Diff.create_patch import create_updates_patch_json
 from .Diff.apply_patch import apply_project_patch
-
+import webbrowser
 
 # This page contains all the accessible API routes for users, each function with @api_routes representing an individual route.
 api_routes = Blueprint('api_routes', __name__, url_prefix="/api")
@@ -33,6 +33,7 @@ class API_Context:
     def __init__(self):
         self.base_path = os.path.join(os.getcwd(), "projects")
         self.client_addr = '/ip4/127.0.0.1/tcp/5001'
+
     
     def get_client(self) -> ipfshttpclient2.Client:
         return ipfshttpclient2.connect(self.client_addr)
@@ -239,7 +240,7 @@ def accept_change() -> flask.Response:
 
 # the functions checks if unsaved changes exist
 @save_path(api_context.base_path)
-def unsaved_changes_internal(change_cids, project_path, client, project_name) -> flask.Response:
+def unsaved_changes_internal(change_cids: list[str], project_path: str, client: ipfshttpclient2.Client, project_name: str) -> flask.Response:
     os.chdir(project_name)
     os.chdir("changes")
     
@@ -391,7 +392,7 @@ def check_project() -> flask.Response:
     
 
 # the function returns the tree of files in a remote project
-def get_project_files_internal(changes_cids, client) -> list:
+def get_project_files_internal(changes_cids: list[str], client: ipfshttpclient2.Client) -> list:
     project_tree = get_remote_project_tree(client, changes_cids)
     project_tree_list = []
     for folder in project_tree.keys():

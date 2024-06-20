@@ -8,7 +8,7 @@ import threading
 
 # the server allow the user to interact with the system
 class Server:
-    def __init__(self, build_dir, port=8000):
+    def __init__(self, build_dir: str, port: int=8000):
         self.app = Flask(__name__, static_url_path='', static_folder=build_dir)
         CORS(self.app)
 

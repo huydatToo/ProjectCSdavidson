@@ -73,7 +73,12 @@ def apply_project_patch(
                     shutil.copy2(hash_path, new_file_path)
 
 
-def apply_project_patch_from_remote_project(client: ipfshttpclient2.Client, old: str, patch: str, ignore: dict[str, dict[str, int] | dict[str, list[dict[str, str | str, int]]]]=None) -> None:
+def apply_project_patch_from_remote_project(
+        client: ipfshttpclient2.Client, 
+        old: str, 
+        patch: str, 
+        ignore: dict[str, dict[str, int] | dict[str, list[dict[str, str | str, int]]]]=None
+    ) -> None:
     patch_cid, changes_folder_cid = get_file_cid_from_patch(client, patch, "patch_json.json", "changes")
 
     json_data = client.cat(patch_cid)

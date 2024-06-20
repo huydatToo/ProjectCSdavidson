@@ -61,19 +61,19 @@ const AccountPage = () => {
         <div className='DistributionAndDev'>
             <div className='accountDiv'>
                 <div className='leftSideAccount'>
-                <div className='accountBox'>
-                    <div className='centerSquare'>
-                        <img className='square' src={`https://effigy.im/a/${accountAddress}.png`} alt=""/>
+                    <div className='accountBox'>
+                        <div className='centerSquare'>
+                            <img className='square' src={`https://effigy.im/a/${accountAddress}.png`} alt=""/>
+                        </div>
+                        <div className='addressBox'>
+                            <span className='Address'>{getFormatAddress(accountAddress)}</span>
+                            <span className='addressSpan'>Address</span>
+                        </div>
                     </div>
-                    <div className='addressBox'>
-                        <span className='Address'>{getFormatAddress(accountAddress)}</span>
-                        <span className='addressSpan'>Address</span>
-                    </div>
-                </div>
 
-                <motion.div whileTap={{y: 6}} whileHover={{y: 3}} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} onClick={() => {navigate('/')}} className='projectHeaderAccount'>
-                    <HomeSvg width={70} height={70}/>
-                </motion.div>
+                    <motion.div whileTap={{y: 6}} whileHover={{y: 3}} exit={{scale: .91 }} transition={{ type: "spring", duration: 0.6 }} onClick={() => {navigate('/')}} className='projectHeaderAccount'>
+                        <HomeSvg width={70} height={70}/>
+                    </motion.div>
                 </div>
 
                 <div className='accountRecentActivityBox'>

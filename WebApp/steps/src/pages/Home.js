@@ -1,20 +1,20 @@
 import { motion, AnimatePresence  } from 'framer-motion';
-import downArrow from '../assets/down-arrow-svgrepo-com.svg';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWallet } from '../utils/WalletContext';
-import {ReactComponent as ParticipantsSvg} from '../assets/person-group-svgrepo-com.svg'
+import {ReactComponent as ParticipantsSvg} from '../assets/person-group-svgrepo-com.svg';
+import {ReactComponent as ArrowDown} from '../assets/down-arrow-svgrepo-com.svg';
 import Patch from '../assets/patch_gray.png'
 
 
 // the home page
 function Home() {
   const { contract } = useWallet();
-  const scrollRef = useRef(null)
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [isButtons, setIsButtons] = useState({new_project: 0, my: 0})
-  const [lastProjects, setLastProjects]  = useState({lastProjects: [], localProjects: []})
-  const [hoverDown, setHoverDown]  = useState(false)
+  const [projectsJump, setProjectsJump] = useState({popular_projects: 0, recent_activity: 0});
+  const [projectsHover, setProjectsHover] = useState({popular_projects: false, recent_activity: false});
+  const [lastProjects, setLastProjects]  = useState({lastProjects: [], localProjects: []});
   const { isConnected, checkWalletConnection, setIsConnected, setAccount, account } = useWallet();
 
   // connect smart wallet function
@@ -24,7 +24,7 @@ function Home() {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         setIsConnected(true);
         setAccount(accounts[0]);
-        setIsButtons({new_project: 0, new: 2})
+        setIsButtons({new_project: 0, new: 2});
       } catch (error) {
         console.error("Wallet connection error:", error);
       }
@@ -113,10 +113,14 @@ function Home() {
 
         <div className='line lineGapHome'>
           <div className='box-projects'>
-            <h1 className='Title'>Popular Projects</h1>
-            {lastProjects.lastProjects.map((project, index) => (
+            <div onMouseEnter={() => {setProjectsHover({...projectsHover, popular_projects: lastProjects.lastProjects.length > 4 ? true : false})}} onMouseLeave={() => {setProjectsHover({...projectsHover, popular_projects: false, cursor: projectsHover.popular_projects ? "pointer" : "default"})}} className='TitleProjects'>
+              <ArrowDown onClick={() => {setProjectsJump({...projectsJump, popular_projects: projectsJump.popular_projects+1 < lastProjects.lastProjects.length && projectsJump.popular_projects+4})}} style={{opacity: projectsHover.popular_projects ? "1" : "0", cursor: projectsHover.popular_projects ? "pointer" : "default"}} className="arrowDown" width={50} height={50}/>
+              <h1 className='Title'>Popular Projects</h1>
+              <ArrowDown onClick={() => {setProjectsJump({...projectsJump, popular_projects: projectsJump.popular_projects-1 > 0 && projectsJump.popular_projects-4})}} style={{opacity: projectsHover.popular_projects ? "1" : "0", cursor: projectsHover.popular_projects ? "pointer" : "default"}} className="arrowDown arrowUp" width={50} height={50}/>
+            </div>
+            {lastProjects.lastProjects.slice(projectsJump.popular_projects, projectsJump.popular_projects+4).map((project, index) => (
             <motion.div onClick={() => {navigate(`project/${project.name}`)}} key={index} whileHover={{scale: 1.05}} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", duration: 0.7 }} className='project-box-load'>
-              <span className='project-box-header'>{project.name}</span>
+              <span className='project-box-header'>{project.name.slice(0, 12)}</span>
               <div className='divProjectsHome'>
                 <div className='centerProjectBox'>
                   <ParticipantsSvg className="svgParticipants" width={30} height={30}/> 
@@ -147,7 +151,7 @@ function Home() {
             </div>
             
 
-            <motion.div onMouseEnter={() => setHoverDown(true)} onMouseLeave={() => setHoverDown(false)} transition={{ type: "spring", duration: 0.7 }} className='box-account'>
+            <motion.div transition={{ type: "spring", duration: 0.7 }} className='box-account'>
               <div onClick={() => navigate("/"+account)} className='centerSquare'>
                   <img className='squareWhite' src={`https://effigy.im/a/${account}.png`} alt=""/>
               </div>
@@ -159,10 +163,14 @@ function Home() {
           </div>
 
           <div className='box-projects'>
-            <h1 className='Title'>Recent activity</h1>
+            <div onMouseEnter={() => {setProjectsHover({...projectsHover, recent_activity: lastProjects.localProjects.length > 4 ? true : false})}} onMouseLeave={() => {setProjectsHover({...projectsHover, recent_activity: false})}} className='TitleProjects'>
+              <ArrowDown onClick={() => {setProjectsJump({...projectsJump, recent_activity: projectsJump.recent_activity+1 < lastProjects.lastProjects.length && projectsJump.recent_activity+4})}} style={{opacity: projectsHover.recent_activity ? "1" : "0", cursor: projectsHover.recent_activity ? "pointer" : "default"}} className="arrowDown" width={50} height={50}/>
+              <h1 className='Title'>Recent Activity</h1>
+              <ArrowDown onClick={() => {setProjectsJump({...projectsJump, recent_activity: projectsJump.recent_activity-1 > 0 && projectsJump.recent_activity-4})}} style={{opacity: projectsHover.recent_activity ? "1" : "0", cursor: projectsHover.recent_activity ? "pointer" : "default"}} className="arrowDown arrowUp" width={50} height={50}/>
+            </div>
             {lastProjects.localProjects.map((project, index) => (
             <motion.div onClick={() => {navigate(`project/${project.name}`)}} key={index} whileHover={{scale: 1.05}} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", duration: 0.7 }} className='project-box-load'>
-              <span className='project-box-header'>{project.name}</span>
+              <span className='project-box-header'>{project.name.slice(0, 12)}</span>
               <div className='divProjectsHome'>
                 <div className='centerProjectBox'>
                   <ParticipantsSvg className="svgParticipants" width={30} height={30}/> 

@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import CompleteSvg from '../assets/complete-svgrepo-com.svg';
 import HomeSvg from '../assets/homeDark.svg';
 import { useNavigate } from 'react-router-dom';
+import "../css/spinnerGreen.css";
 
 // the page of creating a new project
 const CreateNewProject = () => {
@@ -11,6 +12,7 @@ const CreateNewProject = () => {
     const [step, setStep] = useState(1);
     const [name, setName] = useState("");
     const [path, setPath] = useState("")
+    const [load, setLoad] = useState(false)
     const navigate = useNavigate()
 
 
@@ -31,8 +33,10 @@ const CreateNewProject = () => {
         
             const data = await response.json(); 
             const _CID = data.ipfsCID;
-            const transaction = await contract.createProject(_CID, name)
+            const transaction = await contract.createProject(_CID, name);
+            setLoad(true);
             await transaction.wait();
+            setLoad(false);
             navigate(`/project/${name}`)
             
         } catch (error) {
@@ -88,7 +92,7 @@ const CreateNewProject = () => {
             <AnimatePresence initial={false} mode='wait'>
             {path.length > 3 ? (
                 <motion.div key={"divSVG"} exit={{y: 10}} whileHover={{scale: 1.05}} initial={{y: 0 }} animate={{y: 210}} transition={{ type: "spring", duration: 0.7 }} onClick={() => nextStep()} className='button-new-project'>
-                    <motion.img transition={{ type: "spring", duration: 1.5 }} initial={{opacity: -1 }} animate={{opacity: 1}} key={"svgSVG"} className='arrowDown' src={CompleteSvg} alt="" />
+                    {!load ? <motion.img transition={{ type: "spring", duration: 1.5 }} initial={{opacity: -1 }} animate={{opacity: 1}} key={"svgSVG"} className='arrowDown' src={CompleteSvg} alt="" /> : <div className='greenSpinner' id="loaderGreen"></div>}
                 </motion.div>
             ) : <></>}
             </AnimatePresence>

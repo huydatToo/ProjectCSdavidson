@@ -7,7 +7,10 @@ from .get_from_ipfs import get_remote_project_tree, is_remote_folder_content_sam
 from .others import is_file
 from .diff_objects import FileChange
 
-def compare_projects_folder_changes(old_project_path: str, new_project_path: str) -> list[FolderChange]:
+def compare_projects_folder_changes(
+        old_project_path: str, 
+        new_project_path: str
+    ) -> list[FolderChange]:
     folder_changes = []
     
     abs_len_new = (len(new_project_path) + 1)
@@ -37,7 +40,10 @@ def compare_projects_folder_changes(old_project_path: str, new_project_path: str
     return folder_changes
 
 
-def compare_projects(old_project_path: str, new_project_path: str) -> list[FolderChange]:
+def compare_projects(
+        old_project_path: str, 
+        new_project_path: str
+    ) -> list[FolderChange]:
     folder_changes = compare_projects_folder_changes(old_project_path, new_project_path)
     changed_folders = list(filter(lambda folder: folder.diff_type != "/", folder_changes))
 

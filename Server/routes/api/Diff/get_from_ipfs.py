@@ -35,7 +35,7 @@ def get_files_type_in_patch(
         client: ipfshttpclient2.Client, 
         file_name: str, 
         change_cid: str
-    ) -> bool:
+    ) -> bool | str:
    
     patch_cid = get_file_cid_from_patch(client, change_cid, "patch_json.json")
     json_data = client.cat(patch_cid)
